@@ -7,7 +7,7 @@ api_hash = "abcdef1234567890"
 client = TelegramClient("session", api_id, api_hash)
 
 # HuggingFace ücretsiz token (https://huggingface.co/settings/tokens)
-HF_TOKEN = ""
+HF_TOKEN = "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"
 
 async def get_ai_answer(soru):
     headers = {"Authorization": f"Bearer {HF_TOKEN}"}
