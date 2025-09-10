@@ -11,8 +11,8 @@ import pyfiglet
 
 load_dotenv()
 
-API_ID = int(os.getenv("API_ID"))
-API_HASH = os.getenv("API_HASH")
+API_ID = int(os.getenv("21883581"))
+API_HASH = os.getenv("c3b4ba58d5dada9bc8ce6c66e09f3f12")
 SESSION = os.getenv("SESSION_NAME", "session")
 
 client = TelegramClient(SESSION, API_ID, API_HASH)
