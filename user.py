@@ -2,8 +2,8 @@ from telethon import TelegramClient, events
 import requests
 
 # Telegram API bilgilerin
-api_id = 1234567
-api_hash = "abcdef1234567890"
+api_id = 21883581
+api_hash = "c3b4ba58d5dada9bc8ce6c66e09f3f12"
 client = TelegramClient("session", api_id, api_hash)
 
 # HuggingFace ücretsiz token (https://huggingface.co/settings/tokens)
