@@ -30,6 +30,21 @@ def format_uptime(seconds: int):
 
 # ================== TEMEL KOMUTLAR ==================
 
+@client.on(events.NewMessage(pattern=r'^\.artz$', incoming=True))
+async def handler_cilveli(event):
+    user = await event.get_sender()
+    firstname = user.first_name
+
+    messages = [
+        f"💁‍♀️ Buradayım, {firstname}! ArtzUserbot v1.0. Sahibim [t.me/artzfounder] Size hizmet vermek için geliştirildi 😉",
+        f"🌟 Selam {firstname}! Ben ArtzUserbot v1.0, sahibim [t.me/artzfounder] beni gönderdi 😏",
+        f"😎 Merhaba {firstname}! ArtzUserbot v1.0 burada. Eğlence başlasın! ✨",
+        f"✨ {firstname}, ArtzUserbot v1.0 sizi selamlıyor! Sahibim [t.me/artzfounder] her zaman yanınızda 😏",
+        f"💃 Hey {firstname}! ArtzUserbot v1.0 hazır, sahibim [t.me/artzfounder] beni çağırdı 💫"
+    ]
+
+    await event.reply(random.choice(messages))
+
 @client.on(events.NewMessage(pattern=r'^\.artz ping$', incoming=True))
 async def handler_ping(event):
     msg = await event.reply("🏓.")
