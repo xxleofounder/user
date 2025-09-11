@@ -314,8 +314,10 @@ async def cancel(event):
         tekli_calisan.remove(event.chat_id)
         await event.respond(
             "**Etiketleme durduruldu ❌**",
-            buttons=[[Button.url("🎖️ Owner", f"https://t.me/{ownerUser}")]]
+            buttons=[[Button.url("Owner", f"https://t.me/{ownerUser}")]]
         )
+    else:
+        await event.respond("**Durdurulacak bir işlem yok ❗️**")
         
 print(">> 🛠️ Artz , Başarıyla Aktifleştirildi...<<")
 client.run_until_disconnected()
