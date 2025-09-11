@@ -272,52 +272,51 @@ async def mentionall(event):
     # Eğer komutu kullanan admin değilse
     if event.sender_id not in admins:
         return await event.respond("**ʙᴜ ᴋᴏᴍᴜᴛ sᴀᴅᴇᴄᴇ ʏᴏ̈ɴᴇᴛɪᴄɪʟᴇʀ ᴛᴀʀᴀғɪɴᴅᴀɴ ᴋᴜʟʟᴀɴɪʟᴀʙɪʟɪʀ〽**")  
-  if event.pattern_match.group(1):
-    mode = "text_on_cmd"
-    msg = event.pattern_match.group(1)
-  elif event.reply_to_msg_id:
-    mode = "text_on_reply"
-    msg = event.reply_to_msg_id
-    if msg == None:
-        return await event.respond("**Önceki mesajları etiket işlemi için kullanamıyorum.**")
-  elif event.pattern_match.group(1) and event.reply_to_msg_id:
-    return await event.respond("Başlamak için mesaj yazmalısın❗️")
-  else:
-    return await event.respond("**İşleme başlamam için mesaj yazmalısın**")
+
+    if event.pattern_match.group(1):
+        mode = "text_on_cmd"
+        msg = event.pattern_match.group(1)
+    elif event.reply_to_msg_id:
+        mode = "text_on_reply"
+        msg = event.reply_to_msg_id
+        if msg is None:
+            return await event.respond("**Önceki mesajları etiket işlemi için kullanamıyorum.**")
+    elif event.pattern_match.group(1) and event.reply_to_msg_id:
+        return await event.respond("Başlamak için mesaj yazmalısın❗️")
+    else:
+        return await event.respond("**İşleme başlamam için mesaj yazmalısın**")
   
-  if mode == "text_on_cmd":
-    tekli_calisan.append(event.chat_id)
-    usrnum = 0
-    usrtxt = ""
-    async for usr in client.iter_participants(event.chat_id):
-      usrnum += 1
-      usrtxt += f"**👤 - [{usr.first_name}](tg://user?id={usr.id})**"
-      if event.chat_id not in tekli_calisan:
-        await event.respond("**İşlem Başarıyla Durduruldu**❌")
-        return
-      if usrnum == 1:
-        await client.send_message(event.chat_id, f"{usrtxt} {msg}")
-        await asyncio.sleep(2)
+    if mode == "text_on_cmd":
+        tekli_calisan.append(event.chat_id)
         usrnum = 0
         usrtxt = ""
+        async for usr in client.iter_participants(event.chat_id):
+            usrnum += 1
+            usrtxt += f"**👤 - [{usr.first_name}](tg://user?id={usr.id})**"
+            if event.chat_id not in tekli_calisan:
+                await event.respond("**İşlem Başarıyla Durduruldu**❌")
+                return
+            if usrnum == 1:
+                await client.send_message(event.chat_id, f"{usrtxt} {msg}")
+                await asyncio.sleep(2)
+                usrnum = 0
+                usrtxt = ""
         
-  
-  if mode == "text_on_reply":
-    tekli_calisan.append(event.chat_id)
- 
-    usrnum = 0
-    usrtxt = ""
-    async for usr in client.iter_participants(event.chat_id):
-      usrnum += 1
-      usrtxt += f"👤 - [{usr.first_name}](tg://user?id={usr.id})"
-      if event.chat_id not in tekli_calisan:
-        await event.respond("**İşlem başarıyla durduruldu**❌")
-        return
-      if usrnum == 1:
-        await client.send_message(event.chat_id, usrtxt, reply_to=msg)
-        await asyncio.sleep(2)
+    if mode == "text_on_reply":
+        tekli_calisan.append(event.chat_id)
         usrnum = 0
         usrtxt = ""
+        async for usr in client.iter_participants(event.chat_id):
+            usrnum += 1
+            usrtxt += f"👤 - [{usr.first_name}](tg://user?id={usr.id})"
+            if event.chat_id not in tekli_calisan:
+                await event.respond("**İşlem başarıyla durduruldu**❌")
+                return
+            if usrnum == 1:
+                await client.send_message(event.chat_id, usrtxt, reply_to=msg)
+                await asyncio.sleep(2)
+                usrnum = 0
+                usrtxt = ""
 
 @client.on(events.NewMessage(pattern='^(?i)/cancel'))
 async def cancel(event):
