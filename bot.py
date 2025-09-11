@@ -23,9 +23,8 @@ LOGGER = logging.getLogger(__name__)
 api_id = Config.API_ID
 api_hash = Config.API_HASH
 bot_token = Config.BOT_TOKEN
-
-# Sudo/owner ID'yi buraya gir
 OWNER_ID = 8276543841
+botUsername = leousertaggerbot 
 
 client = TelegramClient('client', api_id, api_hash).start(bot_token=bot_token)
 
@@ -41,22 +40,22 @@ keywords = {
   
 
 
-# /start komutu
 @client.on(events.NewMessage(pattern="^/start$"))
 async def start(event):
     user = await event.get_sender()
     first_name = user.first_name
 
-    await client.send_file(
+    await client.send_message(
         event.chat_id,
-        "https://r.resimlink.com/wk3gFJ.jpg",
-        caption=(
-            f"👋🏻 Merhaba {first_name}, ARTz Music\n\n"
-            "🎧 YouTube ile ilgili çeşitli aramalar yapar ve istediğiniz müziği mp3 olarak gönderirim.\n\n"
-            "📣 Yardım için aşağıdaki help butonunu kullanabilirsiniz."
-        ),
+        f"👋🏻 **Merhaba, {first_name}**\n\n"
+        "📌 **Klasik etiketleme Özelliklerine sahip, Bir Etiketleme Botuyum, Çeşitli Özelliklere Sahibim.**\n\n"
+        "🔔 **Komutlar ve destek için aşağıdaki butonları kullanabilirsin.**",
         buttons=[
-            [Button.inline("ℹ️ Help", data="cevirme")]
+            [Button.url("➕ Beni Gruba Ekle", "https://t.me/YourGroupUsername")],
+            [
+                Button.inline("ℹ️ Help", data="cevirme"),
+                Button.url("💬 Destek", "https://t.me/artzfounder")
+            ]
         ],
         link_preview=False
     )
