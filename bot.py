@@ -24,7 +24,7 @@ api_id = Config.API_ID
 api_hash = Config.API_HASH
 bot_token = Config.BOT_TOKEN
 OWNER_ID = 8276543841
-botUsername = leousertaggerbot 
+botUsername = "leousertaggerbot"
 
 client = TelegramClient('client', api_id, api_hash).start(bot_token=bot_token)
 
@@ -51,7 +51,7 @@ async def start(event):
         "📌 **Klasik etiketleme Özelliklerine sahip, Bir Etiketleme Botuyum, Çeşitli Özelliklere Sahibim.**\n\n"
         "🔔 **Komutlar ve destek için aşağıdaki butonları kullanabilirsin.**",
         buttons=[
-            [Button.url("➕ Beni Gruba Ekle", "https://t.me/YourGroupUsername")],
+            [Button.url("➕ Beni Gruba Ekle", f"https://t.me/{botUsername}?startgroup=true")],
             [
                 Button.inline("ℹ️ Help", data="cevirme"),
                 Button.url("💬 Destek", "https://t.me/artzfounder")
@@ -64,9 +64,9 @@ async def start(event):
 @client.on(events.CallbackQuery(data="cevirme"))
 async def cevirme(event):
     await event.edit(
-        "Hangi komutlara erişmek istiyorsunuz?",
+        "🌿 Hangi komut menüsüne erişmek istiyorsun?",
         buttons=[
-            [Button.inline("▶️ Tagger", data="tag"), Button.inline("ℹ️ Diğer", data="diger")],
+            [Button.inline("🏷️ Tagger Komutları", data="tag"), Button.inline("ℹ️ Diğer Komutlar", data="diger")],
             [Button.inline("⬅️ Geri Dön", data="starta")]
         ],
         link_preview=False
@@ -76,8 +76,10 @@ async def cevirme(event):
 @client.on(events.CallbackQuery(data="tag"))
 async def tag_menu(event):
     await event.edit(
-        "📚 Tagger Komutları:\n\n"
-        "➪ /yenile - Sunucuyu yeniden başlatır, hataları giderir",
+        "📚 **Tagger Komutlarım Aşağıda:**\n\n"
+        "➪ /tag - Grup Üyelerini 5'li Şekilde 3sn aralıklı etiketler.\n"
+        "➪ /yenile - Sunucuyu yeniden başlatır, hataları giderir\n\n"
+        "🔻**KOMUTLARI SADECE YETKİLİ ADMİNLER KULLANABİLİR, UNUTMA!**",
         buttons=[[Button.inline("⬅️ Geri Dön", data="cevirme")]],
         link_preview=False
     )
@@ -86,7 +88,7 @@ async def tag_menu(event):
 @client.on(events.CallbackQuery(data="diger"))
 async def diger_menu(event):
     await event.edit(
-        "📚 Diğer Komutlar:\n\n"
+        "📚 **Diğer Komutlar:**\n\n"
         "➪ /ara - YouTube'den müzik veya dosya indirir\n"
         "➪ /song - Şarkı sözlerini bulur\n"
         "➪ /random - Rastgele YouTube parçası atar\n"
