@@ -78,9 +78,10 @@ async def cevirme(event):
 async def tag_menu(event):
     await event.edit(
         "📚 **Tagger Komutlarım Aşağıda:**\n\n"
-        "➪ /tag - Grup Üyelerini 5'li Şekilde 3sn aralıklı etiketler.\n"
-        "➪ /yenile - Sunucuyu yeniden başlatır, hataları giderir\n\n"
-        "🔻**KOMUTLARI SADECE YETKİLİ ADMİNLER KULLANABİLİR, UNUTMA!**",
+        "⇛ /tagall - Üyeleri 5'li Şekilde 3sn aralıklı etiketler\n"
+        "⇛ /tektag - Üyeleri tekli șekilde hepsini etiketler\n"
+        "⇛ /yetkili - Gruptaki adminleri etiketler\n\n"
+        "⛔ **KOMUTLARI SADECE YETKİLİ ADMİNLER KULLANABİLİR, UNUTMA!**",
         buttons=[[Button.inline("⬅️ Geri Dön", data="cevirme")]],
         link_preview=False
     )
@@ -90,10 +91,10 @@ async def tag_menu(event):
 async def diger_menu(event):
     await event.edit(
         "📚 **Diğer Komutlar:**\n\n"
-        "➪ /ara - YouTube'den müzik veya dosya indirir\n"
-        "➪ /song - Şarkı sözlerini bulur\n"
-        "➪ /random - Rastgele YouTube parçası atar\n"
-        "➪ /yenile - Sunucuyu yeniden başlatır",
+        "⇛ /ara - YouTube'den müzik veya dosya indirir\n"
+        "⇛ /song - Şarkı sözlerini bulur\n"
+        "⇛ /random - Rastgele YouTube parçası atar\n"
+        "⇛ /yenile - Sunucuyu yeniden başlatır",
         buttons=[[Button.inline("⬅️ Geri Dön", data="cevirme")]],
         link_preview=False
     )
