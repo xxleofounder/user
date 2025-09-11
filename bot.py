@@ -292,7 +292,7 @@ async def mentionall(event):
     sender = await event.get_sender()
     first_name = sender.first_name
     await event.respond(
-        f"**Etiketleme başlatıldı 🟢**\nBaşlatan: {first_name}\n3 saniye içinde etiketleme başlayacak...",
+        f"**Etiketleme başlatıldı 🟢**\nBaşlatan: {first_name}",
         reply_to=event.message.id
     )
     
@@ -303,7 +303,7 @@ async def mentionall(event):
     if event.chat_id not in tekli_calisan:
         user = await event.get_sender()  # Mesajı gönderen kullanıcıyı alıyoruz
         first_name = user.first_name     # Kullanıcının adını alıyoruz
-        await event.respond(f"**Etiketleme durduruldu ❌\nDurduran: {first_name}**", reply_to=event.message.id)
+        await event.respond(f"**Etiketleme durduruldu ❌\nDurduran:** {first_name}**", reply_to=event.message.id)
         return
 
         # Tıklanabilir mention formatı (normal mesaj olarak)
@@ -318,19 +318,8 @@ async def mentionall(event):
 
 @client.on(events.NewMessage(pattern='^(?i)/cancel'))
 async def cancel(event):
-    global tekli_calisan
-
-    sender = await event.get_sender()
-    first_name = sender.first_name
-
-    if event.chat_id in tekli_calisan:
-        tekli_calisan.remove(event.chat_id)
-
-    # Yanıt olarak durduruldu mesajını gönder
-    await event.respond(
-        f"**Etiketleme durduruldu ❌**\nDurduran: {first_name}",
-        reply_to=event.message.id
-    )
+  global tekli_calisan
+  tekli_calisan.remove(event.chat_id)
     
 print(">> 🛠️ Artz , Başarıyla Aktifleştirildi...<<")
 client.run_until_disconnected()
