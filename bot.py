@@ -249,86 +249,73 @@ async def callback_random(event):
     except Exception as e:
         await status.edit(f"❌ ʜᴀᴛᴀ ᴏʟᴜşᴛᴜ: {e}")  
 
-
-import asyncio
-import urllib.parse
-from telethon import events, Button
-from telethon.tl.types import ChannelParticipantsAdmins
-
-
 @client.on(events.NewMessage(pattern="^/tektag ?(.*)"))
-async def tektag_handler(event):
+async def mentionall(event):
     global tekli_calisan
-
+    
+    # Özelden kullanım engelle
     if event.is_private:
         bot_username = (await client.get_me()).username
-        return await event.reply(
+        return await event.respond(
             "ʙᴜ ᴋᴏᴍᴜᴛ ɢʀᴜᴘʟᴀʀ ᴠᴇ ᴋᴀɴᴀʟʟᴀʀ ɪᴄ̧ɪɴ ɢᴇᴄ̧ᴇʀʟɪᴅɪʀ ❗️",
-            buttons=[[Button.url("➕ ɢʀᴜʙᴀ ᴇᴋʟᴇ", f"https://t.me/{bot_username}?startgroup=true")]]
+            buttons=[
+                [Button.url("➕ ɢʀᴜʙᴀ ᴇᴋʟᴇ", f"https://t.me/{bot_username}?startgroup=true")]
+            ]
         )
 
-    admins = [admin.id async for admin in client.iter_participants(event.chat_id, filter=ChannelParticipantsAdmins)]
+    # Yöneticileri çek
+    admins = []
+    async for admin in client.iter_participants(event.chat_id, filter=ChannelParticipantsAdmins):
+        admins.append(admin.id)
+
+    # Eğer komutu kullanan admin değilse
     if event.sender_id not in admins:
-        return await event.reply("**Bu komutu sadece yöneticiler kullanabilir.**")
+        return await event.respond("**ʙᴜ ᴋᴏᴍᴜᴛ sᴀᴅᴇᴄᴇ ʏᴏ̈ɴᴇᴛɪᴄɪʟᴇʀ ᴛᴀʀᴀғɪɴᴅᴀɴ ᴋᴜʟʟᴀɴɪʟᴀʙɪʟɪʀ〽**")  
 
-    msg_text = event.pattern_match.group(1)
-    if not msg_text:
-        return await event.reply("**İşleme başlamam için mesaj yazmalısın.**")
-
-    # bytes ise decode et ve küçük harfe çevir
-    if isinstance(msg_text, bytes):
-        msg_text = msg_text.decode('utf-8')
-    msg_text = msg_text.lower()
-
-    user = await event.get_sender()
-    encoded_text = urllib.parse.quote(msg_text)
-
-    await event.reply(
-        f"👤 komutu başlatan: {user.first_name.lower()}\n"
-        f"📝 etiketlenecek metin: {msg_text}\n\n"
-        f"onaylıyor musunuz?",
-        buttons=[
-            [Button.inline("✅ onayla", data=f"tektag_onay|{encoded_text}")],
-            [Button.inline("❌ iptal", data="tektag_iptal")]
-        ]
-    )
-
-@client.on(events.CallbackQuery(pattern="tektag_onay\|(.*)"))
-async def tektag_onay(event):
-    global tekli_calisan
-    msg_text = urllib.parse.unquote(event.pattern_match.group(1)).lower()
-
-    await event.edit("✅ etiketleme başladı...")
-    await asyncio.sleep(3)  # 3 sn bekleme, sonra başla
-
-    tekli_calisan.append(event.chat_id)
-
-    async for usr in client.iter_participants(event.chat_id):
-        if event.chat_id not in tekli_calisan:
-            await event.edit("❌ işlem durduruldu.")
-            return
-        await client.send_message(
-            event.chat_id,
-            f"📢 {msg_text}, ({usr.first_name.lower()})",
-            parse_mode='md'
-        )
-        await asyncio.sleep(3)
-
-@client.on(events.CallbackQuery(pattern="tektag_iptal"))
-async def tektag_iptal(event):
-    if event.chat_id in tekli_calisan:
-        tekli_calisan.remove(event.chat_id)
-    await event.edit("❌ işlem iptal edildi.")
-
-@client.on(events.NewMessage(pattern='^(?i)/cancel'))
-async def cancel(event):
-    global tekli_calisan
-    if event.chat_id in tekli_calisan:
-        tekli_calisan.remove(event.chat_id)
-        await event.reply("❌ etiketleme iptal edildi.")
+    if event.pattern_match.group(1):
+        mode = "text_on_cmd"
+        msg = event.pattern_match.group(1)
+    elif event.reply_to_msg_id:
+        mode = "text_on_reply"
+        msg = event.reply_to_msg_id
+        if msg is None:
+            return await event.respond("**Önceki mesajları etiket işlemi için kullanamıyorum.**")
+    elif event.pattern_match.group(1) and event.reply_to_msg_id:
+        return await event.respond("Başlamak için mesaj yazmalısın❗️")
     else:
-        await event.reply("⚠️ şu anda etiketleme işlemi yok.")
-		
+        return await event.respond("**İşleme başlamam için mesaj yazmalısın**")
+  
+    if mode == "text_on_cmd":
+        tekli_calisan.append(event.chat_id)
+        usrnum = 0
+        usrtxt = ""
+        async for usr in client.iter_participants(event.chat_id):
+            usrnum += 1
+            usrtxt += f"**👤 - [{usr.first_name}](tg://user?id={usr.id})**"
+            if event.chat_id not in tekli_calisan:
+                await event.respond("**İşlem Başarıyla Durduruldu**❌")
+                return
+            if usrnum == 1:
+                await client.send_message(event.chat_id, f"{usrtxt} {msg}")
+                await asyncio.sleep(2)
+                usrnum = 0
+                usrtxt = ""
+        
+    if mode == "text_on_reply":
+        tekli_calisan.append(event.chat_id)
+        usrnum = 0
+        usrtxt = ""
+        async for usr in client.iter_participants(event.chat_id):
+            usrnum += 1
+            usrtxt += f"👤 - [{usr.first_name}](tg://user?id={usr.id})"
+            if event.chat_id not in tekli_calisan:
+                await event.respond("**İşlem başarıyla durduruldu**❌")
+                return
+            if usrnum == 1:
+                await client.send_message(event.chat_id, usrtxt, reply_to=msg)
+                await asyncio.sleep(2)
+                usrnum = 0
+                usrtxt = ""
 
 print(">> 🛠️ Artz , Başarıyla Aktifleştirildi...<<")
 client.run_until_disconnected()
