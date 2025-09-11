@@ -7,7 +7,7 @@ from datetime import datetime
 # -----------------------------
 API_ID = 21883581          # kendi API_ID
 API_HASH = "c3b4ba58d5dada9bc8ce6c66e09f3f12"  # kendi API_HASH
-ALLOWED_USER_ID = 123456789  # kendi user id
+ALLOWED_USER_ID = 8276543841  # kendi user id
 
 client = TelegramClient("artz", API_ID, API_HASH)
 
