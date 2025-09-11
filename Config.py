@@ -6,4 +6,4 @@ class Config():
     API_HASH = "2b4f554c9819d4c1e7384da849318635"
 
     # token
-    BOT_TOKEN = ":8209712439:AAFrWkHVww7EnU-3LDUBDjeeA758y8FkZOk" 
+    BOT_TOKEN = "8209712439:AAH-TuZmh0ou1sUw5KtT7Ebox4Av7lQIkFg" 
