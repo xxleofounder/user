@@ -49,7 +49,7 @@ async def start(event):
     await client.send_message(
         event.chat_id,
         f"👋🏻 **Merhaba, {first_name}**\n\n"
-        "📌 **Klasik etiketleme Özelliklerine sahip, Bir Etiketleme Botuyum, Çeşitli Özelliklere Sahibim.**\n\n"
+        "📌 **Klasik etiketleme Özelliklerine sahip, Bir Etiketleme Botuyum. Çeşitli Özelliklere Sahibim.**\n\n"
         "🔔 **Komutlar ve destek için aşağıdaki butonları kullanabilirsin.**",
         buttons=[
             [Button.url("➕ Beni Gruba Ekle", f"https://t.me/{botUsername}?startgroup=true")],
@@ -105,7 +105,7 @@ async def starta(event):
 
     await event.edit(
         f"👋🏻 **Merhaba, {first_name}**\n\n"
-        "📌 **Klasik etiketleme Özelliklerine sahip, Bir Etiketleme Botuyum, Çeşitli Özelliklere Sahibim.**\n\n"
+        "📌 **Klasik etiketleme Özelliklerine sahip, Bir Etiketleme Botuyum. Çeşitli Özelliklere Sahibim.**\n\n"
         "🔔 **Komutlar ve destek için aşağıdaki butonları kullanabilirsin.**",
         buttons=[
             [Button.url("➕ Beni Gruba Ekle", f"https://t.me/{botUsername}?startgroup=true")],
@@ -303,7 +303,7 @@ async def mentionall(event):
 
         # Etiketleme durdurulduysa çık
         if event.chat_id not in tekli_calisan:
-            await event.respond(f"**Etiketleme durduruldu** 🔴\n ᴅᴜʀᴅᴜʀᴀɴ: {first_name}", reply_to=event.message.id)
+            await event.respond(f"**Etiketleme durduruldu** 🔴\nᴅᴜʀᴅᴜʀᴀɴ: {first_name}", reply_to=event.message.id)
             return
 
         # Tıklanabilir mention
