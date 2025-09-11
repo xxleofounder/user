@@ -303,7 +303,7 @@ async def mentionall(event):
 
         # Etiketleme durdurulduysa çık
         if event.chat_id not in tekli_calisan:
-            await event.respond(f"**Etiketleme durduruldu** 🔴\nᴅᴜʀᴅᴜʀᴀɴ: {first_name}", reply_to=event.message.id)
+            await event.respond(f"**ᴇᴛiᴋᴇᴛʟᴇᴍᴇ ișʟᴇᴍi ᴅᴜʀᴅᴜ** 🔴\nᴅᴜʀᴅᴜʀᴀɴ: {first_name}", reply_to=event.message.id)
             return
 
         # Tıklanabilir mention
