@@ -25,6 +25,7 @@ api_hash = Config.API_HASH
 bot_token = Config.BOT_TOKEN
 OWNER_ID = 8276543841
 botUsername = "leousertaggerbot"
+ownerUser = "artzfounder"
 
 client = TelegramClient('client', api_id, api_hash).start(bot_token=bot_token)
 
@@ -249,6 +250,7 @@ async def callback_random(event):
     except Exception as e:
         await status.edit(f"❌ ʜᴀᴛᴀ ᴏʟᴜşᴛᴜ: {e}")  
 
+
 @client.on(events.NewMessage(pattern="^/tektag ?(.*)"))
 async def mentionall(event):
     global tekli_calisan
@@ -258,69 +260,62 @@ async def mentionall(event):
         bot_username = (await client.get_me()).username
         return await event.respond(
             "ʙᴜ ᴋᴏᴍᴜᴛ ɢʀᴜᴘʟᴀʀ ᴠᴇ ᴋᴀɴᴀʟʟᴀʀ ɪᴄ̧ɪɴ ɢᴇᴄ̧ᴇʀʟɪᴅɪʀ ❗️",
-            buttons=[
-                [Button.url("➕ ɢʀᴜʙᴀ ᴇᴋʟᴇ", f"https://t.me/{bot_username}?startgroup=true")]
-            ]
+            buttons=[[Button.url("➕ ɢʀᴜʙᴀ ᴇᴋʟᴇ", f"https://t.me/{bot_username}?startgroup=true")]]
         )
 
     # Yöneticileri çek
-    admins = []
-    async for admin in client.iter_participants(event.chat_id, filter=ChannelParticipantsAdmins):
-        admins.append(admin.id)
+    admins = [admin.id async for admin in client.iter_participants(event.chat_id, filter=ChannelParticipantsAdmins)]
 
-    # Eğer komutu kullanan admin değilse
+    # Admin değilse engelle
     if event.sender_id not in admins:
         return await event.respond("**ʙᴜ ᴋᴏᴍᴜᴛ sᴀᴅᴇᴄᴇ ʏᴏ̈ɴᴇᴛɪᴄɪʟᴇʀ ᴛᴀʀᴀғɪɴᴅᴀɴ ᴋᴜʟʟᴀɴɪʟᴀʙɪʟɪʀ〽**")  
 
+    # Mesaj veya cevap kontrolü
     if event.pattern_match.group(1):
         mode = "text_on_cmd"
         msg = event.pattern_match.group(1)
     elif event.reply_to_msg_id:
         mode = "text_on_reply"
         msg = event.reply_to_msg_id
-        if msg is None:
-            return await event.respond("**Önceki mesajları etiket işlemi için kullanamıyorum.**")
-    elif event.pattern_match.group(1) and event.reply_to_msg_id:
-        return await event.respond("Başlamak için mesaj yazmalısın❗️")
     else:
         return await event.respond("**İşleme başlamam için mesaj yazmalısın**")
-  
-    if mode == "text_on_cmd":
-        tekli_calisan.append(event.chat_id)
-        usrnum = 0
-        usrtxt = ""
-        async for usr in client.iter_participants(event.chat_id):
-            usrnum += 1
-            usrtxt += f"**👤 - [{usr.first_name}](tg://user?id={usr.id})**"
-            if event.chat_id not in tekli_calisan:
-                await event.respond("**İşlem Başarıyla Durduruldu**❌")
-                return
-            if usrnum == 1:
-                await client.send_message(event.chat_id, f"{usrtxt} {msg}")
-                await asyncio.sleep(2)
-                usrnum = 0
-                usrtxt = ""
+
+    # Başlatan kullanıcıya bilgi ver
+    sender = await event.get_sender()
+    first_name = sender.first_name
+    await event.respond(f"**Etiketleme başlatıldı 🟢**\nBaşlatan: {first_name}\n3 saniye içinde etiketleme başlayacak...")
+    
+    await asyncio.sleep(3)
+
+    tekli_calisan.append(event.chat_id)
+    
+    async for usr in client.iter_participants(event.chat_id):
+        if event.chat_id not in tekli_calisan:
+            await event.respond(
+                "**Etiketleme durduruldu ❌**",
+                buttons=[[Button.url("🎖️ Owner", f"https://t.me/{ownerUser}")]]
+            )
+            return
+
+        # Tıklanabilir mention formatı
+        if mode == "text_on_cmd":
+            mention_text = f"📢 {msg}, [{usr.first_name}](tg://user?id={usr.id})"
+            await client.send_message(event.chat_id, mention_text, parse_mode='md')
+        else:
+            mention_text = f"📢 [{usr.first_name}](tg://user?id={usr.id})"
+            await client.send_message(event.chat_id, mention_text, reply_to=msg, parse_mode='md')
         
-    if mode == "text_on_reply":
-        tekli_calisan.append(event.chat_id)
-        usrnum = 0
-        usrtxt = ""
-        async for usr in client.iter_participants(event.chat_id):
-            usrnum += 1
-            usrtxt += f"👤 - [{usr.first_name}](tg://user?id={usr.id})"
-            if event.chat_id not in tekli_calisan:
-                await event.respond("**İşlem başarıyla durduruldu**❌")
-                return
-            if usrnum == 1:
-                await client.send_message(event.chat_id, usrtxt, reply_to=msg)
-                await asyncio.sleep(2)
-                usrnum = 0
-                usrtxt = ""
+        await asyncio.sleep(2)
 
 @client.on(events.NewMessage(pattern='^(?i)/cancel'))
 async def cancel(event):
-  global tekli_calisan
-  tekli_calisan.remove(event.chat_id)
-
+    global tekli_calisan
+    if event.chat_id in tekli_calisan:
+        tekli_calisan.remove(event.chat_id)
+        await event.respond(
+            "**Etiketleme durduruldu ❌**",
+            buttons=[[Button.url("🎖️ Owner", f"https://t.me/{ownerUser}")]]
+        )
+        
 print(">> 🛠️ Artz , Başarıyla Aktifleştirildi...<<")
 client.run_until_disconnected()
