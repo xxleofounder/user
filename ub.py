@@ -1,150 +1,173 @@
-from telethon import TelegramClient, events
-import platform, time, random, asyncio, requests
+from telethon import TelegramClient, events, Button
+import platform, psutil, time, random
+from datetime import datetime
 
-# --- API Ayarları ---
-API_ID = 21883581
-API_HASH = "c3b4ba58d5dada9bc8ce6c66e09f3f12"
-SESSION = "session_userbot"
+# -----------------------------
+# TELEGRAM API BİLGİLERİ
+# -----------------------------
+API_ID = 21883581          # kendi API_ID
+API_HASH = "c3b4ba58d5dada9bc8ce6c66e09f3f12"  # kendi API_HASH
+ALLOWED_USER_ID = 123456789  # kendi user id
 
-client = TelegramClient(SESSION, API_ID, API_HASH)
-START_TIME = time.time()
+client = TelegramClient("artz", API_ID, API_HASH)
 
-# --- YARDIMCI FONKSİYON ---
-def uptime_text():
-    uptime = int(time.time() - START_TIME)
-    h, m = divmod(uptime // 60, 60)
-    s = uptime % 60
-    return f"{h} saat {m} dk {s} sn"
+start_time = time.time()  # uptime için
 
-# --- KOMUTLAR ---
-@client.on(events.NewMessage(pattern=r'^\.artz$', incoming=True))
-async def bot_info(event):
-    await event.reply(
-        "🤖 **Artz Userbot**\n"
-        "👤 Sahibi: [Artz](https://t.me/artzfounder)\n"
-        "🛠 Versiyon: 1.0\n"
-        "💡 Komutlar: .alive, .help, .duyuru, .zarar, .id, .info, .say, .flip, .roll, .sticker, .quote, .weather, .remind, .calc"
-    )
-
-@client.on(events.NewMessage(pattern=r'^\.alive$', incoming=True))
+# -----------------------------
+# KOMUTLAR
+# -----------------------------
+@client.on(events.NewMessage(pattern=r"^\.alive$"))
 async def alive(event):
-    await event.reply(
-        f"✅ Bot aktif!\n⏱ Uptime: {uptime_text()}\n"
-        f"💻 Sistem: {platform.system()} {platform.release()}\n"
-        f"🐍 Python: {platform.python_version()}"
-    )
+    if event.sender_id != ALLOWED_USER_ID:
+        return
+    await event.edit("✅ Artz Userbot aktif ve çalışıyor!")
 
-@client.on(events.NewMessage(pattern=r'^\.help$', incoming=True))
+@client.on(events.NewMessage(pattern=r"^\.ping$"))
+async def ping(event):
+    if event.sender_id != ALLOWED_USER_ID:
+        return
+    start = time.time()
+    await event.edit("🏓 Pong!")
+    end = time.time()
+    await event.edit(f"🏓 Pong! `{round((end-start)*1000)} ms`")
+
+@client.on(events.NewMessage(pattern=r"^\.id$"))
+async def user_id(event):
+    if event.sender_id != ALLOWED_USER_ID:
+        return
+    if event.is_reply:
+        user = await event.get_reply_message()
+        await event.edit(f"👤 ID: `{user.sender_id}`")
+    else:
+        await event.edit(f"👤 Senin ID: `{ALLOWED_USER_ID}`")
+
+@client.on(events.NewMessage(pattern=r"^\.info$"))
+async def user_info(event):
+    if event.sender_id != ALLOWED_USER_ID:
+        return
+    if event.is_reply:
+        user = await event.get_reply_message().sender
+        name = f"{user.first_name or ''} {user.last_name or ''}".strip()
+        username = f"@{user.username}" if user.username else "Yok"
+        photos = await client.get_profile_photos(user)
+        caption = f"👤 Name: {name}\n💻 Username: {username}\n🆔 ID: {user.id}"
+        if photos.total > 0:
+            await client.send_file(event.chat_id, photos[0], caption=caption)
+            await event.delete()
+        else:
+            await event.edit(caption)
+    else:
+        me = await client.get_me()
+        name = f"{me.first_name or ''} {me.last_name or ''}".strip()
+        username = f"@{me.username}" if me.username else "Yok"
+        await event.edit(f"👤 Name: {name}\n💻 Username: {username}\n🆔 ID: {me.id}")
+
+@client.on(events.NewMessage(pattern=r"^\.help$"))
 async def help_cmd(event):
-    await event.reply(
-        "📜 **Komutlar:**\n"
-        "🤖 .artz → Bot bilgisi\n"
-        "⏱ .alive → Bot aktif mi?\n"
-        "🆔 .id → Kullanıcı ID\n"
-        "ℹ️ .info → Kullanıcı bilgisi\n"
-        "📢 .duyuru <mesaj> → Duyuru gönder\n"
-        "💥 .zarar → Örnek komut\n"
-        "🗣 .say <mesaj> → Bot mesajını tekrar eder\n"
-        "🎲 .roll → 1-100 arası zar atar\n"
-        "🔄 .flip → Yazı tura atar\n"
-        "🖼 .sticker → Örnek sticker gönderir\n"
-        "💬 .quote → Rastgele alıntı\n"
-        "🌦 .weather <şehir> → Hava durumu\n"
-        "⏰ .remind <süre> <mesaj> → Hatırlatma kurar\n"
-        "🧮 .calc <işlem> → Basit hesaplama"
-    )
+    if event.sender_id != ALLOWED_USER_ID:
+        return
+    msg = "**ARTZ USERBOT KOMUTLARI**\n\n" \
+          ".alive\n.ping\n.id\n.info\n.sysinfo\n.time\n.flip\n.echo <yazi>\n.del\n.chatinfo\n.owner\n.server\n.uptime\n.bio\n.link\n.stats"
+    await event.edit(msg, buttons=[Button.url("Owner", "https://t.me/artzfounder")])
 
-@client.on(events.NewMessage(pattern=r'^\.id$', incoming=True))
-async def id_cmd(event):
-    sender = await event.get_sender()
-    await event.reply(f"🆔 Senin ID: {sender.id}")
+@client.on(events.NewMessage(pattern=r"^\.sysinfo$"))
+async def sys_info(event):
+    if event.sender_id != ALLOWED_USER_ID:
+        return
+    cpu = psutil.cpu_count(logical=True)
+    ram = round(psutil.virtual_memory().total / (1024**3), 2)
+    await event.edit(f"💻 Sistem: {platform.system()} {platform.release()}\n🖥️ CPU: {cpu} Core\n🔋 RAM: {ram} GB")
 
-@client.on(events.NewMessage(pattern=r'^\.info$', incoming=True))
-async def info_cmd(event):
-    sender = await event.get_sender()
-    await event.reply(
-        f"👤 Ad: {sender.first_name}\n"
-        f"🆔 ID: {sender.id}\n"
-        f"💬 Username: @{sender.username if sender.username else 'Yok'}"
-    )
+@client.on(events.NewMessage(pattern=r"^\.time$"))
+async def current_time(event):
+    if event.sender_id != ALLOWED_USER_ID:
+        return
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    await event.edit(f"⏰ Şu anki zaman: {now}")
 
-# --- YENİ KOMUTLAR ---
-@client.on(events.NewMessage(pattern=r'^\.say (.+)$', incoming=True))
-async def say_cmd(event):
-    await event.reply(event.pattern_match.group(1))
+@client.on(events.NewMessage(pattern=r"^\.flip$"))
+async def flip(event):
+    if event.sender_id != ALLOWED_USER_ID:
+        return
+    choice = random.choice(["Yazı", "Tura"])
+    await event.edit(f"🎲 Sonuç: {choice}")
 
-@client.on(events.NewMessage(pattern=r'^\.roll$', incoming=True))
-async def roll_cmd(event):
-    await event.reply(f"🎲 Zar sonucu: {random.randint(1,100)}")
+@client.on(events.NewMessage(pattern=r"^\.echo (.+)"))
+async def echo(event):
+    if event.sender_id != ALLOWED_USER_ID:
+        return
+    text = event.pattern_match.group(1)
+    await event.edit(text)
 
-@client.on(events.NewMessage(pattern=r'^\.flip$', incoming=True))
-async def flip_cmd(event):
-    await event.reply("🔄 " + random.choice(["Yazı", "Tura"]))
+@client.on(events.NewMessage(pattern=r"^\.del$"))
+async def delete_msg(event):
+    if event.sender_id != ALLOWED_USER_ID:
+        return
+    await event.delete()
 
-@client.on(events.NewMessage(pattern=r'^\.quote$', incoming=True))
-async def quote_cmd(event):
-    quotes = [
-        "💬 Hayat kısa, tadını çıkar.",
-        "💬 Başarı azimli olanların hakkıdır.",
-        "💬 Bugün, geleceğin başlangıcıdır.",
-        "💬 Başarı küçük adımlarla gelir.",
-        "💬 Cesur ol, risk al!",
-        "💬 Sabır her zaman kazandırır.",
-        "💬 Öğrenmek için asla geç değildir.",
-        "💬 Hayallerinin peşinden git.",
-        "💬 Her gün yeni bir fırsattır.",
-        "💬 Olumsuzluklara takılma."
-    ]
-    await event.reply(random.choice(quotes))
+@client.on(events.NewMessage(pattern=r"^\.chatinfo$"))
+async def chat_info(event):
+    if event.sender_id != ALLOWED_USER_ID:
+        return
+    chat = await event.get_chat()
+    info = f"💬 Chat Name: {getattr(chat, 'title', 'Private Chat')}\n🆔 Chat ID: {chat.id}"
+    await event.edit(info)
 
-@client.on(events.NewMessage(pattern=r'^\.zarar$', incoming=True))
-async def zarar_cmd(event):
-    await event.reply("💥 Bu bir örnek zarardır, sadece test amaçlı!")
+@client.on(events.NewMessage(pattern=r"^\.owner$"))
+async def owner(event):
+    if event.sender_id != ALLOWED_USER_ID:
+        return
+    await event.edit("💠 Owner: t.me/artzfounder")
 
-@client.on(events.NewMessage(pattern=r'^\.duyuru (.+)$', incoming=True))
-async def duyuru_cmd(event):
-    await event.reply(f"📢 Duyuru: {event.pattern_match.group(1)}")
+@client.on(events.NewMessage(pattern=r"^\.server$"))
+async def server_info(event):
+    if event.sender_id != ALLOWED_USER_ID:
+        return
+    ip = "127.0.0.1"  # VPS ip tespiti için eklenebilir
+    await event.edit(f"💻 VPS IP: {ip}\nOS: {platform.system()} {platform.release()}")
 
-@client.on(events.NewMessage(pattern=r'^\.sticker$', incoming=True))
-async def sticker_cmd(event):
-    await event.reply("🖼 [Sticker placeholder]")  # Sticker URL veya file eklenebilir
+@client.on(events.NewMessage(pattern=r"^\.uptime$"))
+async def uptime(event):
+    if event.sender_id != ALLOWED_USER_ID:
+        return
+    up = time.time() - start_time
+    await event.edit(f"⏱️ Uptime: {int(up)} saniye")
 
-@client.on(events.NewMessage(pattern=r'^\.weather (.+)$', incoming=True))
-async def weather_cmd(event):
-    city = event.pattern_match.group(1)
-    await event.reply(f"🌦 Hava durumu bilgisi: {city} (örnek veri)")
+@client.on(events.NewMessage(pattern=r"^\.bio$"))
+async def bio(event):
+    if event.sender_id != ALLOWED_USER_ID:
+        return
+    if event.is_reply:
+        user = await event.get_reply_message().sender
+        await event.edit(f"📝 Bio: {user.bot or 'Yok'}")
+    else:
+        me = await client.get_me()
+        await event.edit(f"📝 Bio: {me.bot or 'Yok'}")
 
-@client.on(events.NewMessage(pattern=r'^\.remind (\d+) (.+)$', incoming=True))
-async def remind_cmd(event):
-    seconds = int(event.pattern_match.group(1))
-    msg = event.pattern_match.group(2)
-    await event.reply(f"⏰ Hatırlatma {seconds} saniye sonra ayarlandı!")
-    await asyncio.sleep(seconds)
-    await event.reply(f"⏰ Hatırlatma: {msg}")
+@client.on(events.NewMessage(pattern=r"^\.link$"))
+async def chat_link(event):
+    if event.sender_id != ALLOWED_USER_ID:
+        return
+    chat = await event.get_chat()
+    if hasattr(chat, 'username') and chat.username:
+        await event.edit(f"🔗 t.me/{chat.username}")
+    else:
+        await event.edit("🔗 Bu chat linke sahip değil.")
 
-@client.on(events.NewMessage(pattern=r'^\.calc (.+)$', incoming=True))
-async def calc_cmd(event):
-    expr = event.pattern_match.group(1)
-    try:
-        result = eval(expr)
-        await event.reply(f"🧮 Sonuç: {result}")
-    except Exception:
-        await event.reply("⚠️ Hatalı işlem!")
+@client.on(events.NewMessage(pattern=r"^\.stats$"))
+async def chat_stats(event):
+    if event.sender_id != ALLOWED_USER_ID:
+        return
+    chat = await event.get_chat()
+    msg_count = "Bilinmiyor"  # İleri düzey API ile alınabilir
+    await event.edit(f"📊 Chat Stats:\nID: {chat.id}\nMesaj sayısı: {msg_count}")
 
-# --- GİZLİ SÜRELİ MESAJ LOG ---
-@client.on(events.NewMessage(incoming=True))
-async def secret_media(event):
-    if event.is_private and event.message.ttl_period and event.message.media:
-        await client.send_file("me", event.message.media)
 
-if __name__ == "__main__":
-    print("[INFO] Artz Userbot başlatılıyor...")
-    client.start()  # Oturum aç
-    me = client.loop.run_until_complete(client.get_me())  # Kendi bilgilerini al
-    # Kayıtlı Mesajlar'a bilgi gönder
-    client.loop.run_until_complete(client.send_message(
-        "me",
-        f"✅ Artz Userbot aktif!\n👤 Kullanıcı: {me.first_name}\n⏱ Uptime: 0 sn\n🤖 Sahibi: [Artz](https://t.me/artzfounder)"
-    ))
-    print(f"[INFO] {me.first_name} ile giriş yapıldı, bot aktif!")
-    client.run_until_disconnected()  # Botu sürekli çalıştır
+# -----------------------------
+# BOT BAŞLATMA
+# -----------------------------
+client.start()
+me = client.loop.run_until_complete(client.get_me())
+print(f"[INFO] {me.first_name} ile giriş yapıldı, bot aktif!")
+
+client.run_until_disconnected()
