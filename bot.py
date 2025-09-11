@@ -300,13 +300,17 @@ async def mentionall(event):
     tekli_calisan.append(event.chat_id)
     
     async for usr in client.iter_participants(event.chat_id):
+        # Bot ve silinmiş hesapları atla
+        if usr.bot or usr.deleted:
+            continue
+
         if event.chat_id not in tekli_calisan:
-            user = await event.get_sender()
-            first_name = user.first_name
+            sender = await event.get_sender()
+            first_name = sender.first_name
             await event.respond(f"**Etiketleme durduruldu ❌ - {first_name}**", reply_to=event.message.id)
             return
 
-        # Tıklanabilir mention formatı (normal mesaj olarak)
+        # Tıklanabilir mention formatı
         if mode == "text_on_cmd":
             mention_text = f"📢 {msg}, [{usr.first_name}](tg://user?id={usr.id})"
             await client.send_message(event.chat_id, mention_text, parse_mode='md')
