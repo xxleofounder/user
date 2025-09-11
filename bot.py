@@ -97,22 +97,24 @@ async def diger_menu(event):
         link_preview=False
     )
 
-# /start menüsüne geri dön
 @client.on(events.CallbackQuery(data="starta"))
 async def starta(event):
     user = await event.get_sender()
     first_name = user.first_name
 
     await event.edit(
-        f"👋🏻 Merhaba {first_name}, ARTz Music\n\n"
-        "🎧 YouTube ile ilgili çeşitli aramalar yapar ve istediğiniz müziği mp3 olarak gönderirim.\n\n"
-        "📣 Yardım için aşağıdaki help butonunu kullanabilirsiniz.",
+        f"👋🏻 **Merhaba, {first_name}**\n\n"
+        "📌 **Klasik etiketleme Özelliklerine sahip, Bir Etiketleme Botuyum, Çeşitli Özelliklere Sahibim.**\n\n"
+        "🔔 **Komutlar ve destek için aşağıdaki butonları kullanabilirsin.**",
         buttons=[
-            [Button.inline("ℹ️ Help", data="cevirme")]
+            [Button.url("➕ Beni Gruba Ekle", f"https://t.me/{botUsername}?startgroup=true")],
+            [
+                Button.inline("ℹ️ Help", data="cevirme"),
+                Button.url("💬 Destek", "https://t.me/artzfounder")
+            ]
         ],
         link_preview=False
     )
-
 
 @client.on(events.NewMessage(pattern=r"^/ara (.+)"))
 async def ara(event):
