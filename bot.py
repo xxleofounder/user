@@ -252,10 +252,16 @@ async def callback_random(event):
 
 @client.on(events.NewMessage(pattern="^/tektag ?(.*)"))
 async def mentionall(event):
-  global tekli_calisan
-  if event.is_private:
-    return await event.respond("**Bu komut gruplar ve kanallar için geçerlidir❗️**")
-  
+    global tekli_calisan
+    if event.is_private:
+        bot_username = (await client.get_me()).username
+        return await event.respond(
+            "ʙᴜ ᴋᴏᴍᴜᴛ ɢʀᴜᴘʟᴀʀ ᴠᴇ ᴋᴀɴᴀʟʟᴀʀ ɪᴄ̧ɪɴ ɢᴇᴄ̧ᴇʀʟɪᴅɪʀ ❗️",
+            buttons=[
+                [Button.url("➕ ɢʀᴜʙᴀ ᴇᴋʟᴇ", f"https://t.me/{bot_username}?startgroup=true")]
+            ]
+        )
+		
   admins = []
   async for admin in client.iter_participants(event.chat_id, filter=ChannelParticipantsAdmins):
     admins.append(admin.id)
