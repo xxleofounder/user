@@ -260,8 +260,8 @@ async def mentionall(event):
     if event.is_private:
         bot_username = (await client.get_me()).username
         return await event.respond(
-            "ʙᴜ ᴋᴏᴍᴜᴛ ɢʀᴜᴘʟᴀʀ ᴠᴇ ᴋᴀɴᴀʟʟᴀʀ ɪᴄ̧ɪɴ ɢᴇᴄ̧ᴇʀʟɪᴅɪʀ ❗️",
-            buttons=[[Button.url("➕ ɢʀᴜᴘᴀ ᴇᴋʟᴇ", f"https://t.me/{bot_username}?startgroup=true")]],
+            "Bu komut gruplar ve kanallar için geçerlidir ❗️",
+            buttons=[[Button.url("➕ Gruba Ekle", f"https://t.me/{bot_username}?startgroup=true")]],
             reply_to=event.message.id
         )
 
@@ -271,9 +271,9 @@ async def mentionall(event):
     # Admin değilse engelle
     if event.sender_id not in admins:
         return await event.respond(
-            "**ʙᴜ ᴋᴏᴍᴜᴛ sᴀᴅᴇᴄᴇ ʏᴏ̈ɴᴇᴛɪᴄɪʟᴇʀ ᴛᴀʀᴀғɪɴᴅᴀɴ ᴋᴜʟʟᴀɴɪʟᴀʙɪʟɪʀ〽**", 
+            "Bu komut sadece yöneticiler tarafından kullanılabilir", 
             reply_to=event.message.id
-        )  
+        )
 
     # Mesaj veya cevap kontrolü
     if event.pattern_match.group(1):
@@ -284,33 +284,29 @@ async def mentionall(event):
         msg = event.reply_to_msg_id
     else:
         return await event.respond(
-            "**İşleme başlamam için mesaj yazmalısın**", 
+            "İşleme başlamam için mesaj yazmalısın", 
             reply_to=event.message.id
         )
 
-    # Başlatan kullanıcıya bilgi ver (yanıt olarak)
+    # Başlatan kullanıcıya bilgi ver
     sender = await event.get_sender()
     first_name = sender.first_name
-    await event.respond(
-        f"**Etiketleme başlatıldı 🟢**\nBaşlatan: {first_name}",
-        reply_to=event.message.id
-    )
+    await event.respond(f"Etiketleme başlatıldı 🟢\nBaşlatan: {first_name}", reply_to=event.message.id)
     
     await asyncio.sleep(3)
     tekli_calisan.append(event.chat_id)
-    
-    async for usr in client.iter_participants(event.chat_id):
-        # Bot ve silinmiş hesapları atla
-        if usr.bot or usr.deleted:
-            continue
 
+    # Sadece gerçek üyeleri etiketle
+    async for usr in client.iter_participants(event.chat_id):
+        if usr.bot or usr.deleted:
+            continue  # Bot ve silinmişleri atla
+
+        # Etiketleme durdurulduysa çık
         if event.chat_id not in tekli_calisan:
-            sender = await event.get_sender()
-            first_name = sender.first_name
-            await event.respond(f"**Etiketleme durduruldu ❌ - {first_name}**", reply_to=event.message.id)
+            await event.respond(f"Etiketleme durduruldu ❌ - {first_name}", reply_to=event.message.id)
             return
 
-        # Tıklanabilir mention formatı
+        # Tıklanabilir mention
         if mode == "text_on_cmd":
             mention_text = f"📢 {msg}, [{usr.first_name}](tg://user?id={usr.id})"
             await client.send_message(event.chat_id, mention_text, parse_mode='md')
