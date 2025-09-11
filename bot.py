@@ -250,15 +250,14 @@ async def callback_random(event):
         await status.edit(f"❌ ʜᴀᴛᴀ ᴏʟᴜşᴛᴜ: {e}")  
 
 
-from telethon import events, Button
-
 @client.on(events.NewMessage(pattern="^/tektag ?(.*)"))
 async def tektag_handler(event):
     global tekli_calisan
-    
+
+    # Özelden kullanım engelle
     if event.is_private:
         bot_username = (await client.get_me()).username
-        return await event.respond(
+        return await event.reply(
             "ʙᴜ ᴋᴏᴍᴜᴛ ɢʀᴜᴘʟᴀʀ ᴠᴇ ᴋᴀɴᴀʟʟᴀʀ ɪᴄ̧ɪɴ ɢᴇᴄ̧ᴇʀʟɪᴅɪʀ ❗️",
             buttons=[[Button.url("➕ ɢʀᴜʙᴀ ᴇᴋʟᴇ", f"https://t.me/{bot_username}?startgroup=true")]]
         )
@@ -266,14 +265,14 @@ async def tektag_handler(event):
     # Admin kontrolü
     admins = [admin.id async for admin in client.iter_participants(event.chat_id, filter=ChannelParticipantsAdmins)]
     if event.sender_id not in admins:
-        return await event.respond("**Bu komutu sadece yöneticiler kullanabilir.**")
+        return await event.reply("**Bu komutu sadece yöneticiler kullanabilir.**")
 
     msg_text = event.pattern_match.group(1)
     if not msg_text:
-        return await event.respond("**İşleme başlamam için mesaj yazmalısın**")
+        return await event.reply("**İşleme başlamam için mesaj yazmalısın.**")
 
     user = await event.get_sender()
-    confirm_msg = await event.respond(
+    await event.reply(
         f"👤 **Komutu başlatan:** {user.first_name}\n"
         f"📝 **Etiketlenecek Metin:** {msg_text}\n\n"
         f"Onaylıyor musunuz?",
@@ -284,16 +283,15 @@ async def tektag_handler(event):
     )
 
 
-@client.on(events.CallbackQuery(pattern=b"tektag_onay\|(.*)"))
+@client.on(events.CallbackQuery(pattern="tektag_onay\|(.*)"))
 async def tektag_onay(event):
     global tekli_calisan
-    msg_text = event.pattern_match.group(1).decode("utf-8")
+    msg_text = event.pattern_match.group(1)
 
     await event.edit("✅ Etiketleme başladı...")
 
     tekli_calisan.append(event.chat_id)
-    usrnum = 0
-    usrtxt = ""
+    usrnum, usrtxt = 0, ""
 
     async for usr in client.iter_participants(event.chat_id):
         usrnum += 1
@@ -302,13 +300,12 @@ async def tektag_onay(event):
             await event.edit("❌ İşlem durduruldu.")
             return
         if usrnum == 1:
-            await client.send_message(event.chat_id, f"{usrtxt}\n\n{msg_text}")
+            await client.send_message(event.chat_id, f"{usrtxt}\n\n{msg_text}", reply_to=event.message_id)
             await asyncio.sleep(2)
-            usrnum = 0
-            usrtxt = ""
+            usrnum, usrtxt = 0, ""
 
 
-@client.on(events.CallbackQuery(pattern=b"tektag_iptal"))
+@client.on(events.CallbackQuery(pattern="tektag_iptal"))
 async def tektag_iptal(event):
     await event.edit("❌ İşlem iptal edildi.")
 
