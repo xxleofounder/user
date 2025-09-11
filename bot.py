@@ -13,6 +13,7 @@ import re
 import lyricsgenius
 import random
 from telethon import Button, events
+from telethon.tl.types import ChannelParticipantsAdmins
 
 logging.basicConfig(
     level=logging.INFO,
