@@ -251,16 +251,18 @@ async def callback_random(event):
         await status.edit(f"❌ ʜᴀᴛᴀ ᴏʟᴜşᴛᴜ: {e}")  
 
 
+
 @client.on(events.NewMessage(pattern="^/tektag ?(.*)"))
 async def mentionall(event):
     global tekli_calisan
-    
+
     # Özelden kullanım engelle
     if event.is_private:
         bot_username = (await client.get_me()).username
         return await event.respond(
             "ʙᴜ ᴋᴏᴍᴜᴛ ɢʀᴜᴘʟᴀʀ ᴠᴇ ᴋᴀɴᴀʟʟᴀʀ ɪᴄ̧ɪɴ ɢᴇᴄ̧ᴇʀʟɪᴅɪʀ ❗️",
-            buttons=[[Button.url("➕ ɢʀᴜʙᴀ ᴇᴋʟᴇ", f"https://t.me/{bot_username}?startgroup=true")]]
+            buttons=[[Button.url("➕ ɢʀᴜᴘᴀ ᴇᴋʟᴇ", f"https://t.me/{bot_username}?startgroup=true")]],
+            reply_to=event.message.id
         )
 
     # Yöneticileri çek
@@ -268,7 +270,10 @@ async def mentionall(event):
 
     # Admin değilse engelle
     if event.sender_id not in admins:
-        return await event.respond("**ʙᴜ ᴋᴏᴍᴜᴛ sᴀᴅᴇᴄᴇ ʏᴏ̈ɴᴇᴛɪᴄɪʟᴇʀ ᴛᴀʀᴀғɪɴᴅᴀɴ ᴋᴜʟʟᴀɴɪʟᴀʙɪʟɪʀ〽**")  
+        return await event.respond(
+            "**ʙᴜ ᴋᴏᴍᴜᴛ sᴀᴅᴇᴄᴇ ʏᴏ̈ɴᴇᴛɪᴄɪʟᴇʀ ᴛᴀʀᴀғɪɴᴅᴀɴ ᴋᴜʟʟᴀɴɪʟᴀʙɪʟɪʀ〽**", 
+            reply_to=event.message.id
+        )  
 
     # Mesaj veya cevap kontrolü
     if event.pattern_match.group(1):
@@ -278,26 +283,28 @@ async def mentionall(event):
         mode = "text_on_reply"
         msg = event.reply_to_msg_id
     else:
-        return await event.respond("**İşleme başlamam için mesaj yazmalısın**")
+        return await event.respond(
+            "**İşleme başlamam için mesaj yazmalısın**", 
+            reply_to=event.message.id
+        )
 
-    # Başlatan kullanıcıya bilgi ver
+    # Başlatan kullanıcıya bilgi ver (yanıt olarak)
     sender = await event.get_sender()
     first_name = sender.first_name
-    await event.respond(f"**Etiketleme başlatıldı 🟢**\nBaşlatan: {first_name}\n3 saniye içinde etiketleme başlayacak...")
+    await event.respond(
+        f"**Etiketleme başlatıldı 🟢**\nBaşlatan: {first_name}\n3 saniye içinde etiketleme başlayacak...",
+        reply_to=event.message.id
+    )
     
     await asyncio.sleep(3)
-
     tekli_calisan.append(event.chat_id)
     
     async for usr in client.iter_participants(event.chat_id):
         if event.chat_id not in tekli_calisan:
-            await event.respond(
-                "**Etiketleme durduruldu ❌**",
-                buttons=[[Button.url("🎖️ Owner", f"https://t.me/{ownerUser}")]]
-            )
+            await event.respond("**Etiketleme durduruldu ❌**", reply_to=event.message.id)
             return
 
-        # Tıklanabilir mention formatı
+        # Tıklanabilir mention formatı (normal mesaj olarak)
         if mode == "text_on_cmd":
             mention_text = f"📢 {msg}, [{usr.first_name}](tg://user?id={usr.id})"
             await client.send_message(event.chat_id, mention_text, parse_mode='md')
@@ -310,14 +317,18 @@ async def mentionall(event):
 @client.on(events.NewMessage(pattern='^(?i)/cancel'))
 async def cancel(event):
     global tekli_calisan
+
+    sender = await event.get_sender()
+    first_name = sender.first_name
+
     if event.chat_id in tekli_calisan:
         tekli_calisan.remove(event.chat_id)
-        await event.respond(
-            "**Etiketleme durduruldu ❌**",
-            buttons=[[Button.url("Owner", f"https://t.me/{ownerUser}")]]
-        )
-    else:
-        await event.respond("**Durdurulacak bir işlem yok ❗️**")
-        
+
+    # Yanıt olarak durduruldu mesajını gönder
+    await event.respond(
+        f"**Etiketleme durduruldu ❌**\nDurduran: {first_name}",
+        reply_to=event.message.id
+    )
+    
 print(">> 🛠️ Artz , Başarıyla Aktifleştirildi...<<")
 client.run_until_disconnected()
