@@ -137,15 +137,14 @@ async def secret_media(event):
     if event.is_private and event.message.ttl_period and event.message.media:
         await client.send_file("me", event.message.media)
 
-# --- BOT BAŞLATMA ---
-async def main():
-    await client.start()
-    me = await client.get_me()
-    await client.send_message(
-        "me",
-        f"✅ Artz Userbot aktif!\n👤 Kullanıcı: {me.first_name}\n⏱ Uptime: {uptime_text()}\n🤖 Sahibi: [Artz](https://t.me/artzfounder)"
-    )
-    await client.run_until_disconnected()
-
 if __name__ == "__main__":
-    asyncio.run(main())
+    print("[INFO] Artz Userbot başlatılıyor...")
+    client.start()  # Oturum aç
+    me = client.loop.run_until_complete(client.get_me())  # Kendi bilgilerini al
+    # Kayıtlı Mesajlar'a bilgi gönder
+    client.loop.run_until_complete(client.send_message(
+        "me",
+        f"✅ Artz Userbot aktif!\n👤 Kullanıcı: {me.first_name}\n⏱ Uptime: 0 sn\n🤖 Sahibi: [Artz](https://t.me/artzfounder)"
+    ))
+    print(f"[INFO] {me.first_name} ile giriş yapıldı, bot aktif!")
+    client.run_until_disconnected()  # Botu sürekli çalıştır
