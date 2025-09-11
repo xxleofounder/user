@@ -300,11 +300,11 @@ async def mentionall(event):
     tekli_calisan.append(event.chat_id)
     
     async for usr in client.iter_participants(event.chat_id):
-    if event.chat_id not in tekli_calisan:
-        user = await event.get_sender()
-        first_name = user.first_name
-        await event.respond(f"**Etiketleme durduruldu ❌ - {first_name}**", reply_to=event.message.id)
-        return
+        if event.chat_id not in tekli_calisan:
+            user = await event.get_sender()
+            first_name = user.first_name
+            await event.respond(f"**Etiketleme durduruldu ❌ - {first_name}**", reply_to=event.message.id)
+            return
 
         # Tıklanabilir mention formatı (normal mesaj olarak)
         if mode == "text_on_cmd":
@@ -315,7 +315,7 @@ async def mentionall(event):
             await client.send_message(event.chat_id, mention_text, reply_to=msg, parse_mode='md')
         
         await asyncio.sleep(2)
-
+        
 @client.on(events.NewMessage(pattern='^(?i)/cancel'))
 async def cancel(event):
   global tekli_calisan
