@@ -253,6 +253,8 @@ async def callback_random(event):
 @client.on(events.NewMessage(pattern="^/tektag ?(.*)"))
 async def mentionall(event):
     global tekli_calisan
+    
+    # Özelden kullanım engelle
     if event.is_private:
         bot_username = (await client.get_me()).username
         return await event.respond(
@@ -261,13 +263,15 @@ async def mentionall(event):
                 [Button.url("➕ ɢʀᴜʙᴀ ᴇᴋʟᴇ", f"https://t.me/{bot_username}?startgroup=true")]
             ]
         )
-		
-  admins = []
-  async for admin in client.iter_participants(event.chat_id, filter=ChannelParticipantsAdmins):
-    admins.append(admin.id)
-  if not event.sender_id in admins:
-    return await event.respond("**Bu komutu sadace yoneticiler kullana bilir〽**")
-  
+
+    # Yöneticileri çek
+    admins = []
+    async for admin in client.iter_participants(event.chat_id, filter=ChannelParticipantsAdmins):
+        admins.append(admin.id)
+
+    # Eğer komutu kullanan admin değilse
+    if event.sender_id not in admins:
+        return await event.respond("**ʙᴜ ᴋᴏᴍᴜᴛ sᴀᴅᴇᴄᴇ ʏᴏ̈ɴᴇᴛɪᴄɪʟᴇʀ ᴛᴀʀᴀғɪɴᴅᴀɴ ᴋᴜʟʟᴀɴɪʟᴀʙɪʟɪʀ〽**")  
   if event.pattern_match.group(1):
     mode = "text_on_cmd"
     msg = event.pattern_match.group(1)
