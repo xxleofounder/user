@@ -40,91 +40,74 @@ keywords = {
 }
   
 
+
+# /start komutu
 @client.on(events.NewMessage(pattern="^/start$"))
 async def start(event):
     user = await event.get_sender()
     first_name = user.first_name
-    user_id = user.id
-    username = user.username if user.username else "Kullanıcı adı yok"
 
-    # Kullanıcıya hoş geldin mesajı
     await client.send_file(
         event.chat_id,
         "https://r.resimlink.com/wk3gFJ.jpg",
         caption=(
-            f"👋🏻 ᴍᴇʀʜᴀʙᴀ {first_name}, ᴀʀᴛᴢ ᴍᴜsɪᴄ\n\n"
-            "🎧 Bᴇɴ YᴏᴜTᴜʙᴇ iʟᴇ iʟɢiʟi ᴄ̧ᴇşɪᴛʟɪ ᴀʀᴀᴍᴀʟᴀʀ ʏᴀᴘᴀʀ, ᴀʀᴀᴅɪɢ̆ɪɴɪᴢ ᴍᴜ̈ᴢɪğɪ ʙᴜʟᴜᴘ sɪᴢᴇ ᴍᴘ3 ᴏʟᴀʀᴀᴋ ɢᴏ̈ɴᴅᴇʀɪʀɪᴍ.\n\n"
-            "📣 ᴋᴜʟʟᴀɴɪᴍ ᴋᴏɴᴜsᴜɴᴅᴀ ʏᴀʀᴅɪᴍ ɪçɪɴ ʜᴇʟᴘ ʙᴜᴛᴏɴᴜɴᴜ ᴋᴜʟʟᴀɴᴀʙɪʟɪʀsɪɴɪᴢ."
+            f"👋🏻 Merhaba {first_name}, ARTz Music\n\n"
+            "🎧 YouTube ile ilgili çeşitli aramalar yapar ve istediğiniz müziği mp3 olarak gönderirim.\n\n"
+            "📣 Yardım için aşağıdaki help butonunu kullanabilirsiniz."
         ),
         buttons=[
-            [Button.url("🥇 ᴏᴡɴᴇʀ", "https://t.me/ARTzX7")],
-            [Button.inline("ℹ️ ʜᴇʟᴘ", data="cevirme")]
+            [Button.inline("ℹ️ Help", data="cevirme")]
         ],
         link_preview=False
     )
 
-    # Owner'a bildirim gönder
-    await client.send_message(
-        OWNER_ID,
-        f"👤 Kullanıcı /start kullandı:\n\n"
-        f"• İsim: {first_name}\n"
-        f"• ID: {user_id}\n"
-        f"• Kullanıcı Adı: @{username}"
-    )
-
-
-
-# Inline Start’a Geri Dön
+# Çevirme menüsü (Help tıklanınca)
 @client.on(events.CallbackQuery(data="cevirme"))
 async def cevirme(event):
-    user = await event.get_sender()
-    first_name = user.first_name
-
     await event.edit(
-        f"{first_name}, Hangi Komutlara Erişmek istiyorsun?",
+        "Hangi komutlara erişmek istiyorsunuz?",
         buttons=[
-            [Button.inline("▶️ Tagger", data="tag")],
-            [Button.inline("ℹ️ Diğer", data="diger")]
+            [Button.inline("▶️ Tagger", data="tag"), Button.inline("ℹ️ Diğer", data="diger")],
+            [Button.inline("⬅️ Geri Dön", data="starta")]
         ],
         link_preview=False
     )
 
-# Inline Help Menüsü
+# Tagger menüsü
 @client.on(events.CallbackQuery(data="tag"))
 async def tag_menu(event):
     await event.edit(
-        "📚 ᴋᴏᴍᴜᴛʟᴀʀ ᴀşᴀɢ̆ɪᴅᴀ ʏᴇʀ ᴀʟɪʏᴏʀ:\n\n"
-        "➪ `/yenile` - sᴜɴᴜᴄᴜ'ʏᴜ ʏᴇɴɪᴅᴇɴ ʙᴀşʟᴀᴛɪʀ, ʜᴀᴛᴀʟᴀʀɪ ɢɪᴅᴇʀɪʀ",
-        buttons=[[Button.inline("⬅️ ɢᴇʀɪ ᴅᴏ̈ɴ", data="starta")]],
+        "📚 Tagger Komutları:\n\n"
+        "➪ /yenile - Sunucuyu yeniden başlatır, hataları giderir",
+        buttons=[[Button.inline("⬅️ Geri Dön", data="cevirme")]],
         link_preview=False
     )
 
-# Inline tag Menüsü
+# Diğer menüsü
 @client.on(events.CallbackQuery(data="diger"))
 async def diger_menu(event):
     await event.edit(
-        "📚 ᴋᴏᴍᴜᴛʟᴀʀ ᴀşᴀɢ̆ɪᴅᴀ ʏᴇʀ ᴀʟɪʏᴏʀ:\n\n"
-        "➪ `/ara` - ʏᴏᴛᴜʙᴇᴅᴇ ᴍᴜsɪc, ᴠᴇʏᴀ ᴅᴏsʏᴀ sᴇsɪ ɪɴᴅɪʀɪʀ\n\n"
-        "➪ `/song` - ᴀʀᴀᴅɪɢ̆ɪɴɪᴢ ᴘᴀʀᴄ̧ᴀɴɪɴ sᴏ̈ᴢʟᴇʀɪɴɪ ʙᴜʟᴜᴘ sɪᴢᴇ iʟᴇᴛiʀ\n\n"
-        "➪ `/random` - siᴢᴇ ʀᴀsᴛɢᴇʟᴇ ʏᴏᴜᴛᴜʙᴇ'ᴅᴇ ᴘᴀʀᴄ̧ᴀ ʙᴜʟᴜᴘ ᴀᴛᴀʀ\n\n"
-        "➪ `/yenile` - sᴜɴᴜᴄᴜ'ʏᴜ ʏᴇɴɪᴅᴇɴ ʙᴀşʟᴀᴛɪʀ, ʜᴀᴛᴀʟᴀʀɪ ɢɪᴅᴇʀɪʀ",
-        buttons=[[Button.inline("⬅️ ɢᴇʀɪ ᴅᴏ̈ɴ", data="starta")]],
+        "📚 Diğer Komutlar:\n\n"
+        "➪ /ara - YouTube'den müzik veya dosya indirir\n"
+        "➪ /song - Şarkı sözlerini bulur\n"
+        "➪ /random - Rastgele YouTube parçası atar\n"
+        "➪ /yenile - Sunucuyu yeniden başlatır",
+        buttons=[[Button.inline("⬅️ Geri Dön", data="cevirme")]],
         link_preview=False
     )
 
-# Inline Start’a Geri Dön
+# /start menüsüne geri dön
 @client.on(events.CallbackQuery(data="starta"))
 async def starta(event):
     user = await event.get_sender()
     first_name = user.first_name
 
     await event.edit(
-        f"👋🏻 ᴍᴇʀʜᴀʙᴀ {first_name}, ᴀʀᴛᴢ ᴍᴜsɪᴄ\n\n"
-        "🎧 Bᴇɴ YᴏᴜTᴜʙᴇ iʟᴇ iʟɢiʟi ᴄ̧ᴇşɪᴛʟɪ ᴀʀᴀᴍᴀʟᴀʀ ʏᴀᴘᴀʀ, ᴀʀᴀᴅɪɢ̆ɪɴɪᴢ ᴍᴜ̈ᴢɪğɪ ʙᴜʟᴜᴘ sɪᴢᴇ ᴍᴘ3 ᴏʟᴀʀᴀᴋ ɢᴏ̈ɴᴅᴇʀɪʀɪᴍ.\n\n"
-        "📣 ᴋᴜʟʟᴀɴɪᴍ ᴋᴏɴᴜsᴜɴᴅᴀ ʏᴀʀᴅɪᴍ ɪçɪɴ ʜᴇʟᴘ ʙᴜᴛᴏɴᴜɴᴜ ᴋᴜʟʟᴀɴᴀʙɪʟɪʀsɪɴɪᴢ.",
+        f"👋🏻 Merhaba {first_name}, ARTz Music\n\n"
+        "🎧 YouTube ile ilgili çeşitli aramalar yapar ve istediğiniz müziği mp3 olarak gönderirim.\n\n"
+        "📣 Yardım için aşağıdaki help butonunu kullanabilirsiniz.",
         buttons=[
-            [Button.url("🥇 ᴏᴡɴᴇʀ", "https://t.me/ARTzX7")],
-            [Button.inline("ℹ️ ʜᴇʟᴘ", data="help")]
+            [Button.inline("ℹ️ Help", data="cevirme")]
         ],
         link_preview=False
     )
