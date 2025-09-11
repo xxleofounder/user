@@ -1,19 +1,16 @@
 from telethon import Button
-from telethon import TelegramClient, events
+from telethon import TelegramClient, events, errors, Button
+from telethon.tl.types import ChannelParticipantsAdmins
 from asyncio import sleep
 from Config import Config
 import asyncio
 import subprocess
-from telethon import events
 import yt_dlp
 import os
-from telethon import events, errors
 import logging
-import re 
+import re
 import lyricsgenius
 import random
-from telethon import Button, events
-from telethon.tl.types import ChannelParticipantsAdmins
 
 logging.basicConfig(
     level=logging.INFO,
