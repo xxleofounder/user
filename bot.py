@@ -12,6 +12,8 @@ import re
 import lyricsgenius
 import random
 
+tekli_calisan = []
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(name)s - [%(levelname)s] - %(message)s'
