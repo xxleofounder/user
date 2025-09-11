@@ -250,6 +250,12 @@ async def callback_random(event):
         await status.edit(f"❌ ʜᴀᴛᴀ ᴏʟᴜşᴛᴜ: {e}")  
 
 
+import asyncio
+import urllib.parse
+from telethon import events, Button
+from telethon.tl.types import ChannelParticipantsAdmins
+
+
 @client.on(events.NewMessage(pattern="^/tektag ?(.*)"))
 async def tektag_handler(event):
     global tekli_calisan
@@ -269,52 +275,60 @@ async def tektag_handler(event):
     if not msg_text:
         return await event.reply("**İşleme başlamam için mesaj yazmalısın.**")
 
+    # bytes ise decode et ve küçük harfe çevir
     if isinstance(msg_text, bytes):
         msg_text = msg_text.decode('utf-8')
+    msg_text = msg_text.lower()
 
     user = await event.get_sender()
+    encoded_text = urllib.parse.quote(msg_text)
+
     await event.reply(
-        f"👤 **Komutu başlatan:** {user.first_name}\n"
-        f"📝 **Etiketlenecek Metin:** {msg_text}\n\n"
-        f"Onaylıyor musunuz?",
+        f"👤 komutu başlatan: {user.first_name.lower()}\n"
+        f"📝 etiketlenecek metin: {msg_text}\n\n"
+        f"onaylıyor musunuz?",
         buttons=[
-            [Button.inline("✅ Onayla", data=str(f"tektag_onay|{msg_text}"))],
-            [Button.inline("❌ İptal", data="tektag_iptal")]
+            [Button.inline("✅ onayla", data=f"tektag_onay|{encoded_text}")],
+            [Button.inline("❌ iptal", data="tektag_iptal")]
         ]
     )
 
 @client.on(events.CallbackQuery(pattern="tektag_onay\|(.*)"))
 async def tektag_onay(event):
     global tekli_calisan
-    msg_text = event.pattern_match.group(1)
+    msg_text = urllib.parse.unquote(event.pattern_match.group(1)).lower()
 
-    if isinstance(msg_text, bytes):
-        msg_text = msg_text.decode('utf-8')
-
-    await event.edit("✅ Etiketleme başladı...")
+    await event.edit("✅ etiketleme başladı...")
+    await asyncio.sleep(3)  # 3 sn bekleme, sonra başla
 
     tekli_calisan.append(event.chat_id)
 
     async for usr in client.iter_participants(event.chat_id):
         if event.chat_id not in tekli_calisan:
-            await event.edit("❌ İşlem durduruldu.")
+            await event.edit("❌ işlem durduruldu.")
             return
         await client.send_message(
             event.chat_id,
-            f"📢 {msg_text}, ([{usr.first_name}](tg://user?id={usr.id}))",
+            f"📢 {msg_text}, ({usr.first_name.lower()})",
             parse_mode='md'
         )
         await asyncio.sleep(3)
 
 @client.on(events.CallbackQuery(pattern="tektag_iptal"))
 async def tektag_iptal(event):
-    await event.edit("❌ İşlem iptal edildi.")
+    if event.chat_id in tekli_calisan:
+        tekli_calisan.remove(event.chat_id)
+    await event.edit("❌ işlem iptal edildi.")
 
 @client.on(events.NewMessage(pattern='^(?i)/cancel'))
 async def cancel(event):
-  global tekli_calisan
-  tekli_calisan.remove(event.chat_id)
-	
+    global tekli_calisan
+    if event.chat_id in tekli_calisan:
+        tekli_calisan.remove(event.chat_id)
+        await event.reply("❌ etiketleme iptal edildi.")
+    else:
+        await event.reply("⚠️ şu anda etiketleme işlemi yok.")
+		
 
 print(">> 🛠️ Artz , Başarıyla Aktifleştirildi...<<")
 client.run_until_disconnected()
