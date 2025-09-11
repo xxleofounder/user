@@ -254,7 +254,6 @@ async def callback_random(event):
 async def tektag_handler(event):
     global tekli_calisan
 
-    # Özelden kullanım engeli
     if event.is_private:
         bot_username = (await client.get_me()).username
         return await event.reply(
@@ -262,7 +261,6 @@ async def tektag_handler(event):
             buttons=[[Button.url("➕ ɢʀᴜʙᴀ ᴇᴋʟᴇ", f"https://t.me/{bot_username}?startgroup=true")]]
         )
 
-    # Admin kontrolü
     admins = [admin.id async for admin in client.iter_participants(event.chat_id, filter=ChannelParticipantsAdmins)]
     if event.sender_id not in admins:
         return await event.reply("**Bu komutu sadece yöneticiler kullanabilir.**")
@@ -271,13 +269,16 @@ async def tektag_handler(event):
     if not msg_text:
         return await event.reply("**İşleme başlamam için mesaj yazmalısın.**")
 
+    if isinstance(msg_text, bytes):
+        msg_text = msg_text.decode('utf-8')
+
     user = await event.get_sender()
     await event.reply(
         f"👤 **Komutu başlatan:** {user.first_name}\n"
         f"📝 **Etiketlenecek Metin:** {msg_text}\n\n"
         f"Onaylıyor musunuz?",
         buttons=[
-            [Button.inline("✅ Onayla", data=f"tektag_onay|{msg_text}")],
+            [Button.inline("✅ Onayla", data=str(f"tektag_onay|{msg_text}"))],
             [Button.inline("❌ İptal", data="tektag_iptal")]
         ]
     )
@@ -287,6 +288,9 @@ async def tektag_onay(event):
     global tekli_calisan
     msg_text = event.pattern_match.group(1)
 
+    if isinstance(msg_text, bytes):
+        msg_text = msg_text.decode('utf-8')
+
     await event.edit("✅ Etiketleme başladı...")
 
     tekli_calisan.append(event.chat_id)
@@ -295,13 +299,12 @@ async def tektag_onay(event):
         if event.chat_id not in tekli_calisan:
             await event.edit("❌ İşlem durduruldu.")
             return
-        # Kullanıcıyı tıklanabilir etiket olarak gönder
         await client.send_message(
             event.chat_id,
-            f"📢 **{msg_text}**, ([{usr.first_name}](tg://user?id={usr.id}))",
+            f"📢 {msg_text}, ([{usr.first_name}](tg://user?id={usr.id}))",
             parse_mode='md'
         )
-        await asyncio.sleep(1)  # opsiyonel bekleme süresi
+        await asyncio.sleep(3)
 
 @client.on(events.CallbackQuery(pattern="tektag_iptal"))
 async def tektag_iptal(event):
