@@ -260,8 +260,8 @@ async def mentionall(event):
     if event.is_private:
         bot_username = (await client.get_me()).username
         return await event.respond(
-            "Bu komut gruplar ve kanallar için geçerlidir ❗️",
-            buttons=[[Button.url("➕ Gruba Ekle", f"https://t.me/{bot_username}?startgroup=true")]],
+            "üᴢɢüɴüᴍ, ʙᴜ ᴋᴏᴍᴜᴛ ɢʀᴜᴘ ᴠᴇʏᴀ ᴋᴀɴᴀʟʟᴀʀ içiɴ ɢᴇçᴇʀʟiᴅiʀ❗️",
+            buttons=[[Button.url("➕ ʙᴇɴi ɢʀᴜʙᴀ ᴇᴋʟᴇ", f"https://t.me/{bot_username}?startgroup=true")]],
             reply_to=event.message.id
         )
 
@@ -271,7 +271,7 @@ async def mentionall(event):
     # Admin değilse engelle
     if event.sender_id not in admins:
         return await event.respond(
-            "Bu komut sadece yöneticiler tarafından kullanılabilir", 
+            "⚠️ üᴢɢüɴüᴍ, ʙᴜ ᴋᴏᴍᴜᴛᴜ sᴀᴅᴇᴄᴇ ʏᴇᴛiᴋiʟi ᴋᴜʟʟᴀɴᴀʙiʟiʀ", 
             reply_to=event.message.id
         )
 
@@ -284,14 +284,14 @@ async def mentionall(event):
         msg = event.reply_to_msg_id
     else:
         return await event.respond(
-            "İşleme başlamam için mesaj yazmalısın", 
+            "⛔ ișʟᴇᴍᴇ ʙᴀșʟᴀᴍᴀᴍ içiɴ, ʙiʀ ᴍᴇᴛiɴ ʙᴇʟiʀʟᴇᴍᴇɴ ʟᴀᴢɪᴍ", 
             reply_to=event.message.id
         )
 
     # Başlatan kullanıcıya bilgi ver
     sender = await event.get_sender()
     first_name = sender.first_name
-    await event.respond(f"Etiketleme başlatıldı 🟢\nBaşlatan: {first_name}", reply_to=event.message.id)
+    await event.respond(f"**ᴇᴛiᴋᴇᴛʟᴇᴍᴇ ișʟᴇᴍi ʙᴀșʟᴀᴅɪ** 🟢\nʙᴀșʟᴀᴛᴀɴ: {first_name}", reply_to=event.message.id)
     
     await asyncio.sleep(3)
     tekli_calisan.append(event.chat_id)
@@ -303,7 +303,7 @@ async def mentionall(event):
 
         # Etiketleme durdurulduysa çık
         if event.chat_id not in tekli_calisan:
-            await event.respond(f"Etiketleme durduruldu ❌ - {first_name}", reply_to=event.message.id)
+            await event.respond(f"**Etiketleme durduruldu** 🔴\n ᴅᴜʀᴅᴜʀᴀɴ: {first_name}", reply_to=event.message.id)
             return
 
         # Tıklanabilir mention
