@@ -254,7 +254,7 @@ async def callback_random(event):
 async def tektag_handler(event):
     global tekli_calisan
 
-    # Özelden kullanım engelle
+    # Özelden kullanım engeli
     if event.is_private:
         bot_username = (await client.get_me()).username
         return await event.reply(
@@ -282,7 +282,6 @@ async def tektag_handler(event):
         ]
     )
 
-
 @client.on(events.CallbackQuery(pattern="tektag_onay\|(.*)"))
 async def tektag_onay(event):
     global tekli_calisan
@@ -291,19 +290,18 @@ async def tektag_onay(event):
     await event.edit("✅ Etiketleme başladı...")
 
     tekli_calisan.append(event.chat_id)
-    usrnum, usrtxt = 0, ""
 
     async for usr in client.iter_participants(event.chat_id):
-        usrnum += 1
-        usrtxt += f"👤 [{usr.first_name}](tg://user?id={usr.id})"
         if event.chat_id not in tekli_calisan:
             await event.edit("❌ İşlem durduruldu.")
             return
-        if usrnum == 1:
-            await client.send_message(event.chat_id, f"{usrtxt}\n\n{msg_text}", reply_to=event.message_id)
-            await asyncio.sleep(2)
-            usrnum, usrtxt = 0, ""
-
+        # Kullanıcıyı tıklanabilir etiket olarak gönder
+        await client.send_message(
+            event.chat_id,
+            f"📢 **{msg_text}**, ([{usr.first_name}](tg://user?id={usr.id}))",
+            parse_mode='md'
+        )
+        await asyncio.sleep(1)  # opsiyonel bekleme süresi
 
 @client.on(events.CallbackQuery(pattern="tektag_iptal"))
 async def tektag_iptal(event):
