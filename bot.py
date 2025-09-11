@@ -164,14 +164,13 @@ async def ara(event):
 
 @client.on(events.NewMessage(pattern="^/yenile$"))
 async def yenile(event):
-    # Başlangıç mesajı
-    mesaj = await event.respond("🔄 ʏᴇɴɪᴅᴇɴ ʙᴀşʟᴀᴛɪʟɪʏᴏʀ: %0")
+    # Başlangıç mesajı (YANIT)
+    mesaj = await event.reply("🔄 ʏᴇɴɪᴅᴇɴ ʙᴀşʟᴀᴛɪʟɪʏᴏʀ: %0")
 
     for yuzde in range(10, 101, 10):
         await asyncio.sleep(0.5)
         await mesaj.edit(f"🔄 ʏᴇɴɪᴅᴇɴ ʙᴀşʟᴀᴛɪʟɪʏᴏʀ: %{yuzde}")
 
-  
     try:
         ping_output = subprocess.check_output(
             ["ping", "-c", "1", "8.8.8.8"], universal_newlines=True
@@ -183,8 +182,10 @@ async def yenile(event):
         ping_ms = "ᴜ̈ᴢɢᴜ̈ɴᴜ̈ᴍ, ᴘɪɴɢ ᴏ̈ʟᴄ̧ᴜ̈ʟᴍᴇᴅɪ"
 
     await asyncio.sleep(2)
-    await mesaj.edit(f"✅ ʏᴇɴɪʟᴇᴍᴇ ʙɪᴛᴛɪ!! ᴘɪɴɢ: {ping_ms} ms\nʙᴏᴛ ᴀʀᴛɪᴋ ᴅᴀʜᴀ sᴛᴀʙɪʟ, ɪʏɪ sᴏʜʙᴇᴛʟᴇʀ..")
-
+    await mesaj.edit(
+        f"✅ ʏᴇɴɪʟᴇᴍᴇ ʙɪᴛᴛɪ!! ᴘɪɴɢ: {ping_ms} ms\n"
+        f"ʙᴏᴛ ᴀʀᴛɪᴋ ᴅᴀʜᴀ sᴛᴀʙɪʟ, ɪʏɪ sᴏʜʙᴇᴛʟᴇʀ.."
+    )
 
 genius = lyricsgenius.Genius(GENIUS_TOKEN, timeout=15, skip_non_songs=True)
 
