@@ -58,7 +58,7 @@ async def start(event):
         ),
         buttons=[
             [Button.url("🥇 ᴏᴡɴᴇʀ", "https://t.me/ARTzX7")],
-            [Button.inline("ℹ️ ʜᴇʟᴘ", data="help")]
+            [Button.inline("ℹ️ ʜᴇʟᴘ", data="cevirme")]
         ],
         link_preview=False
     )
@@ -73,11 +73,37 @@ async def start(event):
     )
 
 
-# Inline Help Menüsü
-@client.on(events.CallbackQuery(data="help"))
-async def help_menu(event):
+
+# Inline Start’a Geri Dön
+@client.on(events.CallbackQuery(data="cevirme"))
+async def cevirme(event):
+    user = await event.get_sender()
+    first_name = user.first_name
+
     await event.edit(
-        "📚 ᴋᴏᴍᴜᴛʟᴀʀɪᴍ ᴀşᴀɢ̆ɪᴅᴀ ʏᴇʀ ᴀʟɪʏᴏʀ:\n\n"
+        f"{first_name}, Hangi Komutlara Erişmek istiyorsun?",
+        buttons=[
+            [Button.inline("▶️ Tagger", data="tag")],
+            [Button.inline("ℹ️ Diğer", data="diger")]
+        ],
+        link_preview=False
+    )
+
+# Inline Help Menüsü
+@client.on(events.CallbackQuery(data="tag"))
+async def tag_menu(event):
+    await event.edit(
+        "📚 ᴋᴏᴍᴜᴛʟᴀʀ ᴀşᴀɢ̆ɪᴅᴀ ʏᴇʀ ᴀʟɪʏᴏʀ:\n\n"
+        "➪ `/yenile` - sᴜɴᴜᴄᴜ'ʏᴜ ʏᴇɴɪᴅᴇɴ ʙᴀşʟᴀᴛɪʀ, ʜᴀᴛᴀʟᴀʀɪ ɢɪᴅᴇʀɪʀ",
+        buttons=[[Button.inline("⬅️ ɢᴇʀɪ ᴅᴏ̈ɴ", data="starta")]],
+        link_preview=False
+    )
+
+# Inline tag Menüsü
+@client.on(events.CallbackQuery(data="diger"))
+async def diger_menu(event):
+    await event.edit(
+        "📚 ᴋᴏᴍᴜᴛʟᴀʀ ᴀşᴀɢ̆ɪᴅᴀ ʏᴇʀ ᴀʟɪʏᴏʀ:\n\n"
         "➪ `/ara` - ʏᴏᴛᴜʙᴇᴅᴇ ᴍᴜsɪc, ᴠᴇʏᴀ ᴅᴏsʏᴀ sᴇsɪ ɪɴᴅɪʀɪʀ\n\n"
         "➪ `/song` - ᴀʀᴀᴅɪɢ̆ɪɴɪᴢ ᴘᴀʀᴄ̧ᴀɴɪɴ sᴏ̈ᴢʟᴇʀɪɴɪ ʙᴜʟᴜᴘ sɪᴢᴇ iʟᴇᴛiʀ\n\n"
         "➪ `/random` - siᴢᴇ ʀᴀsᴛɢᴇʟᴇ ʏᴏᴜᴛᴜʙᴇ'ᴅᴇ ᴘᴀʀᴄ̧ᴀ ʙᴜʟᴜᴘ ᴀᴛᴀʀ\n\n"
@@ -85,7 +111,6 @@ async def help_menu(event):
         buttons=[[Button.inline("⬅️ ɢᴇʀɪ ᴅᴏ̈ɴ", data="starta")]],
         link_preview=False
     )
-
 
 # Inline Start’a Geri Dön
 @client.on(events.CallbackQuery(data="starta"))
