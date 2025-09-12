@@ -78,10 +78,10 @@ async def cevirme(event):
 async def tag_menu(event):
     await event.edit(
         "📚 **Tagger Komutlarım Aşağıda:**\n\n"
-        "⇛ /tagall - Üyeleri 5'li Şekilde 3sn aralıklı etiketler\n"
-        "⇛ /tektag - Üyeleri tekli șekilde hepsini etiketler\n"
-        "⇛ /yetkili - Gruptaki adminleri etiketler\n\n"
-        "⛔ **KOMUTLARI SADECE YETKİLİ ADMİNLER KULLANABİLİR, UNUTMA!**",
+        "⇨ `/tagall` - üʏᴇʟᴇʀi 5'ʟi ᴇᴛiᴋᴇᴛʟᴇʀ\n"
+        "⇨ `/tektag` - üʏᴇʟᴇʀi ᴛᴇᴋʟi ᴇᴛiᴋᴇᴛʟᴇʀ\n"
+        "⇨ `/yetkili` - ɢʀᴜᴘ ʏᴇᴛᴋiʟiʟᴇʀiɴi ᴇᴛiᴋᴇᴛʟᴇʀ\n\n"
+        "⛔ **ᴋᴏᴍᴜᴛʟᴀʀɪ sᴀᴅᴇᴄᴇ ʏᴇᴛᴋiʟi ᴀᴅᴍiɴʟᴇʀ ᴋᴜʟʟᴀɴᴀʙiʟiʀ!**",
         buttons=[[Button.inline("⬅️ Geri Dön", data="cevirme")]],
         link_preview=False
     )
@@ -91,10 +91,10 @@ async def tag_menu(event):
 async def diger_menu(event):
     await event.edit(
         "📚 **Diğer Komutlar:**\n\n"
-        "⇛ /ara - YouTube'den müzik veya dosya indirir\n"
-        "⇛ /song - Şarkı sözlerini bulur\n"
-        "⇛ /random - Rastgele YouTube parçası atar\n"
-        "⇛ /yenile - Sunucuyu yeniden başlatır",
+        "⇨ `/ara` - ʏᴏᴜᴛᴜʙᴇ'ᴅᴇɴ isᴛᴇᴅiɢiɴ ᴘᴀʀçᴀʏɪ iɴᴅiʀiʀ\n"
+        "⇨ `/song` - șᴀʀᴋɪ söᴢʟᴇʀiɴi ʙᴜʟᴜʀ\n"
+        "⇨ `/random` - ʀᴀsᴛɢᴇʟᴇ ᴘᴀʀçᴀ öɴᴇʀiʀ\n"
+        "⇨ `/yenile` - sᴜɴᴜᴄᴜʏᴜ ʏᴇɴiᴅᴇɴ ʙᴀșʟᴀᴛɪʀ",
         buttons=[[Button.inline("⬅️ Geri Dön", data="cevirme")]],
         link_preview=False
     )
