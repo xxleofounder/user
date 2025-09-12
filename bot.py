@@ -61,6 +61,29 @@ async def start(event):
         link_preview=False
     )
 
+
+@client.on(events.ChatAction)
+async def handler(event):
+    # botu tetikle
+    if event.user_added and (await event.get_user()).is_self:
+        chat = await event.get_chat()
+
+        await client.send_message(
+            event.chat_id,
+            f"👋🏻 **Merhaba {chat.title} üyeleri!**\n\n"
+            "📌 **Ben bir etiketleme botuyum. Çeşitli özelliklere sahibim.**\n\n"
+            "🔔 **Komutlar ve destek için aşağıdaki butonları kullanabilirsiniz.**",
+            buttons=[
+                [Button.url("➕ Beni Gruba Ekle", f"https://t.me/{botUsername}?startgroup=true")],
+                [
+                    Button.inline("ℹ️ Help", data="cevirme"),
+                    Button.url("💬 Destek", "https://t.me/artzfounder")
+                ]
+            ],
+            link_preview=False
+        )
+
+
 # Çevirme menüsü (Help tıklanınca)
 @client.on(events.CallbackQuery(data="cevirme"))
 async def cevirme(event):
