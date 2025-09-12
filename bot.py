@@ -396,5 +396,5 @@ async def cancel(event):
         tekli_calisan.remove(event.chat_id)
 
 
-print(">> 🛠️ Artz , Başarıyla Aktifleştirildi...<<")
+print("[INFO] - Artz , Başarıyla Aktifleştirildi...")
 client.run_until_disconnected()
