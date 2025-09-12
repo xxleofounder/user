@@ -46,8 +46,7 @@ async def start(event):
     user = await event.get_sender()
     first_name = user.first_name
 
-    await client.send_message(
-        event.chat_id,
+    await event.respond(
         f"👋🏻 **Merhaba, {first_name}**\n\n"
         "📌 **Klasik etiketleme Özelliklerine sahip, Bir Etiketleme Botuyum. Çeşitli Özelliklere Sahibim.**\n\n"
         "🔔 **Komutlar ve destek için aşağıdaki butonları kullanabilirsin.**",
