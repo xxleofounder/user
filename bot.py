@@ -55,7 +55,7 @@ async def start(event):
             [Button.url("➕ Beni Gruba Ekle", f"https://t.me/{botUsername}?startgroup=true")],
             [
                 Button.inline("ℹ️ Help", data="cevirme"),
-                Button.url("💬 Destek", "https://t.me/artzfounder")
+                Button.url("💬 Destek", "https://t.me/{ownerUser}")
             ]
         ],
         link_preview=False
@@ -67,8 +67,10 @@ async def handler(event):
     # Bot gruba eklendiğinde tetiklenecek
     if event.user_added and (await event.get_user()).is_self:
         chat = await event.get_chat()
-        adder = await event.get_user()
-        firstname = adder.first_name
+        
+        # Gruba ekleyen kişiyi al
+        adder = await client.get_entity(event.added_by)
+        firstname = adder.first_name if adder else "Birisi"
 
         await client.send_message(
             event.chat_id,
@@ -76,8 +78,8 @@ async def handler(event):
             "📌 Detaylı bilgi için aşağıdaki butonları kullanabilirsin:",
             buttons=[
                 [
-                    Button.url("💬 Destek", "https://t.me/artzfounder"),
-                    Button.inline("ℹ️ Help", data="cevirme")
+                    Button.url("💬 Destek", "https://t.me/{ownerUser}"),
+                    Button.inline("📖 Help", data="cevirme")
                 ]
             ],
             link_preview=False
