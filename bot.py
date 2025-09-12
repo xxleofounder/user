@@ -57,7 +57,8 @@ async def start(event):
                 Button.url("💬 Destek", f"https://t.me/{ownerUser}")
             ]
         ],
-        link_preview=False
+        link_preview=False,
+        reply_to=event.message.id  # İşte burası mesajı yanıt olarak gönderir
     )
 
 
