@@ -136,7 +136,7 @@ async def starta(event):
             [Button.url("➕ Beni Gruba Ekle", f"https://t.me/{botUsername}?startgroup=true")],
             [
                 Button.inline("ℹ️ Help", data="cevirme"),
-                Button.url("💬 Destek", f"https://t.me/{ownerUser")
+                Button.url("💬 Destek", f"https://t.me/{ownerUser}")
             ]
         ],
         link_preview=False
