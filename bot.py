@@ -41,7 +41,7 @@ keywords = {
   
 
 
-@client.on(events.NewMessage(pattern="^/start$"))
+@client.on(events.NewMessage(pattern=rf"^/start(@{botUsername})?$"))
 async def start(event):
     user = await event.get_sender()
     first_name = user.first_name
