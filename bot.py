@@ -23,9 +23,9 @@ LOGGER = logging.getLogger(__name__)
 api_id = Config.API_ID
 api_hash = Config.API_HASH
 bot_token = Config.BOT_TOKEN
-OWNER_ID = 8276543841
-botUsername = "leousertaggerbot"
-ownerUser = "artzfounder"
+OWNER_ID = Config.OWNER_ID
+botUsername = Config.BOT_USERNAME
+ownerUser = Config.OWNER_USER
 
 client = TelegramClient('client', api_id, api_hash).start(bot_token=bot_token)
 
