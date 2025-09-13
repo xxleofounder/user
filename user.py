@@ -2,9 +2,9 @@ from telethon import TelegramClient, events
 import asyncio
 
 # ---- CONFIG ----
-API_ID = 12345
-API_HASH = "BURAYA_API_HASH_YAZ"
-MAIN_BOT_TOKEN = "BURAYA_ANA_BOT_TOKENINI_YAZ"
+API_ID = 21883581
+API_HASH = "c3b4ba58d5dada9bc8ce6c66e09f3f12"
+MAIN_BOT_TOKEN = "8449988873:AAFAAdg4cwLjE2GtiBk891OfE85o-xRQVuc"
 
 MAIN_START_MSG = "👋 Merhaba! Ben ana botum.\n/token <BOT_TOKEN> ile yeni bot ekleyebilirsin."
 CLONE_START_MSG = "🤖 Selam! Ben yeni eklenen bir kopya botum."
