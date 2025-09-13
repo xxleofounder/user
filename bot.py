@@ -66,9 +66,11 @@ async def start(event):
 async def handler(event):
     # Sadece bot gruba eklendiğinde çalışsın
     if event.user_added and (await event.get_user()).is_self:
-        chat = await event.get_chat()
+        # Tekrarı engellemek için user_joined'i pas geç
+        if event.user_joined:
+            return  
 
-        # Gruba ekleyen kişiyi al
+        chat = await event.get_chat()
         adder = await event.get_added_by()
         firstname = adder.first_name if adder else "Birisi"
 
