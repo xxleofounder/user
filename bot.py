@@ -64,12 +64,12 @@ async def start(event):
 
 @client.on(events.ChatAction)
 async def handler(event):
-    # Bot gruba eklendiğinde tetiklensin
-    if event.user_added and (await event.get_user()).is_self and event.added_by:
+    # Sadece bot gruba eklendiğinde çalışsın
+    if event.user_added and (await event.get_user()).is_self:
         chat = await event.get_chat()
 
-        # Gruba ekleyen kişi
-        adder = await client.get_entity(event.added_by)
+        # Gruba ekleyen kişiyi al
+        adder = await event.get_added_by()
         firstname = adder.first_name if adder else "Birisi"
 
         await client.send_message(
