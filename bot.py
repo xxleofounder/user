@@ -434,7 +434,7 @@ async def tag_admins(event):
     if event.is_private:
         return await event.respond(
             "ʙᴜ ᴋᴏᴍᴜᴛ ɢʀᴜᴘ ᴠᴇʏᴀ ᴋᴀɴᴀʟʟᴀʀ içiɴ ɢᴇçᴇʀʟiᴅiʀ❗️",
-            buttons=[[Button.url("➕ ʙᴇɴɪ ɢʀᴜʙᴀ ᴇᴋʟᴇ", f"https://t.me/{bot_username}?startgroup=true")]]
+            buttons=[[Button.url("➕ ʙᴇɴɪ ɢʀᴜʙᴀ ᴇᴋʟᴇ", f"https://t.me/{botUsername}?startgroup=true")]]
         )
 
     # Komutu sadece adminler kullanabilir
@@ -481,7 +481,7 @@ async def list_bots(event):
     if event.is_private:
         return await event.reply(
             "❌ ʙᴜ ᴋᴏᴍᴜᴛ sᴀᴅᴇᴄᴇ ɢʀᴜᴘ ᴠᴇʏᴀ ᴋᴀɴᴀʟʟᴀʀᴅᴀ ᴋᴜʟʟᴀɴɪʟᴀʙɪʟɪʀ",
-            buttons=[[Button.url("➕ ʙᴇɴɪ ɢʀᴜʙᴀ ᴇᴋʟᴇ", f"https://t.me/{bot_username}?startgroup=true")]]
+            buttons=[[Button.url("➕ ʙᴇɴɪ ɢʀᴜʙᴀ ᴇᴋʟᴇ", f"https://t.me/{botUsername}?startgroup=true")]]
         )
 
     bots = []
