@@ -108,7 +108,8 @@ async def tag_menu(event):
         "📚 **Tagger Komutlarım Aşağıda:**\n\n"
         "⇨ `/tagall` - üʏᴇʟᴇʀi 5'ʟi ᴇᴛiᴋᴇᴛʟᴇʀ\n\n"
         "⇨ `/tektag` - üʏᴇʟᴇʀi ᴛᴇᴋʟi ᴇᴛiᴋᴇᴛʟᴇʀ\n\n"
-        "⇨ `/yetkili` - ɢʀᴜᴘ ʏᴇᴛᴋiʟiʟᴇʀiɴi ᴇᴛiᴋᴇᴛʟᴇʀ\n\n"
+        "⇨ `/yetkili` - ɢʀᴜᴘ ʏᴇᴛᴋiʟiʟᴇʀiɴi ʟisᴛᴇʟᴇʀ\n\n"
+        "⇨ `/cancel` - ᴀᴋᴛiғ çᴀʟɪșᴀɴ ișʟᴇᴍʟᴇʀi ᴅᴜʀᴅᴜʀᴜʀ\n\n"
         "⛔ **ᴋᴏᴍᴜᴛʟᴀʀɪ sᴀᴅᴇᴄᴇ ʏᴇᴛᴋiʟi ᴀᴅᴍiɴʟᴇʀ ᴋᴜʟʟᴀɴᴀʙiʟiʀ!**",
         buttons=[[Button.inline("⬅️ Geri Dön", data="cevirme")]],
         link_preview=False
@@ -444,7 +445,7 @@ async def tag_admins(event):
             is_admin = True
             break
     if not is_admin:
-        return await event.reply("❌ ʙᴜ ᴋᴏᴍᴜᴛ sᴀᴅᴇᴄᴇ ɢʀᴜᴘ ʏöɴᴇᴛɪᴄɪʟᴇʀ ᴋᴜʟʟᴀɴᴀ ʙɪʟɪʀ")
+        return await event.reply("❌ ʙᴜ ᴋᴏᴍᴜᴛ sᴀᴅᴇᴄᴇ ɢʀᴜᴘ ʏöɴᴇᴛɪᴄɪʟᴇʀ ᴋᴜʟʟᴀɴᴀʙɪʟɪʀ")
 
     # Adminleri al
     admins = []
@@ -468,7 +469,7 @@ async def tag_admins(event):
         mesaj += f"{sayac}. [{admin.first_name}](tg://user?id={admin.id})\n"
         sayac += 1
 
-    mesaj += "\n**ɢʀᴜᴘ ᴀᴅᴍɪɴʟᴇʀɪ ʙᴜɴʟᴀʀᴅɪʀ**"
+    mesaj += "\n**♦ ɢʀᴜᴘ ᴀᴅᴍiɴʟᴇʀi ʏᴜᴋᴀʀɪᴅᴀ ʟisᴛᴇʟᴇɴᴍișiʀ.**"
     await event.reply(mesaj)
 
 
@@ -490,9 +491,9 @@ async def list_bots(event):
             bots.append(member)
 
     if not bots:
-        return await event.reply("⚠️ ʙᴜ ɢʀᴜᴘᴛᴀ ʙᴏᴛ ʙᴜʟᴜɴᴍᴀᴍᴀᴋᴛᴀ")
+        return await event.reply("⚠️ ʙᴜ ɢʀᴜᴘᴛᴀ ʙᴏᴛ ʙᴜʟᴜɴᴍᴀᴍᴀᴋᴛᴀᴅɪʀ")
 
-    mesaj = "🤖 **ɢʀᴜᴘᴛᴀᴋɪ ʙᴏᴛʟᴀʀ:**\n"
+    mesaj = "🤖 **ʙᴏᴛʟᴀʀ ʟisᴛᴇʟᴇɴᴅi:**\n\n"
     for i, bot in enumerate(bots, start=1):
         mesaj += f"{i}. [{bot.first_name}](tg://user?id={bot.id})\n"
 
