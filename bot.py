@@ -424,57 +424,87 @@ async def cancel(event):
         tekli_calisan.remove(event.chat_id)
 
 from telethon import events, Button
+from telethon.tl.types import ChannelParticipantsAdmins
 
-@client.on(events.NewMessage(pattern="^/admin$"))
-async def list_admins(event):
-    if not event.is_group:
-        return await event.reply("Bu komut sadece gruplarda kullanılabilir.")
+# /yetkili komutu
+@client.on(events.NewMessage(pattern="^/yetkili$"))
+async def tag_admins(event):
+    if event.is_private:
+        return await event.reply("❌ Bu komut sadece gruplarda kullanılabilir.")
 
     sender = await event.get_sender()
     chat = await event.get_chat()
 
-    # Adminleri al
-    admins = [u async for u in client.iter_participants(chat, filter=lambda u: u.admin_rights or u.creator)]
-    sender_is_admin = any(sender.id == admin.id for admin in admins)
-    if not sender_is_admin:
+    # Komutu sadece adminler kullanabilir
+    is_admin = False
+    async for member in client.iter_participants(chat.id, filter=ChannelParticipantsAdmins):
+        if member.id == sender.id:
+            is_admin = True
+            break
+    if not is_admin:
         return await event.reply("❌ Bu komutu sadece grup yöneticileri kullanabilir.")
 
-    # Admin butonları
-    buttons = []
-    for admin in admins:
-        name = admin.first_name if admin.first_name else "Bilinmeyen"
-        if admin.username:
-            buttons.append([Button.url(name, f"https://t.me/{admin.username}")])
+    # Adminleri al
+    admins = []
+    creator = None
+    bots = []
+    async for member in client.iter_participants(chat.id, filter=ChannelParticipantsAdmins):
+        if member.bot:
+            bots.append(member)
+            continue
+        if getattr(member, 'creator', False):
+            creator = member
         else:
-            buttons.append([Button.inline(name, data=f"admin_{admin.id}")])
+            admins.append(member)
 
-    # Tek bir bot listesi butonu ekle
-    buttons.append([Button.inline("🤖 Botları Listele", data=b"list_bots")])
+    # Mesajı oluştur
+    mesaj = ""
+    sayac = 1
 
-    msg_text = f"👑 **Grup Adminleri ({len(admins)})**"
-    await event.reply(msg_text, buttons=buttons)
+    if creator:
+        mesaj += f"{sayac}. [{creator.first_name}](tg://user?id={creator.id})\n"
+        sayac += 1
 
+    for admin in admins[:99]:
+        mesaj += f"{sayac}. [{admin.first_name}](tg://user?id={admin.id})\n"
+        sayac += 1
 
-# Bot listesi butonu için handler
-@client.on(events.CallbackQuery(data=b'list_bots'))
+    mesaj += "\n**Grup adminleri bunlardır**"
+
+    # Mesajı reply ile gönder ve inline button ekle
+    await event.reply(
+        mesaj,
+        buttons=[
+            [Button.inline("🤖 Botları Göster", data=b"show_bots")]
+        ]
+    )
+
+# Buton callback
+@client.on(events.CallbackQuery(data=b"show_bots"))
 async def show_bots(event):
     chat = await event.get_chat()
-    bots = [u async for u in client.iter_participants(chat) if u.bot]
+
+    # Botları al
+    bots = []
+    async for member in client.iter_participants(chat.id):
+        if member.bot:
+            bots.append(member)
 
     if not bots:
-        return await event.edit("Bu grupta bot bulunmuyor.")
+        await event.reply("Bu grupta bot yok.")
+        return
 
-    # Botları tıklanabilir şekilde buton olarak göster
-    buttons = []
-    for bot in bots:
-        name = bot.first_name if bot.first_name else "Bilinmeyen"
-        if bot.username:
-            buttons.append([Button.url(name, f"https://t.me/{bot.username}")])
-        else:
-            buttons.append([Button.inline(name, data=f"bot_{bot.id}")])
+    mesaj = "🤖 **Gruptaki Botlar:**\n"
+    for i, bot in enumerate(bots, start=1):
+        mesaj += f"{i}. [{bot.first_name}](tg://user?id={bot.id})\n"
 
-    msg_text = f"🤖 **Grup Botları ({len(bots)})**"
-    await event.edit(msg_text, buttons=buttons)
+    # Orijinal mesajı silip yeni mesajı reply ile gönder
+    try:
+        await event.get_message().delete()
+    except:
+        pass
+
+    await event.reply(mesaj)
 
 print("[INFO] - Artz-rahmet , Başarıyla Aktifleştirildi...")
 client.run_until_disconnected()
