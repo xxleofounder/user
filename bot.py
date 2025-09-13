@@ -479,8 +479,8 @@ async def callback_handler(event):
             await event.answer("❌ Bu grupta bot bulunamadı.", alert=True)
             return
 
-        mesaj = "🤖 **Gruptaki Botlar:**\n\n" + "\n".join(bots)
-        # Mesajı reply üzerine edit et
+        mesaj = "🤖 **Gruptaki Botlar:**\n" + "\n".join(bots)
+        # Mevcut mesajı edit et
         await event.edit(
             mesaj,
             buttons=[[Button.inline("🗑 Mesajı Sil", data="delete_msg")]]
@@ -489,8 +489,10 @@ async def callback_handler(event):
     elif data == "delete_msg":
         # Mesajı silmek yerine editleyip bilgi ver
         try:
+            # Inline buton mesajını editleyerek silinmiş göster
             await event.edit("🗑 **Mesaj Silinmiştir, İyi sohbetler!**", buttons=[])
-        except:
+        except Exception as e:
+            print(f"Mesaj editlenemedi: {e}")
             await event.answer("❌ Mesaj editlenemedi.", alert=True)
 
 print("[INFO] - Artz-rahmet , Başarıyla Aktifleştirildi...")
