@@ -13,6 +13,7 @@ import lyricsgenius
 import random
 
 tekli_calisan = []
+sent_groups = set()
 
 logging.basicConfig(
     level=logging.INFO,
@@ -64,11 +65,12 @@ async def start(event):
 
 @client.on(events.ChatAction)
 async def handler(event):
-    # Sadece bot gruba eklendiğinde çalışsın
-    if event.user_added and (await event.get_user()).is_self:
-        # Tekrarı engellemek için user_joined'i pas geç
-        if event.user_joined:
-            return  
+    # Sadece bot eklendiğinde ve ekleyen kişi varsa çalışsın
+    if event.user_added and (await event.get_user()).is_self and event.added_by:
+        # Aynı gruba tekrar mesaj gönderilmesini engelle
+        if event.chat_id in sent_groups:
+            return
+        sent_groups.add(event.chat_id)
 
         chat = await event.get_chat()
         adder = await event.get_added_by()
