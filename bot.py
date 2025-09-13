@@ -423,7 +423,6 @@ async def cancel(event):
     if event.chat_id in tekli_calisan:
         tekli_calisan.remove(event.chat_id)
 
-
 from telethon import events, Button
 from telethon.tl.types import ChannelParticipantsAdmins
 
@@ -466,11 +465,13 @@ async def tag_admins(event):
 @client.on(events.CallbackQuery)
 async def callback_handler(event):
     data = event.data.decode("utf-8")
+    chat_id = event.chat_id
+    msg_id = event.message.id  # Mesaj ID’si alınır
 
     if data == "show_bots":
         bots = []
         sayac = 1
-        async for member in event.client.iter_participants(event.chat_id):
+        async for member in event.client.iter_participants(chat_id):
             if member.bot:
                 bots.append(f"{sayac}. [{member.first_name}](tg://user?id={member.id})")
                 sayac += 1
@@ -480,17 +481,15 @@ async def callback_handler(event):
             return
 
         mesaj = "🤖 **Gruptaki Botlar:**\n" + "\n".join(bots)
-        # Mevcut mesajı edit et
-        await event.edit(
-            mesaj,
-            buttons=[[Button.inline("🗑 Mesajı Sil", data="delete_msg")]]
-        )
+        # Mesajı ID ile edit et
+        await event.client.edit_message(chat_id, msg_id, mesaj,
+                                        buttons=[[Button.inline("🗑 Mesajı Sil", data="delete_msg")]])
 
     elif data == "delete_msg":
-        # Mesajı silmek yerine editleyip bilgi ver
+        # Mesajı ID ile edit ederek "silinmiş" göster
         try:
-            # Inline buton mesajını editleyerek silinmiş göster
-            await event.edit("🗑 **Mesaj Silinmiştir, İyi sohbetler!**", buttons=[])
+            await event.client.edit_message(chat_id, msg_id, "🗑 **Mesaj Silinmiştir, İyi sohbetler!**",
+                                            buttons=[])
         except Exception as e:
             print(f"Mesaj editlenemedi: {e}")
             await event.answer("❌ Mesaj editlenemedi.", alert=True)
