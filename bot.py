@@ -459,12 +459,18 @@ async def tag_admins(event):
     # Reply olarak gönder, sadece "Botları Göster" butonu
     await event.reply(
         mesaj,
-        buttons=[[Button.inline("🤖 Botları Göster", data="show_bots")]]
+        buttons=[[Button.inline("🤖 Botları Göster", data=b"show_bots")]]
     )
 
 @client.on(events.CallbackQuery)
 async def callback_handler(event):
-    data = event.data.decode("utf-8")
+    # Callback verisini güvenli şekilde al
+    data = event.data
+    if isinstance(data, bytes):
+        data = data.decode("utf-8")
+    else:
+        data = str(data)
+
     msg = await event.get_message()
     chat_id = event.chat_id
 
@@ -481,15 +487,14 @@ async def callback_handler(event):
             await event.answer("❌ Bu grupta bot bulunamadı.", alert=True)
             return
 
-        mesaj = "🤖 **Gruptaki Botlar:**\n\n" + "\n".join(bots)
-        # Mesajı editle, sadece "Adminleri Göster" butonu
+        mesaj = "🤖 **Gruptaki Botlar:**\n" + "\n".join(bots)
         await msg.edit(
             mesaj,
-            buttons=[[Button.inline("👑 Adminleri Göster", data="show_admins")]]
+            buttons=[[Button.inline("👑 Adminleri Göster", data=b"show_admins")]]
         )
 
     elif data == "show_admins":
-        # Adminleri al (botlar hariç)
+        # Adminleri al
         admins = []
         async for member in event.client.iter_participants(chat_id, filter=ChannelParticipantsAdmins):
             if not member.bot:
@@ -500,11 +505,10 @@ async def callback_handler(event):
             mesaj += f"🔹 {idx}. [{admin.first_name}](tg://user?id={admin.id})\n"
         mesaj += "\nℹ️ **Grup adminleri bunlardır**"
 
-        # Mesajı editle, sadece "Botları Göster" butonu
         await msg.edit(
             mesaj,
-            buttons=[[Button.inline("🤖 Botları Göster", data="show_bots")]]
-                               )
+            buttons=[[Button.inline("🤖 Botları Göster", data=b"show_bots")]]
+        )
 
 print("[INFO] - Artz-rahmet , Başarıyla Aktifleştirildi...")
 client.run_until_disconnected()
