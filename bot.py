@@ -435,13 +435,16 @@ async def tag_admins(event):
     chat = await event.get_chat()
 
     # Komutu sadece adminler kullanabilir
+    sender_is_admin = False
     async for member in client.iter_participants(chat.id, filter=ChannelParticipantsAdmins):
         if member.id == sender.id:
+            sender_is_admin = True
             break
-    else:
+
+    if not sender_is_admin:
         return await event.reply("❌ Bu komutu sadece grup yöneticileri kullanabilir.")
 
-    # Adminleri al (kurucu dahil)
+    # Adminleri al (botlar hariç)
     admins = []
     async for member in client.iter_participants(chat.id, filter=ChannelParticipantsAdmins):
         if not member.bot:
@@ -451,24 +454,22 @@ async def tag_admins(event):
     mesaj = ""
     for idx, admin in enumerate(admins, start=1):
         mesaj += f"🔹 {idx}. [{admin.first_name}](tg://user?id={admin.id})\n"
-
     mesaj += "\nℹ️ **Grup adminleri bunlardır**"
 
-    # Reply olarak gönder
-    sent_msg = await event.reply(
+    # Reply olarak gönder, sadece "Botları Göster" butonu
+    await event.reply(
         mesaj,
-        buttons=[
-            [Button.inline("🤖 Botları Göster", data="show_bots"), Button.inline("🗑 Mesajı Sil", data="delete_msg")]
-        ]
+        buttons=[[Button.inline("🤖 Botları Göster", data="show_bots")]]
     )
 
 @client.on(events.CallbackQuery)
 async def callback_handler(event):
     data = event.data.decode("utf-8")
+    msg = await event.get_message()
     chat_id = event.chat_id
-    msg_id = event.message.id  # Mesaj ID’si alınır
 
     if data == "show_bots":
+        # Botları al
         bots = []
         sayac = 1
         async for member in event.client.iter_participants(chat_id):
@@ -480,19 +481,30 @@ async def callback_handler(event):
             await event.answer("❌ Bu grupta bot bulunamadı.", alert=True)
             return
 
-        mesaj = "🤖 **Gruptaki Botlar:**\n" + "\n".join(bots)
-        # Mesajı ID ile edit et
-        await event.client.edit_message(chat_id, msg_id, mesaj,
-                                        buttons=[[Button.inline("🗑 Mesajı Sil", data="delete_msg")]])
+        mesaj = "🤖 **Gruptaki Botlar:**\n\n" + "\n".join(bots)
+        # Mesajı editle, sadece "Adminleri Göster" butonu
+        await msg.edit(
+            mesaj,
+            buttons=[[Button.inline("👑 Adminleri Göster", data="show_admins")]]
+        )
 
-    elif data == "delete_msg":
-        # Mesajı ID ile edit ederek "silinmiş" göster
-        try:
-            await event.client.edit_message(chat_id, msg_id, "🗑 **Mesaj Silinmiştir, İyi sohbetler!**",
-                                            buttons=[])
-        except Exception as e:
-            print(f"Mesaj editlenemedi: {e}")
-            await event.answer("❌ Mesaj editlenemedi.", alert=True)
+    elif data == "show_admins":
+        # Adminleri al (botlar hariç)
+        admins = []
+        async for member in event.client.iter_participants(chat_id, filter=ChannelParticipantsAdmins):
+            if not member.bot:
+                admins.append(member)
+
+        mesaj = ""
+        for idx, admin in enumerate(admins, start=1):
+            mesaj += f"🔹 {idx}. [{admin.first_name}](tg://user?id={admin.id})\n"
+        mesaj += "\nℹ️ **Grup adminleri bunlardır**"
+
+        # Mesajı editle, sadece "Botları Göster" butonu
+        await msg.edit(
+            mesaj,
+            buttons=[[Button.inline("🤖 Botları Göster", data="show_bots")]]
+                               )
 
 print("[INFO] - Artz-rahmet , Başarıyla Aktifleştirildi...")
 client.run_until_disconnected()
