@@ -424,20 +424,18 @@ async def cancel(event):
     if event.chat_id in tekli_calisan:
         tekli_calisan.remove(event.chat_id)
 
-from telethon import events
-from telethon.tl.types import ChannelParticipantsAdmins
-
 # /yetkili komutu → adminleri listeler
 @client.on(events.NewMessage(pattern="^/yetkili$"))
 async def tag_admins(event):
-    if event.is_private:
-        return await event.respond(
-            "üᴢɢüɴüᴍ, ʙᴜ ᴋᴏᴍᴜᴛ ɢʀᴜᴘ ᴠᴇʏᴀ ᴋᴀɴᴀʟʟᴀʀ içiɴ ɢᴇçᴇʀʟiᴅiʀ❗️",
-            buttons=[[Button.url("➕ ʙᴇɴi ɢʀᴜʙᴀ ᴇᴋʟᴇ", f"https://t.me/{bot_username}?startgroup=true")]],
-        )
-        
     sender = await event.get_sender()
     chat = await event.get_chat()
+
+    # DM kontrolü
+    if event.is_private:
+        return await event.respond(
+            "ʙᴜ ᴋᴏᴍᴜᴛ ɢʀᴜᴘ ᴠᴇʏᴀ ᴋᴀɴᴀʟʟᴀʀ içiɴ ɢᴇçᴇʀʟiᴅiʀ❗️",
+            buttons=[[Button.url("➕ ʙᴇɴɪ ɢʀᴜʙᴀ ᴇᴋʟᴇ", f"https://t.me/{bot_username}?startgroup=true")]]
+        )
 
     # Komutu sadece adminler kullanabilir
     is_admin = False
@@ -446,7 +444,7 @@ async def tag_admins(event):
             is_admin = True
             break
     if not is_admin:
-        return await event.reply("❌ Bu komutu sadece grup yöneticileri kullanabilir.")
+        return await event.reply("❌ ʙᴜ ᴋᴏᴍᴜᴛ sᴀᴅᴇᴄᴇ ɢʀᴜᴘ ʏöɴᴇᴛɪᴄɪʟᴇʀ ᴋᴜʟʟᴀɴᴀ ʙɪʟɪʀ")
 
     # Adminleri al
     admins = []
@@ -459,7 +457,6 @@ async def tag_admins(event):
         else:
             admins.append(member)
 
-    # Mesajı oluştur
     mesaj = ""
     sayac = 1
 
@@ -471,17 +468,21 @@ async def tag_admins(event):
         mesaj += f"{sayac}. [{admin.first_name}](tg://user?id={admin.id})\n"
         sayac += 1
 
-    mesaj += "\n**Grup adminleri bunlardır**"
+    mesaj += "\n**ɢʀᴜᴘ ᴀᴅᴍɪɴʟᴇʀɪ ʙᴜɴʟᴀʀᴅɪʀ**"
     await event.reply(mesaj)
 
 
 # /bots komutu → sadece botları listeler
 @client.on(events.NewMessage(pattern="^/bots$"))
 async def list_bots(event):
-    if event.is_private:
-        return await event.reply("❌ ʙᴜ ᴋᴏᴍᴜᴛ sᴀᴅᴇᴄᴇ ɢʀᴜᴘ ᴠᴇʏᴀ ᴋᴀɴᴀʟʟᴀʀᴅᴀ ᴋᴜʟʟᴀɴɪʟᴀʙiʟiʀ")
-
     chat = await event.get_chat()
+
+    # DM kontrolü
+    if event.is_private:
+        return await event.reply(
+            "❌ ʙᴜ ᴋᴏᴍᴜᴛ sᴀᴅᴇᴄᴇ ɢʀᴜᴘ ᴠᴇʏᴀ ᴋᴀɴᴀʟʟᴀʀᴅᴀ ᴋᴜʟʟᴀɴɪʟᴀʙɪʟɪʀ",
+            buttons=[[Button.url("➕ ʙᴇɴɪ ɢʀᴜʙᴀ ᴇᴋʟᴇ", f"https://t.me/{bot_username}?startgroup=true")]]
+        )
 
     bots = []
     async for member in client.iter_participants(chat.id):
@@ -491,7 +492,7 @@ async def list_bots(event):
     if not bots:
         return await event.reply("⚠️ ʙᴜ ɢʀᴜᴘᴛᴀ ʙᴏᴛ ʙᴜʟᴜɴᴍᴀᴍᴀᴋᴛᴀ")
 
-    mesaj = "🤖 **Gruptaki Botlar:**\n"
+    mesaj = "🤖 **ɢʀᴜᴘᴛᴀᴋɪ ʙᴏᴛʟᴀʀ:**\n"
     for i, bot in enumerate(bots, start=1):
         mesaj += f"{i}. [{bot.first_name}](tg://user?id={bot.id})\n"
 
