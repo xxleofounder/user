@@ -118,10 +118,11 @@ async def tag_menu(event):
 @client.on(events.CallbackQuery(data="diger"))
 async def diger_menu(event):
     await event.edit(
-        "📚 **Diğer Komutlar:**\n\n"
+        "📚 **Diğer Komutlarm:**\n\n"
         "⇨ `/ara` - ʏᴏᴜᴛᴜʙᴇ'ᴅᴇɴ isᴛᴇᴅiɢiɴ ᴘᴀʀçᴀʏɪ iɴᴅiʀiʀ\n\n"
         "⇨ `/song` - șᴀʀᴋɪ söᴢʟᴇʀiɴi ʙᴜʟᴜʀ\n\n"
         "⇨ `/random` - ʀᴀsᴛɢᴇʟᴇ ᴘᴀʀçᴀ öɴᴇʀiʀ\n\n"
+        "⇨ `/bots` - ɢʀᴜᴘᴛᴀᴋi ʙᴏᴛʟᴀʀɪ ʟisᴛᴇʟᴇʀ\n\n"
         "⇨ `/yenile` - sᴜɴᴜᴄᴜʏᴜ ʏᴇɴiᴅᴇɴ ʙᴀșʟᴀᴛɪʀ",
         buttons=[[Button.inline("⬅️ Geri Dön", data="cevirme")]],
         link_preview=False
@@ -430,8 +431,11 @@ from telethon.tl.types import ChannelParticipantsAdmins
 @client.on(events.NewMessage(pattern="^/yetkili$"))
 async def tag_admins(event):
     if event.is_private:
-        return await event.reply("❌ Bu komut sadece gruplarda kullanılabilir.")
-
+        return await event.respond(
+            "üᴢɢüɴüᴍ, ʙᴜ ᴋᴏᴍᴜᴛ ɢʀᴜᴘ ᴠᴇʏᴀ ᴋᴀɴᴀʟʟᴀʀ içiɴ ɢᴇçᴇʀʟiᴅiʀ❗️",
+            buttons=[[Button.url("➕ ʙᴇɴi ɢʀᴜʙᴀ ᴇᴋʟᴇ", f"https://t.me/{bot_username}?startgroup=true")]],
+        )
+        
     sender = await event.get_sender()
     chat = await event.get_chat()
 
@@ -475,7 +479,7 @@ async def tag_admins(event):
 @client.on(events.NewMessage(pattern="^/bots$"))
 async def list_bots(event):
     if event.is_private:
-        return await event.reply("❌ Bu komut sadece gruplarda kullanılabilir.")
+        return await event.reply("❌ ʙᴜ ᴋᴏᴍᴜᴛ sᴀᴅᴇᴄᴇ ɢʀᴜᴘ ᴠᴇʏᴀ ᴋᴀɴᴀʟʟᴀʀᴅᴀ ᴋᴜʟʟᴀɴɪʟᴀʙiʟiʀ")
 
     chat = await event.get_chat()
 
@@ -485,7 +489,7 @@ async def list_bots(event):
             bots.append(member)
 
     if not bots:
-        return await event.reply("Bu grupta bot yok.")
+        return await event.reply("⚠️ ʙᴜ ɢʀᴜᴘᴛᴀ ʙᴏᴛ ʙᴜʟᴜɴᴍᴀᴍᴀᴋᴛᴀ")
 
     mesaj = "🤖 **Gruptaki Botlar:**\n"
     for i, bot in enumerate(bots, start=1):
