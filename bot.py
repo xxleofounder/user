@@ -423,10 +423,10 @@ async def cancel(event):
     if event.chat_id in tekli_calisan:
         tekli_calisan.remove(event.chat_id)
 
-from telethon import events, Button
+from telethon import events
 from telethon.tl.types import ChannelParticipantsAdmins
 
-# /yetkili komutu
+# /yetkili komutu → adminleri listeler
 @client.on(events.NewMessage(pattern="^/yetkili$"))
 async def tag_admins(event):
     if event.is_private:
@@ -444,17 +444,15 @@ async def tag_admins(event):
     if not is_admin:
         return await event.reply("❌ Bu komutu sadece grup yöneticileri kullanabilir.")
 
-    # Adminleri ve botları al
+    # Adminleri al
     admins = []
     creator = None
-    bots = []
-    async for member in client.iter_participants(chat.id):
+    async for member in client.iter_participants(chat.id, filter=ChannelParticipantsAdmins):
         if member.bot:
-            bots.append(member)
             continue
         if getattr(member, 'creator', False):
             creator = member
-        elif getattr(member, 'admin_rights', False):
+        else:
             admins.append(member)
 
     # Mesajı oluştur
@@ -470,36 +468,30 @@ async def tag_admins(event):
         sayac += 1
 
     mesaj += "\n**Grup adminleri bunlardır**"
-
-    # Inline buton ekle
-    buttons = [[Button.inline("🤖 Botları Göster", data=b"show_bots")]]
-    await event.reply(mesaj, buttons=buttons)
+    await event.reply(mesaj)
 
 
-# Buton callback
-@client.on(events.CallbackQuery(data=b"show_bots"))
-async def show_bots(event):
+# /bots komutu → sadece botları listeler
+@client.on(events.NewMessage(pattern="^/bots$"))
+async def list_bots(event):
+    if event.is_private:
+        return await event.reply("❌ Bu komut sadece gruplarda kullanılabilir.")
+
     chat = await event.get_chat()
 
-    # Botları al
     bots = []
     async for member in client.iter_participants(chat.id):
         if member.bot:
             bots.append(member)
 
     if not bots:
-        await event.answer("Bu grupta bot yok.", alert=True)
-        return
+        return await event.reply("Bu grupta bot yok.")
 
     mesaj = "🤖 **Gruptaki Botlar:**\n"
     for i, bot in enumerate(bots, start=1):
         mesaj += f"{i}. [{bot.first_name}](tg://user?id={bot.id})\n"
 
-    # Orijinal mesajı edit ile güncelle
-    try:
-        await event.edit(mesaj, buttons=None)
-    except:
-        pass
+    await event.reply(mesaj)
 
 print("[INFO] - Artz-rahmet , Başarıyla Aktifleştirildi...")
 client.run_until_disconnected()
