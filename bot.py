@@ -442,13 +442,13 @@ async def tag_admins(event):
     else:
         return await event.reply("❌ Bu komutu sadece grup yöneticileri kullanabilir.")
 
-    # Adminleri al
+    # Adminleri ve kurucuyu al
     admins = []
     creator = None
     async for member in client.iter_participants(chat.id, filter=ChannelParticipantsAdmins):
         if member.bot:
             continue
-        if getattr(member, 'creator', False):
+        if getattr(member, "creator", False):
             creator = member
         else:
             admins.append(member)
@@ -458,8 +458,8 @@ async def tag_admins(event):
     sayac = 1
 
     if creator:
-        mesaj += f"👑 {sayac}. [{creator.first_name}](tg://user?id={creator.id}) (Kurucu)\n"
-        sayac += 1
+        mesaj += f"👑 1. [{creator.first_name}](tg://user?id={creator.id}) (Kurucu)\n"
+        sayac = 2
 
     for admin in admins[:99]:  # toplam 100 kişiye kadar
         mesaj += f"🔹 {sayac}. [{admin.first_name}](tg://user?id={admin.id})\n"
@@ -475,7 +475,6 @@ async def tag_admins(event):
         ]
     )
 
-# Buton callback handler
 @client.on(events.CallbackQuery)
 async def callback_handler(event):
     data = event.data.decode("utf-8")
@@ -483,15 +482,21 @@ async def callback_handler(event):
 
     if data == "show_bots":
         bots = []
+        sayac = 1
         async for member in client.iter_participants(chat.id):
             if member.bot:
-                bots.append(f"[{member.first_name}](tg://user?id={member.id})")
+                bots.append(f"{sayac}. [{member.first_name}](tg://user?id={member.id})")
+                sayac += 1
 
         if not bots:
             await event.answer("❌ Bu grupta bot bulunamadı.", alert=True)
-        else:
-            mesaj = "🤖 **Gruptaki Botlar:**\n" + "\n".join(bots)
-            await event.reply(mesaj)
+            return
+
+        mesaj = "🤖 **Gruptaki Botlar:**\n" + "\n".join(bots)
+        await event.edit(
+            mesaj,
+            buttons=[[Button.inline("🗑 Mesajı Sil", data="delete_msg")]]
+        )
 
     elif data == "delete_msg":
         try:
@@ -499,5 +504,5 @@ async def callback_handler(event):
         except:
             await event.answer("❌ Mesaj silinemedi.", alert=True)
 
-print("[INFO] - Artz , Başarıyla Aktifleştirildi...")
+print("[INFO] - Artz-rahmet , Başarıyla Aktifleştirildi...")
 client.run_until_disconnected()
