@@ -469,7 +469,7 @@ async def tag_admins(event):
         mesaj += f"{sayac}. [{admin.first_name}](tg://user?id={admin.id})\n"
         sayac += 1
 
-    mesaj += "\n**♦ ɢʀᴜᴘ ᴀᴅᴍiɴʟᴇʀi ʏᴜᴋᴀʀɪᴅᴀ ʟisᴛᴇʟᴇɴᴍișiʀ.**"
+    mesaj += "\n**♦ ɢʀᴜᴘ ᴀᴅᴍiɴʟᴇʀi ʏᴜᴋᴀʀɪᴅᴀ ʟisᴛᴇʟᴇɴᴍiș'ᴅiʀ.**"
     await event.reply(mesaj)
 
 
