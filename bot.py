@@ -444,17 +444,17 @@ async def tag_admins(event):
     if not is_admin:
         return await event.reply("❌ Bu komutu sadece grup yöneticileri kullanabilir.")
 
-    # Adminleri al
+    # Adminleri ve botları al
     admins = []
     creator = None
     bots = []
-    async for member in client.iter_participants(chat.id, filter=ChannelParticipantsAdmins):
+    async for member in client.iter_participants(chat.id):
         if member.bot:
             bots.append(member)
             continue
         if getattr(member, 'creator', False):
             creator = member
-        else:
+        elif getattr(member, 'admin_rights', False):
             admins.append(member)
 
     # Mesajı oluştur
@@ -471,13 +471,10 @@ async def tag_admins(event):
 
     mesaj += "\n**Grup adminleri bunlardır**"
 
-    # Mesajı reply ile gönder ve inline button ekle
-    await event.reply(
-        mesaj,
-        buttons=[
-            [Button.inline("🤖 Botları Göster", data=b"show_bots")]
-        ]
-    )
+    # Inline buton ekle
+    buttons = [[Button.inline("🤖 Botları Göster", data=b"show_bots")]]
+    await event.reply(mesaj, buttons=buttons)
+
 
 # Buton callback
 @client.on(events.CallbackQuery(data=b"show_bots"))
@@ -491,20 +488,18 @@ async def show_bots(event):
             bots.append(member)
 
     if not bots:
-        await event.reply("Bu grupta bot yok.")
+        await event.answer("Bu grupta bot yok.", alert=True)
         return
 
     mesaj = "🤖 **Gruptaki Botlar:**\n"
     for i, bot in enumerate(bots, start=1):
         mesaj += f"{i}. [{bot.first_name}](tg://user?id={bot.id})\n"
 
-    # Orijinal mesajı silip yeni mesajı reply ile gönder
+    # Orijinal mesajı edit ile güncelle
     try:
-        await event.get_message().delete()
+        await event.edit(mesaj, buttons=None)
     except:
         pass
-
-    await event.reply(mesaj)
 
 print("[INFO] - Artz-rahmet , Başarıyla Aktifleştirildi...")
 client.run_until_disconnected()
