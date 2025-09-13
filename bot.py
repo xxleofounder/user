@@ -423,7 +423,7 @@ async def cancel(event):
     if event.chat_id in tekli_calisan:
         tekli_calisan.remove(event.chat_id)
 
-from telethon import events, Button
+        from telethon import events, Button
 from telethon.tl.types import ChannelParticipantsAdmins
 
 @client.on(events.NewMessage(pattern="^/yetkili$"))
@@ -465,20 +465,33 @@ async def tag_admins(event):
 @client.on(events.CallbackQuery)
 async def callback_handler(event):
     # Callback verisini güvenli şekilde al
-    data = event.data
+    data = getattr(event, "data", None)  # data yoksa None olarak al
+    if data is None:
+        await event.answer("❌ Geçersiz buton tıklaması.", alert=True)
+        return
+
+    # bytes ise decode et, değilse string'e çevir
     if isinstance(data, bytes):
-        data = data.decode("utf-8")
+        try:
+            data = data.decode("utf-8")
+        except Exception:
+            data = str(data)
     else:
         data = str(data)
 
-    msg = await event.get_message()
+    # Mesajı al
+    try:
+        msg = await event.get_message()
+    except Exception:
+        return  # mesaj alınamadıysa işlemi durdur
+
     chat_id = event.chat_id
 
+    # Toggle işlemleri
     if data == "show_bots":
-        # Botları al
         bots = []
         sayac = 1
-        async for member in event.client.iter_participants(chat_id):
+        async for member in client.iter_participants(chat_id):
             if member.bot:
                 bots.append(f"{sayac}. [{member.first_name}](tg://user?id={member.id})")
                 sayac += 1
@@ -494,9 +507,8 @@ async def callback_handler(event):
         )
 
     elif data == "show_admins":
-        # Adminleri al
         admins = []
-        async for member in event.client.iter_participants(chat_id, filter=ChannelParticipantsAdmins):
+        async for member in client.iter_participants(chat_id, filter=ChannelParticipantsAdmins):
             if not member.bot:
                 admins.append(member)
 
