@@ -424,5 +424,80 @@ async def cancel(event):
         tekli_calisan.remove(event.chat_id)
 
 
+from telethon import events, Button
+from telethon.tl.types import ChannelParticipantsAdmins
+
+@client.on(events.NewMessage(pattern="^/yetkili$"))
+async def tag_admins(event):
+    if event.is_private:
+        return await event.reply("❌ Bu komut sadece gruplarda kullanılabilir.")
+
+    sender = await event.get_sender()
+    chat = await event.get_chat()
+
+    # Komutu sadece adminler kullanabilir
+    async for member in client.iter_participants(chat.id, filter=ChannelParticipantsAdmins):
+        if member.id == sender.id:
+            break
+    else:
+        return await event.reply("❌ Bu komutu sadece grup yöneticileri kullanabilir.")
+
+    # Adminleri al
+    admins = []
+    creator = None
+    async for member in client.iter_participants(chat.id, filter=ChannelParticipantsAdmins):
+        if member.bot:
+            continue
+        if getattr(member, 'creator', False):
+            creator = member
+        else:
+            admins.append(member)
+
+    # Mesajı oluştur
+    mesaj = ""
+    sayac = 1
+
+    if creator:
+        mesaj += f"👑 {sayac}. [{creator.first_name}](tg://user?id={creator.id}) (Kurucu)\n"
+        sayac += 1
+
+    for admin in admins[:99]:  # toplam 100 kişiye kadar
+        mesaj += f"🔹 {sayac}. [{admin.first_name}](tg://user?id={admin.id})\n"
+        sayac += 1
+
+    mesaj += "\nℹ️ **Grup adminleri bunlardır**"
+
+    # Mesajı butonlarla gönder
+    await event.reply(
+        mesaj,
+        buttons=[
+            [Button.inline("🤖 Botları Göster", data="show_bots"), Button.inline("🗑 Mesajı Sil", data="delete_msg")]
+        ]
+    )
+
+# Buton callback handler
+@client.on(events.CallbackQuery)
+async def callback_handler(event):
+    data = event.data.decode("utf-8")
+    chat = await event.get_chat()
+
+    if data == "show_bots":
+        bots = []
+        async for member in client.iter_participants(chat.id):
+            if member.bot:
+                bots.append(f"[{member.first_name}](tg://user?id={member.id})")
+
+        if not bots:
+            await event.answer("❌ Bu grupta bot bulunamadı.", alert=True)
+        else:
+            mesaj = "🤖 **Gruptaki Botlar:**\n" + "\n".join(bots)
+            await event.reply(mesaj)
+
+    elif data == "delete_msg":
+        try:
+            await event.message.delete()
+        except:
+            await event.answer("❌ Mesaj silinemedi.", alert=True)
+
 print("[INFO] - Artz , Başarıyla Aktifleştirildi...")
 client.run_until_disconnected()
