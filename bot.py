@@ -1020,18 +1020,6 @@ async def mentionalll(event):
             reply_to=event.message.id
         )
 
-    if event.pattern_match.group(1):
-        mode = "text_on_cmd"
-        msg = event.pattern_match.group(1)
-    elif event.reply_to_msg_id:
-        mode = "text_on_reply"
-        msg = event.reply_to_msg_id
-    else:
-        return await event.respond(
-            "⛔ ișʟᴇᴍᴇ ʙᴀșʟᴀᴍᴀᴍ içiɴ, ʙiʀ ᴍᴇᴛiɴ ʙᴇʟiʀʟᴇᴍᴇɴ ʟᴀᴢɪᴍ", 
-            reply_to=event.message.id
-        )
-
     sender = await event.get_sender()
     first_name = sender.first_name
     await event.respond(f"**ᴇᴛiᴋᴇᴛʟᴇᴍᴇ ișʟᴇᴍi ʙᴀșʟᴀᴅɪ** 🟢\nʙᴀșʟᴀᴛᴀɴ: {first_name}", reply_to=event.message.id)
@@ -1049,22 +1037,18 @@ async def mentionalll(event):
             return
 
         emoji = random.choice(emojis)
-        users_batch.append(f"{emoji} [{usr.first_name}](tg://user?id={usr.id})")
+        users_batch.append(f"[{emoji}](tg://user?id={usr.id})")  # Sadece emoji ile etiket
 
+        # 5 kişi birikince mesaj gönder
         if len(users_batch) == 5:
-            if mode == "text_on_cmd":
-                await client.send_message(event.chat_id, f"📢 {msg} | {' '.join(users_batch)}", parse_mode='md')
-            else:
-                await client.send_message(event.chat_id, f"📢 {' '.join(users_batch)}", reply_to=msg, parse_mode='md')
+            await client.send_message(event.chat_id, f"📢 {' '.join(users_batch)}", parse_mode='md')
             users_batch = []
             await asyncio.sleep(2)
 
+    # Kalan kullanıcıları gönder
     if users_batch:
-        if mode == "text_on_cmd":
-            await client.send_message(event.chat_id, f"📢 {msg} | {' '.join(users_batch)}", parse_mode='md')
-        else:
-          await client.send_message(event.chat_id, f"📢 {' '.join(users_batch)}", reply_to=msg, parse_mode='md')
-            
+        await client.send_message(event.chat_id, f"📢 {' '.join(users_batch)}", parse_mode='md') 
+        
 @client.on(events.NewMessage(pattern='^(?i)/cancel'))
 async def cancel(event):
     global tekli_calisan
