@@ -1020,6 +1020,16 @@ async def mentionalll(event):
             reply_to=event.message.id
         )
 
+    if event.pattern_match.group(1):
+        msg = event.pattern_match.group(1)
+    elif event.reply_to_msg_id:
+        msg = event.reply_to_msg_id
+    else:
+        return await event.respond(
+            "⛔ ișʟᴇᴍᴇ ʙᴀșʟᴀᴍᴀᴍ içiɴ, ʙiʀ ᴍᴇᴛiɴ ʙᴇʟiʀʟᴇᴍᴇɴ ʟᴀᴢɪᴍ", 
+            reply_to=event.message.id
+        )
+
     sender = await event.get_sender()
     first_name = sender.first_name
     await event.respond(f"**ᴇᴛiᴋᴇᴛʟᴇᴍᴇ ișʟᴇᴍi ʙᴀșʟᴀᴅɪ** 🟢\nʙᴀșʟᴀᴛᴀɴ: {first_name}", reply_to=event.message.id)
@@ -1039,15 +1049,13 @@ async def mentionalll(event):
         emoji = random.choice(emojis)
         users_batch.append(f"[{emoji}](tg://user?id={usr.id})")  # Sadece emoji ile etiket
 
-        # 5 kişi birikince mesaj gönder
         if len(users_batch) == 5:
-            await client.send_message(event.chat_id, f"📢 {' '.join(users_batch)}", parse_mode='md')
+            await client.send_message(event.chat_id, f"📢 {msg} | {' '.join(users_batch)}", parse_mode='md')
             users_batch = []
             await asyncio.sleep(2)
 
-    # Kalan kullanıcıları gönder
     if users_batch:
-        await client.send_message(event.chat_id, f"📢 {' '.join(users_batch)}", parse_mode='md') 
+        await client.send_message(event.chat_id, f"📢 {msg} | {' '.join(users_batch)}", parse_mode='md')      
         
 @client.on(events.NewMessage(pattern='^(?i)/cancel'))
 async def cancel(event):
