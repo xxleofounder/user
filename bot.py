@@ -866,6 +866,117 @@ async def cancel(event):
     global tekli_calisan
     if event.chat_id in tekli_calisan:  # Liste kontrolü
         tekli_calisan.remove(event.chat_id)
+
+
+sorular_ms = [
+    "En son izlediğin film neydi?",
+    "Favori rengin hangisi?",
+    "Hiç yabancı bir ülkeye gittin mi?",
+    "Kahve mi, çay mı tercih edersin?",
+    "Hangi mevsimi daha çok seversin?",
+    "Hayalindeki tatil nereye olurdu?",
+    "En sevdiğin yemek nedir?",
+    "Hiç kitap okudun mu, hangi türleri seversin?",
+    "Küçükken hayalini kurduğun meslek neydi?",
+    "Favori dizin veya TV programın nedir?",
+    "Müzik dinlerken en çok hangi türleri tercih edersin?",
+    "Hiç spor yaptın mı, hangi sporları seversin?",
+    "Bilgisayar mı yoksa telefon mu?",
+    "Gün içinde en çok ne ile vakit geçirirsin?",
+    "En sevdiğin tatlı nedir?",
+    "Seyahat etmeyi sever misin?",
+    "Hiç hayvan besledin mi, hangi hayvanları?",
+    "En unutulmaz anın hangisi?",
+    "Hobilerin neler?",
+    "Sabah insanı mısın, gece kuşu mu?",
+    "En sevdiğin film türü nedir?",
+    "Dünya üzerinde gitmek istediğin tek yer neresi?",
+    "Favori içeceğin nedir?",
+    "Küçükken favori oyuncağın neydi?",
+    "En son öğrendiğin yeni şey neydi?",
+    "Rüyanda en çok görmek istediğin şey nedir?",
+    "Süper güçlerin olsaydı hangisini seçerdin?",
+    "Hiç ekstrem spor yaptın mı?",
+    "Gelecekte yapmak istediğin en büyük şey nedir?",
+    "En sevdiğin meyve hangisi?",
+    "Geçmişte değiştirebileceğin bir an var mı?",
+    "Zamanda yolculuk yapabilseydin hangi döneme giderdin?",
+    "Bir günlüğüne görünmez olsaydın ne yapardın?",
+    "En tuhaf alışkanlığın nedir?",
+    "Favori çizgi filmin hangisi?",
+    "Hiç hayvan gibi davranmayı denedin mi?",
+    "Rüyanda en saçma şeyi gördüğün oldu mu?",
+    "Bir adada yalnız kalsan yanına ne alırdın?",
+    "Hiç kendi kendine şarkı söyledin mi?",
+    "En sevdiğin çocukluk hatıran nedir?",
+    "Sihirli bir değnek olsaydı ne yapardın?",
+    "Hayatında yaptığın en çılgın şey neydi?",
+    "Hiç kendini bir film karakteri gibi hissettin mi?",
+    "En ilginç yeteneğin nedir?",
+    "Hiç geleceğini tahmin etmeye çalıştın mı?",
+    "Rüyanda hiç uçtuğun oldu mu?",
+    "Favori tatil anın hangisi?",
+    "Hiç kendine ait bir dil uydurdun mu?",
+    "En garip rüyan neydi?",
+    "Bir günlüğüne hayvan olsaydın hangisi olurdun?",
+    "Hiç geçmişe mektup yazmayı denedin mi?"
+]
+
+@client.on(events.NewMessage(pattern="^/stag ?(.*)"))
+async def stag(event):
+    global tekli_calisan
+
+    # Özelden kullanım engelle
+    if event.is_private:
+        bot_username = (await client.get_me()).username
+        return await event.respond(
+            "üᴢɢüɴüᴍ, ʙᴜ ᴋᴏᴍᴜᴛ ɢʀᴜᴘ ᴠᴇʏᴀ ᴋᴀɴᴀʟʟᴀʀ içiɴ ɢᴇçᴇʀʟiᴅiʀ❗️",
+            buttons=[[Button.url("➕ ʙᴇɴi ɢʀᴜʙᴀ ᴇᴋʟᴇ", f"https://t.me/{bot_username}?startgroup=true")]],
+            reply_to=event.message.id
+        )
+
+    # Yöneticileri çek
+    admins = [admin.id async for admin in client.iter_participants(event.chat_id, filter=ChannelParticipantsAdmins)]
+
+    # Admin değilse engelle
+    if event.sender_id not in admins:
+        return await event.respond(
+            "⚠️ üᴢɢüɴüᴍ, ʙᴜ ᴋᴏᴍᴜᴛᴜ sᴀᴅᴇᴄᴇ ʏᴇᴛiᴋiʟi ᴋᴜʟʟᴀɴᴀʙiʟiʀ", 
+            reply_to=event.message.id
+        )
+
+    # Başlatan kullanıcıya bilgi ver
+    sender = await event.get_sender()
+    first_name = sender.first_name
+    await event.respond(f"**ᴇᴛiᴋᴇᴛʟᴇᴍᴇ ișʟᴇᴍi ʙᴀșʟᴀᴅɪ** 🟢\nʙᴀșʟᴀᴛᴀɴ: {first_name}", reply_to=event.message.id)
     
+    await asyncio.sleep(3)
+    tekli_calisan.append(event.chat_id)
+
+    # Sadece gerçek üyeleri etiketle
+    async for usr in client.iter_participants(event.chat_id):
+        if usr.bot or usr.deleted:
+            continue  # Bot ve silinmişleri atla
+
+        # Etiketleme durdurulduysa çık
+        if event.chat_id not in tekli_calisan:
+            await event.respond(f"**ᴇᴛiᴋᴇᴛʟᴇᴍᴇ ișʟᴇᴍi ᴅᴜʀᴅᴜ** 🔴\nᴅᴜʀᴅᴜʀᴀɴ: {first_name}", reply_to=event.message.id)
+            return
+
+        # Rastgele mesaj seç
+        random_text = random.choice(sorular_ms)
+
+        # Tıklanabilir mention
+        mention_text = f"📢 {random_text} [{usr.first_name}](tg://user?id={usr.id})"
+        await client.send_message(event.chat_id, mention_text, parse_mode='md')
+        
+        await asyncio.sleep(2)
+        
+@client.on(events.NewMessage(pattern='^(?i)/cancel'))
+async def cancel(event):
+    global tekli_calisan
+    if event.chat_id in tekli_calisan:  # Liste kontrolü
+        tekli_calisan.remove(event.chat_id)
+        
 print("[INFO] - 🥰 Artz , Başarıyla Aktifleştirildi...")
 client.run_until_disconnected()
