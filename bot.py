@@ -189,7 +189,7 @@ async def ara(event):
         await status.delete()
 
 
-tahmin_aktif = {}
+tahmin_aktif = {}  # chat_id: {"sayi": int, "deneme": int}
 
 # Oyunu başlat
 @client.on(events.NewMessage(pattern="^/sayıtahmin"))
@@ -199,49 +199,50 @@ async def sayi_tahmin(event):
         return await event.respond("⚠️ Bu chat'te zaten bir oyun devam ediyor!", reply_to=event.message.id)
 
     sayi = random.randint(1, 1000)
-    tahmin_aktif[chat_id] = sayi
+    tahmin_aktif[chat_id] = {"sayi": sayi, "deneme": 0}
     await event.respond(
-        "🎲 1-1000 arasında bir sayı tuttum! Tahminini bu mesaja cevap olarak gönder.",
+        "🎲 1-1000 arasında bir sayı tuttum! Tahminini direkt chat'e yazabilirsin.",
         reply_to=event.message.id
     )
 
-# Kullanıcının tahminini kontrol et
+# Kullanıcının tahminlerini kontrol et
 @client.on(events.NewMessage)
 async def tahmin_kontrol(event):
     chat_id = event.chat_id
     if chat_id not in tahmin_aktif:
         return  # oyun yoksa boş geç
 
-    if not event.is_reply:
-        return  # reply ile tahmin gelmeli
-
     try:
         tahmin = int(event.text)
     except ValueError:
         return  # sayı değilse boş geç
 
-    sayi = tahmin_aktif[chat_id]
+    tahmin_aktif[chat_id]["deneme"] += 1
+    sayi = tahmin_aktif[chat_id]["sayi"]
+    deneme = tahmin_aktif[chat_id]["deneme"]
 
     if tahmin < sayi:
-        await event.respond("⬆️ Daha yüksek bir sayı söyle!", reply_to=event.message.id)
+        await event.respond("⬆️ Daha yüksek bir sayı söyle!")
     elif tahmin > sayi:
-        await event.respond("⬇️ Daha düşük bir sayı söyle!", reply_to=event.message.id)
+        await event.respond("⬇️ Daha düşük bir sayı söyle!")
     else:
         sender = await event.get_sender()
         await event.respond(
-            f"🎉 Tebrikler! Doğru sayı **{sayi}** idi.\nBulan kişi: [{sender.first_name}](tg://user?id={sender.id})",
-            reply_to=event.message.id,
+            f"🎉 Tebrikler! Doğru sayı **{sayi}** idi.\nBulan kişi: [{sender.first_name}](tg://user?id={sender.id})\nDeneme sayısı: {deneme}",
             parse_mode='md'
         )
         del tahmin_aktif[chat_id]  # oyun bitti
 
-# Oyunu iptal et
-@client.on(events.NewMessage(pattern="^(?i)/cancel"))
-async def tahmin_cancel(event):
+# Oyunu durdur
+@client.on(events.NewMessage(pattern="^/dur"))
+async def oyun_dur(event):
     chat_id = event.chat_id
     if chat_id in tahmin_aktif:
         del tahmin_aktif[chat_id]
-
+        await event.respond("🛑 Sayı tahmin oyunu durduruldu!")
+    else:
+        await event.respond("⚠️ Bu chat'te aktif bir oyun yok.")
+        
 @client.on(events.NewMessage(pattern="^/eros ?(.*)"))
 async def eros(event):
     bot_username = (await client.get_me()).username
