@@ -701,7 +701,7 @@ gecetag_ms = [
 ]
 
 @client.on(events.NewMessage(pattern="^/gecetag ?(.*)"))
-async def mentionall(event):
+async def gecetag(event):
     global tekli_calisan
 
     # Özelden kullanım engelle
