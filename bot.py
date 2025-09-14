@@ -646,6 +646,60 @@ async def cancel(event):
         tekli_calisan.remove(event.chat_id)
 
 
+gecetag_ms = [
+    "İyi geceler 🌙",
+    "Resimli geceler hayırlı olsun ⭐",
+    "Senin gecen tatlı rüyalarla dolsun 🌌",
+    "Tatlı rüyalar ve huzurlu bir gece ✨",
+    "Hoş geceler, tatlı rüyalar 🌙",
+    "Güzel rüyalar gör 🌌",
+    "Her gece sana mutluluk getirsin 🌟",
+    "Nasıl geçerse geçsin, bu gece güzel olsun 🌙",
+    "Senin için huzurlu bir gece olsun 🌌",
+    "Yerin rahat olsun, iyi geceler 🌙",
+    "Tatlı rüyalar gör 🌠",
+    "Gece harika olsun ✨",
+    "Barış dolu geceler dilerim 🌙",
+    "Senin için parlak rüyalar ⭐",
+    "Güzel bir gece geçir 🌌",
+    "Bu gece seni tatlı rüyalarla buluştursun 🌙",
+    "Gece hayırlı, rüyalar dolu olsun 🌠",
+    "Huzurlu ve sakin bir gece geçir 🌙",
+    "Rüyaların en güzeli seninle olsun 🌌",
+    "Geceyi mutlu ve keyifli geçir 🌙",
+    "Tatlı rüyalara dal 🌠",
+    "Huzur dolu geceler 🌙",
+    "Rüyalarının en güzel anı olsun 🌌",
+    "Sevdiklerinle güzel bir gece geçir 🌟",
+    "Geceyi rahat ve keyifli geçir 🌙",
+    "Mutlu rüyalar dilerim 🌌",
+    "Düşlerin gerçek olsun 🌠",
+    "Gecenin sessizliği sana huzur versin 🌙",
+    "Sevgi dolu geceler 🌌",
+    "Rüya gibi bir gece geçir 🌟",
+    "Geceyi keyifle geçir 🌙",
+    "Tatlı uykular dilerim 🌌",
+    "Rüyaların en parlak yıldızı sen ol 🌠",
+    "Geceyi güzel düşüncelerle kapat 🌙",
+    "Huzur ve mutluluk dolu geceler 🌌",
+    "Rüya gibi uykular 🌟",
+    "İçin rahat olsun, iyi geceler 🌙",
+    "Geceyi sevgilerle geçir 🌌",
+    "Rüyaların tatlı olsun 🌠",
+    "Sessiz ve sakin bir gece 🌙",
+    "Mutlulukla dolu rüyalar 🌌",
+    "Gecen huzur dolu olsun 🌟",
+    "Rüya gibi bir uyku dilerim 🌙",
+    "Tatlı rüyalar seni bulsun 🌌",
+    "Geceyi sevgiyle kapat 🌠",
+    "Huzurlu ve tatlı bir uyku 🌙",
+    "Geceyi keyifle geçir, tatlı rüyalar 🌌",
+    "Rüyaların seni mutlu etsin 🌟",
+    "İyi uykular, güzel sabahlar 🌙",
+    "Huzur ve sevgi dolu bir gece 🌌",
+    "Gecen tatlı rüyalarla dolsun 🌠"
+]
+
 @client.on(events.NewMessage(pattern="^/gecetag ?(.*)"))
 async def mentionall(event):
     global tekli_calisan
@@ -688,7 +742,7 @@ async def mentionall(event):
             return
 
         # Rastgele mesaj seç
-        random_text = random.choice(random_gece)
+        random_text = random.choice(gecetag_ms)
 
         # Tıklanabilir mention
         mention_text = f"📢 {random_text} [{usr.first_name}](tg://user?id={usr.id})"
