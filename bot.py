@@ -1181,11 +1181,13 @@ async def new_game(event):
     
     countdown_msg = await event.respond("⏳ 30 saniye kaldı...")
 
-    # 30 saniyelik geri sayım, 5 saniyede bir güncelle
     for remaining in range(30, 0, -5):
-        await asyncio.sleep(5)
+    await asyncio.sleep(5)
+    try:
         await countdown_msg.edit(f"⏳ {remaining} saniye kaldı...")
-
+    except telethon.errors.rpcerrorlist.MessageNotModifiedError:
+        pass  # İçerik aynıysa hata yoksayılır
+        
     game = games[chat_id]
 
     if len(game.players) < 2:
