@@ -6,15 +6,13 @@ api_id = 21883581
 api_hash = 'c3b4ba58d5dada9bc8ce6c66e09f3f12'
 bot_token = '8449988873:AAFAAdg4cwLjE2GtiBk891OfE85o-xRQVuc'
 
-# Client oluştur
 client = TelegramClient('uno_client', api_id, api_hash).start(bot_token=bot_token)
-
 games = {}  # chat_id: game_data
 
-# DM kontrol decorator
+# DM ve grup kontrol decorator
 def only_in_group(func):
     async def wrapper(event):
-        if event.is_private:
+        if not (event.is_group or event.is_channel):
             await event.respond(
                 "❌ Bu komut sadece gruplarda çalışır!",
                 buttons=[[Button.url("Beni Gruba Ekle", "https://t.me/YOUR_BOT_USERNAME?startgroup=true")]]
@@ -23,36 +21,38 @@ def only_in_group(func):
         await func(event)
     return wrapper
 
-# /start
+# /start DM
 @client.on(events.NewMessage(pattern='/start'))
 async def start(event):
     if event.is_private:
         await event.respond(
             "🎮 UNO Botuna Hoşgeldiniz!\n➡ Oyun oynamak için beni bir gruba ekleyin.",
             buttons=[
-                [Button.url("Beni Gruba Ekle", "https://t.me/YOUR_BOT_USERNAME?startgroup=true")],
+                [Button.url("Beni Gruba Ekle", "https://t.me/ARTzX7bot?startgroup=true")],
                 [Button.inline("Help", data="help")]
             ]
         )
 
-# Help inline
+# Help butonu
 @client.on(events.CallbackQuery(data=b'help'))
 async def help_button(event):
-    await event.edit("ℹ️ UNO Bot Komutları:\n"
-                     "/new - Yeni oyun başlat\n"
-                     "/join - Oyuna katıl\n"
-                     "🎴 Oyun sırasında:\nDraw - Kart çek\nPass - Sırayı geç\nPlay Card - Kart oyna\nWild kartlar renk seçimi ile oynanır",
-                     buttons=[
-                         [Button.inline("Geri", data="back")]
-                     ])
+    await event.edit(
+        "ℹ️ UNO Bot Komutları:\n"
+        "/new - Yeni oyun başlat\n"
+        "/join - Oyuna katıl\n"
+        "🎴 Oyun sırasında:\nDraw - Kart çek\nPass - Sırayı geç\nPlay Card - Kart oyna\nWild kartlar renk seçimi ile oynanır",
+        buttons=[[Button.inline("Geri", data="back")]]
+    )
 
 @client.on(events.CallbackQuery(data=b'back'))
 async def back(event):
-    await event.edit("🎮 UNO Botuna Hoşgeldiniz!\n➡ Oyun oynamak için beni bir gruba ekleyin.",
-                     buttons=[
-                         [Button.url("Beni Gruba Ekle", "https://t.me/YOUR_BOT_USERNAME?startgroup=true")],
-                         [Button.inline("Help", data="help")]
-                     ])
+    await event.edit(
+        "🎮 UNO Botuna Hoşgeldiniz!\n➡ Oyun oynamak için beni bir gruba ekleyin.",
+        buttons=[
+            [Button.url("Beni Gruba Ekle", "https://t.me/YOUR_BOT_USERNAME?startgroup=true")],
+            [Button.inline("Help", data="help")]
+        ]
+    )
 
 # /new komutu - Lobby bekleme
 @client.on(events.NewMessage(pattern='/new'))
@@ -66,7 +66,6 @@ async def new_game(event):
     games[chat_id] = {'players': [], 'turn': 0, 'deck': [], 'current_card': None, 'hands': {}}
     lobby_msg = await event.reply("✅ Yeni UNO oyunu başlatıldı! Katılmak için /join yazın.\n⏳ 30 saniye lobby beklemesi...")
 
-    # 30 saniye bekle
     for i in range(30, 0, -5):
         await asyncio.sleep(5)
         await lobby_msg.edit(f"✅ Yeni UNO oyunu başlatıldı! Katılmak için /join yazın.\n⏳ {i} saniye kaldı...")
@@ -76,7 +75,6 @@ async def new_game(event):
         del games[chat_id]
         return
 
-    # Oyun başlıyor
     await lobby_msg.edit("🎉 Oyun Başlıyor!")
 
     # Kartlar
@@ -104,14 +102,14 @@ async def new_game(event):
 
     # Sıra butonları
     current_player = games[chat_id]['players'][games[chat_id]['turn']]
-    await event.reply(f"Sıradaki oyuncu: [{current_player}](tg://user?id={current_player})",
-                      buttons=[
-                          [Button.inline("Draw", data=f"draw_{current_player}"),
-                           Button.inline("Pass", data=f"pass_{current_player}"),
-                           Button.inline("Play Card", data=f"play_{current_player}")]
-                      ])
+    await event.reply(
+        f"Sıradaki oyuncu: [{current_player}](tg://user?id={current_player})",
+        buttons=[[Button.inline("Draw", data=f"draw_{current_player}"),
+                  Button.inline("Pass", data=f"pass_{current_player}"),
+                  Button.inline("Play Card", data=f"play_{current_player}")]]
+    )
 
-# /join
+# /join komutu
 @client.on(events.NewMessage(pattern='/join'))
 @only_in_group
 async def join_game(event):
@@ -128,13 +126,13 @@ async def join_game(event):
     games[chat_id]['players'].append(user_id)
     await event.reply(f"✅ {event.sender.first_name} oyuna katıldı!")
 
-# Draw / Pass / Play callback
+# Draw / Pass / Play Card callback
 @client.on(events.CallbackQuery)
 async def button_handler(event):
     data = event.data.decode('utf-8')
     chat_id = event.chat_id
 
-    if '_' not in data:  # Help veya başka inline
+    if '_' not in data:
         return
 
     action, player_id = data.split('_')
@@ -149,15 +147,18 @@ async def button_handler(event):
         await event.answer("❌ Sıra sizde değil!", alert=True)
         return
 
+    hand = games[chat_id]['hands'][user_id]
+
     if action == "draw":
         card = games[chat_id]['deck'].pop()
-        games[chat_id]['hands'][user_id].append(card)
+        hand.append(card)
         await event.edit(f"🎴 Kart çekildi: {card}")
     elif action == "pass":
         await event.edit("⏭️ Sırayı geçtiniz.")
     elif action == "play":
-        # Play Card mantığı basit demo
-        hand = games[chat_id]['hands'][user_id]
+        if not hand:
+            await event.answer("❌ Elinizde kart yok!", alert=True)
+            return
         card_to_play = hand.pop(0)
         games[chat_id]['current_card'] = card_to_play
         await event.edit(f"🃏 Kart oynandı: {card_to_play}")
@@ -165,12 +166,12 @@ async def button_handler(event):
     # Sıradaki oyuncu
     games[chat_id]['turn'] = (games[chat_id]['turn'] + 1) % len(games[chat_id]['players'])
     next_player = games[chat_id]['players'][games[chat_id]['turn']]
-    await event.respond(f"Sıradaki oyuncu: [{next_player}](tg://user?id={next_player})",
-                        buttons=[
-                            [Button.inline("Draw", data=f"draw_{next_player}"),
-                             Button.inline("Pass", data=f"pass_{next_player}"),
-                             Button.inline("Play Card", data=f"play_{next_player}")]
-                        ])
+    await event.respond(
+        f"Sıradaki oyuncu: [{next_player}](tg://user?id={next_player})",
+        buttons=[[Button.inline("Draw", data=f"draw_{next_player}"),
+                  Button.inline("Pass", data=f"pass_{next_player}"),
+                  Button.inline("Play Card", data=f"play_{next_player}")]]
+    )
 
-print("UNO Client Botu çalışıyor...")
+print("UNO Client Botu grupta aktif şekilde çalışıyor...")
 client.run_until_disconnected()
