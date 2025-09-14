@@ -1,5 +1,5 @@
 from telethon import Button
-from config import tagmetin
+from Config import tagmetin
 from telethon import TelegramClient, events, errors, Button
 from telethon.tl.types import ChannelParticipantsAdmins
 from asyncio import sleep
