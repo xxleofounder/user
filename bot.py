@@ -1,4 +1,5 @@
 from telethon import Button
+from config import tagmetin
 from telethon import TelegramClient, events, errors, Button
 from telethon.tl.types import ChannelParticipantsAdmins
 from asyncio import sleep
@@ -101,22 +102,10 @@ async def cevirme(event):
         link_preview=False
     )
 
-# Tagger menüsü
 @client.on(events.CallbackQuery(data="tag"))
 async def tag_menu(event):
     await event.edit(
-        "📚 **Tagger Komutlarım Aşağıda:**\n\n"
-        "⇨ `/tagall` - üʏᴇʟᴇʀi 5'ʟi ᴇᴛiᴋᴇᴛʟᴇʀ\n\n"
-        "⇨ `/tektag` - üʏᴇʟᴇʀi ᴛᴇᴋʟi ᴇᴛiᴋᴇᴛʟᴇʀ\n\n"
-        "⇨ `/rtag` - üʏᴇʟᴇʀᴇ ʀᴀɴᴅᴏᴍ \"ɴᴀsɪʟsɪɴ, ɴᴀᴘɪʏᴏʀsᴜɴ\" șᴇᴋʟiɴᴅᴇ ᴇᴛiᴋᴇᴛ ᴀᴛᴀʀ\n\n"
-        "⇨ `/aktiftag` - sᴀᴅᴇᴄᴇ ᴀᴋᴛiғ ᴠᴇ sᴏɴ ɢöʀüʟᴍᴇsi ʏᴀᴋɪɴʟᴀʀɪ ᴇᴛiᴋᴇᴛʟᴇʀ\n\n"
-        "⇨ `/guntag` - siᴢiɴ ʏᴇʀiɴiᴢᴇ üʏᴇʟᴇʀᴇ ʀᴀɴᴅᴏᴍ ɢüɴᴀʏᴅɪɴ ᴍᴇsᴀᴊɪ ᴀᴛᴀʀ\n\n"
-        "⇨ `/gecetag` - siᴢiɴ ʏᴇʀiɴiᴢᴇ üʏᴇʟᴇʀᴇ ʀᴀɴᴅᴏᴍ iʏi ɢᴇᴄᴇʟᴇʀ ᴍᴇsᴀᴊɪ ᴀᴛᴀʀ\n\n"
-        "⇨ `/stag` - üʏᴇʟᴇʀᴇ ʀᴀɴᴅᴏᴍ sᴏʀᴜ sᴏʀᴀʀᴀᴋ ᴇᴛiᴋᴇᴛʟᴇʀ\n\n"
-        "⇨ `/etag` - 5'ʟi șᴇᴋiʟᴅᴇ ᴇᴍᴏᴊiʏʟᴇ ᴇᴛiᴋᴇᴛʟᴇʀ\n\n"
-        "⇨ `/yetkili` - ɢʀᴜᴘ ʏᴇᴛᴋiʟiʟᴇʀiɴi ʟisᴛᴇʟᴇʀ\n\n"
-        "⇨ `/cancel` - ᴀᴋᴛiғ çᴀʟɪșᴀɴ ișʟᴇᴍʟᴇʀi ᴅᴜʀᴅᴜʀᴜʀ\n\n"
-        "⛔ **ᴋᴏᴍᴜᴛʟᴀʀɪ sᴀᴅᴇᴄᴇ ʏᴇᴛᴋiʟi ᴀᴅᴍiɴʟᴇʀ ᴋᴜʟʟᴀɴᴀʙiʟiʀ!**",
+        tagmetin,
         buttons=[[Button.inline("⬅️ Geri Dön", data="cevirme")]],
         link_preview=False
     )
