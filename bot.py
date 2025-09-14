@@ -756,6 +756,61 @@ async def cancel(event):
     if event.chat_id in tekli_calisan:  # Liste kontrolü
         tekli_calisan.remove(event.chat_id)
 
+guntag_ms = [
+    "Günaydın ☀️",
+    "Hayırlı sabahlar 🌸",
+    "Güzel bir gün dilerim 🌞",
+    "Yeni gün, yeni umutlar 🌅",
+    "Mutlu bir sabah geçir 🌻",
+    "Enerjik ve güzel bir gün olsun 🌞",
+    "Gününü keyifle geçir 🌼",
+    "Hoş sabahlar ☀️",
+    "Bugün harika geçsin 🌸",
+    "Pozitif bir gün dilerim 🌞",
+    "Sevgi dolu bir sabah 🌅",
+    "İyi ve huzurlu bir gün geçir 🌻",
+    "Güne gülümseyerek başla ☀️",
+    "Bugün senin için güzel olsun 🌼",
+    "Huzurlu ve mutlu bir gün 🌞",
+    "Yeni başlangıçlar için güzel bir sabah 🌸",
+    "Güne enerjik başla ☀️",
+    "İçten bir gün dilerim 🌅",
+    "Günaydın, harika bir gün geçir 🌻",
+    "Sabahın keyfini çıkar 🌞",
+    "Güzel haberlerle dolu bir gün 🌸",
+    "Bugün harika fırsatlar sunsun 🌼",
+    "Pozitif enerjilerle dolu bir sabah ☀️",
+    "Güne güzel bir başlangıç yap 🌞",
+    "Sevdiklerinle güzel bir sabah 🌅",
+    "Günaydın, tatlı bir gün olsun 🌻",
+    "Huzur ve mutluluk dolu bir gün 🌸",
+    "İyi sabahlar, güzel rüyaların ardından 🌞",
+    "Güne güzel düşüncelerle başla ☀️",
+    "Bugün senin için harika geçsin 🌼",
+    "Pozitif bir enerjiyle başla 🌸",
+    "Günaydın, yeni fırsatlar seni bulsun 🌅",
+    "Huzurlu ve keyifli bir sabah 🌞",
+    "Mutlu başlangıçlar için günaydın ☀️",
+    "Güzel bir gün geçirmeni dilerim 🌻",
+    "Enerjik bir sabah 🌸",
+    "Günaydın, neşeli bir gün olsun 🌞",
+    "Sevgi ve mutlulukla dolu bir gün 🌼",
+    "Bugün her şey gönlünce olsun ☀️",
+    "Güne güzel bir gülümsemeyle başla 🌸",
+    "Pozitif bir sabah geçir 🌞",
+    "Günaydın, huzurlu bir gün dilerim 🌻",
+    "Yeni gün, yeni mutluluklar 🌅",
+    "Güne keyifle başla 🌼",
+    "Günaydın, harika bir gün olsun ☀️",
+    "Sabahın güzellikleri seninle olsun 🌸",
+    "Enerji dolu bir gün geçir 🌞",
+    "Mutluluk ve neşe dolu bir sabah 🌻",
+    "Pozitif düşüncelerle dolu bir gün 🌸",
+    "Günaydın, güzel fırsatlar seni bulsun 🌼",
+    "Huzur ve sevinç dolu bir sabah ☀️",
+    "Güne güzel bir başlangıç yap 🌞"
+]
+
 @client.on(events.NewMessage(pattern="^/guntag ?(.*)"))
 async def guntag(event):
     global tekli_calisan
@@ -798,7 +853,7 @@ async def guntag(event):
             return
 
         # Rastgele mesaj seç
-        random_text = random.choice(gecetag_ms)
+        random_text = random.choice(guntag_ms)
 
         # Tıklanabilir mention
         mention_text = f"📢 {random_text} [{usr.first_name}](tg://user?id={usr.id})"
@@ -812,5 +867,5 @@ async def cancel(event):
     if event.chat_id in tekli_calisan:  # Liste kontrolü
         tekli_calisan.remove(event.chat_id)
     
-print("[INFO] - Artz-rahmet , Başarıyla Aktifleştirildi...")
+print("[INFO] - 🥰 Artz , Başarıyla Aktifleştirildi...")
 client.run_until_disconnected()
