@@ -1,17 +1,17 @@
-from telethon import Button
-from Config import tagmetin
-from telethon import TelegramClient, events, errors, Button
-from telethon.tl.types import ChannelParticipantsAdmins, UserStatusRecently, UserStatusOnlinefrom 
-import sleep
-from Config import Config
 import asyncio
+import time
+import os
+import re
+import random
+import logging
 import subprocess
 import yt_dlp
-import os
-import logging
-import re
 import lyricsgenius
-import random
+
+from telethon import TelegramClient, events, errors, Button
+from telethon.tl.types import ChannelParticipantsAdmins, UserStatusRecently, UserStatusOnline
+
+from Config import tagmetin, Config
 
 tekli_calisan = []
 sent_groups = set()
