@@ -215,23 +215,26 @@ async def eros(event):
             return await event.respond("Yeterli kullanıcı yok!")
         user1, user2 = random.sample(participants, 2)
 
-    # Eros mesajı
+    # Eros mesajı ve emoji
     emojis = ["💖","💕","💘","💞","💓","💗","💝","💟","❣️"]
     emoji = random.choice(emojis)
 
     # Aşk mesajı listesi
     love_messages = [
-        "Aşk dolu bir an yaşadınız! 😍",
-        "Kalpler bir araya geldi 💞",
-        "Romantik bir sürpriz! 💖",
-        "Sevgi dolu bir Eros geldi! 💘",
-        "Kalpler birbirine dokundu ❤️"
+        "**Aşk dolu bir an yaşadınız!** 😍",
+        "**Kalpler bir araya geldi** 💞",
+        "**Romantik bir sürpriz!** 💖",
+        "**Sevgi dolu bir Eros geldi!** 💘",
+        "**Kalpler birbirine dokundu** ❤️"
     ]
     love_msg = random.choice(love_messages)
 
-    # Reply mesaj ile gönder
-    await event.respond(f"{emoji} {user1.first_name} ❤️ {user2.first_name} {emoji}\n{love_msg}", reply_to=event.message.id)
+    # Tıklanabilir isimlerle mesaj
+    msg_text = f"{emoji} [{user1.first_name}](tg://user?id={user1.id}) ❤️ [{user2.first_name}](tg://user?id={user2.id}) {emoji}\n{love_msg}"
 
+    # Mesajı gönder
+    await event.respond(msg_text, reply_to=event.message.id, parse_mode='md')
+    
 
 @client.on(events.NewMessage(pattern="^/yenile$"))
 async def yenile(event):
