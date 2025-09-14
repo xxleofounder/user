@@ -2,6 +2,7 @@ from telethon import Button
 from Config import tagmetin
 from telethon import TelegramClient, events, errors, Button
 from telethon.tl.types import ChannelParticipantsAdmins
+import ChannelParticipantsAdmins, UserStatusRecently, UserStatusOnline
 from asyncio import sleep
 from Config import Config
 import asyncio
@@ -584,7 +585,67 @@ async def cancel(event):
     global tekli_calisan
     if event.chat_id in tekli_calisan:
         tekli_calisan.remove(event.chat_id)
-        await event.respond("✅ ʀᴀɴᴅᴏᴍ ᴇᴛiᴋᴇᴛʟᴇᴍᴇ ᴅᴜʀᴅᴜʀᴜʟᴅᴜ", reply_to=event.message.id)
+
+
+@client.on(events.NewMessage(pattern="^/aktiftag$"))
+async def aktiftag(event):
+    global tekli_calisan
+
+    # Özelden kullanım engelle
+    if event.is_private:
+        bot_username = (await client.get_me()).username
+        return await event.respond(
+            "üᴢɢüɴüᴍ, ʙᴜ ᴋᴏᴍᴜᴛ ɢʀᴜᴘ ᴠᴇʏᴀ ᴋᴀɴᴀʟʟᴀʀ içiɴ ɢᴇçᴇʀʟiᴅiʀ❗️",
+            buttons=[[Button.url("➕ ʙᴇɴi ɢʀᴜʙᴀ ᴇᴋʟᴇ", f"https://t.me/{bot_username}?startgroup=true")]],
+            reply_to=event.message.id
+        )
+
+    # Yöneticileri çek
+    admins = [admin.id async for admin in client.iter_participants(event.chat_id, filter=ChannelParticipantsAdmins)]
+
+    # Admin değilse engelle
+    if event.sender_id not in admins:
+        return await event.respond(
+            "⚠️ üᴢɢüɴüᴍ, ʙᴜ ᴋᴏᴍᴜᴛᴜ sᴀᴅᴇᴄᴇ ʏᴇᴛiᴋiʟi ᴋᴜʟʟᴀɴᴀʙiʟiʀ", 
+            reply_to=event.message.id
+        )
+
+    # Başlatan kullanıcıya bilgi ver
+    sender = await event.get_sender()
+    first_name = sender.first_name
+    await event.respond(f"**ᴀᴋᴛɪғ ᴇᴛiᴋᴇᴛʟᴇᴍᴇ ʙᴀșʟᴀᴅɪ** 🟢\nʙᴀșʟᴀᴛᴀɴ: {first_name}", reply_to=event.message.id)
+    
+    await asyncio.sleep(3)
+    tekli_calisan.append(event.chat_id)
+
+    # Sadece aktif ve son görülmesi yakın olanları etiketle
+    async for usr in client.iter_participants(event.chat_id):
+        if usr.bot or usr.deleted:
+            continue  # Bot ve silinmişleri atla
+
+        if not (hasattr(usr, "status") and usr.status):
+            continue
+
+        if not (usr.status.__class__.__name__ in ["UserStatusRecently", "UserStatusOnline"]):
+            continue  # sadece aktif ve yakın zamanlı görülenleri al
+
+        # Etiketleme durdurulduysa çık
+        if event.chat_id not in tekli_calisan:
+            await event.respond(f"**ᴇᴛiᴋᴇᴛʟᴇᴍᴇ ᴅᴜʀᴅᴜ** 🔴\nᴅᴜʀᴅᴜʀᴀɴ: {first_name}", reply_to=event.message.id)
+            return
+
+        # Tıklanabilir mention
+        mention_text = f"📢 [{usr.first_name}](tg://user?id={usr.id})"
+        await client.send_message(event.chat_id, mention_text, parse_mode='md')
+        
+        await asyncio.sleep(2)
+
+@client.on(events.NewMessage(pattern='^(?i)/cancel'))
+async def cancel(event):
+    global tekli_calisan
+    if event.chat_id in tekli_calisan:
+        tekli_calisan.remove(event.chat_id)
+
 
 print("[INFO] - Artz-rahmet , Başarıyla Aktifleştirildi...")
 client.run_until_disconnected()
