@@ -97,6 +97,7 @@ async def cevirme(event):
         "🌿 Hangi komut menüsüne erişmek istiyorsun?",
         buttons=[
             [Button.inline("🏷️ Tagger Komutları", data="tag"), Button.inline("ℹ️ Diğer Komutlar", data="diger")],
+            [Button.inline("🕹️ Eğlence Komutları", data="eglence")],
             [Button.inline("⬅️ Geri Dön", data="starta")]
         ],
         link_preview=False
