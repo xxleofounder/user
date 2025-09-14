@@ -1169,36 +1169,47 @@ async def update_message(chat_id, game):
         game.message_id=msg.id
 
 @client.on(events.NewMessage(pattern="^/new"))
+@client.on(events.NewMessage(pattern="^/new"))
 async def new_game(event):
-    chat_id=event.chat_id
-    if chat_id in games: return await event.respond("Zaten oyun başlatıldı!")
-    creator=event.sender_id
-    games[chat_id]=UnoGame(creator)
-    await event.respond("🎮 Yeni UNO oyunu! Katılmak için /join yazın. 30 saniye sonra oyun başlar (2-10 kişi).")
-    countdown_msg=await event.respond("⏳ 30 saniye kaldı...")
-    for remaining in range(29,0,-1):
-        await asyncio.sleep(1)
-        bar="🔵"*(30-remaining)+"⚪"*remaining
-        await countdown_msg.edit(f"⏳ {remaining} saniye kaldı...\n{bar}")
-    game=games[chat_id]
-    if len(game.players)<2:
+    chat_id = event.chat_id
+    if chat_id in games:
+        return await event.respond("Zaten oyun başlatıldı!")
+
+    creator = event.sender_id
+    games[chat_id] = UnoGame(creator)
+    await event.respond("🎮 Yeni UNO oyunu! Katılmak için /join yazın. Oyun 30 saniye sonra başlayacak (2-10 kişi).")
+    
+    countdown_msg = await event.respond("⏳ 30 saniye kaldı...")
+
+    # 30 saniyelik geri sayım, 5 saniyede bir güncelle
+    for remaining in range(30, 0, -5):
+        await asyncio.sleep(5)
+        await countdown_msg.edit(f"⏳ {remaining} saniye kaldı...")
+
+    game = games[chat_id]
+
+    if len(game.players) < 2:
         await countdown_msg.edit("❌ Yeterli oyuncu yok, oyun iptal edildi.")
         del games[chat_id]
         return
-    if len(game.players)>10:
-        game.players=game.players[:10]
-        await countdown_msg.edit("⚠️ Maks 10 kişi ile başlatıldı!")
-    game.active=True
-    game.deck=create_deck()
+
+    if len(game.players) > 10:
+        game.players = game.players[:10]
+        await countdown_msg.edit("⚠️ Maksimum 10 kişi ile başlatıldı!")
+
+    game.active = True
+    game.deck = create_deck()
     for p in game.players:
-        game.hands[p]=[game.deck.pop() for _ in range(7)]
-    first=game.deck.pop()
+        game.hands[p] = [game.deck.pop() for _ in range(7)]
+
+    first = game.deck.pop()
     game.discard_pile.append(first)
-    game.current_card=first
-    game.current_color=first[0] if "Wild" not in first else None
+    game.current_card = first
+    game.current_color = first[0] if "Wild" not in first else None
+
     await countdown_msg.edit(f"🎮 Oyun başladı!\nİlk kart: {first}")
     await update_message(chat_id, game)
-
+    
 @client.on(events.NewMessage(pattern="^/join"))
 async def join_game(event):
     chat_id=event.chat_id
