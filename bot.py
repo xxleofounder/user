@@ -977,6 +977,100 @@ async def cancel(event):
     global tekli_calisan
     if event.chat_id in tekli_calisan:  # Liste kontrolü
         tekli_calisan.remove(event.chat_id)
+
+emojis = [
+    "📌","💫","🔥","⭐","⚡","🎯","🌟","✨","🎉","💥",
+    "💎","🌈","🎈","🪐","🌸","🍀","🍎","🍇","🍒","🥳",
+    "🤩","😎","🥰","💖","💛","💚","💙","💜","🖤","🤍",
+    "🤯","😇","👑","🎵","🎶","🎤","🎧","🏆","🥇","🥈",
+    "🥉","⚽","🏀","🏈","⚾","🎾","🏐","🏓","🎱","🏹",
+    "🌞","🌝","🌛","🌜","🌚","🌕","🌖","🌗","🌘","🌑",
+    "🌒","🌓","🌔","☀️","⛅","🌤️","🌦️","🌧️","⛈️","🌩️",
+    "🌨️","❄️","☃️","⛄","💧","💦","☔","🌊","🍏","🍎",
+    "🍐","🍊","🍋","🍌","🍉","🍇","🍓","🫐","🍈","🍒",
+    "🍑","🥭","🍍","🥥","🥝","🍅","🍆","🥑","🥦","🥬",
+    "🥒","🌶️","🫑","🌽","🥕","🫒","🧄","🧅","🥔","🍠",
+    "🥐","🥯","🍞","🥖","🥨","🧀","🥚","🍳","🥞","🧇",
+    "🥓","🥩","🍗","🍖","🌭","🍔","🍟","🍕","🥪","🥙",
+    "🫔","🌮","🌯","🥗","🥘","🥫","🍝","🍜","🍲","🍛",
+    "🍣","🍱","🥟","🦪","🍤","🍙","🍚","🍘","🍥","🥠",
+    "🥮","🍢","🍡","🍧","🍨","🍦","🥧","🧁","🍰","🎂",
+    "🍮","🍭","🍬","🍫","🍿","🧂","🍩","🍪","🌰","🥜",
+    "🍯","🥛","🍼","☕","🫖","🍵","🥤","🧃","🧉","🍶",
+    "🍺","🍻","🥂","🍷","🥃","🍸","🍹","🧊","🥄","🍴",
+    "🍽️","🥢","🪑","🛋️","🛏️","🛁","🚿","🪒","🧴","🧼"
+]
+
+@client.on(events.NewMessage(pattern="^/etag ?(.*)"))
+async def mentionalll(event):
+    global tekli_calisan
+
+    if event.is_private:
+        bot_username = (await client.get_me()).username
+        return await event.respond(
+            "üᴢɢüɴüᴍ, ʙᴜ ᴋᴏᴍᴜᴛ ɢʀᴜᴘ ᴠᴇʏᴀ ᴋᴀɴᴀʟʟᴀʀ içiɴ ɢᴇçᴇʀʟiᴅiʀ❗️",
+            buttons=[[Button.url("➕ ʙᴇɴi ɢʀᴜʙᴀ ᴇᴋʟᴇ", f"https://t.me/{bot_username}?startgroup=true")]],
+            reply_to=event.message.id
+        )
+
+    admins = [admin.id async for admin in client.iter_participants(event.chat_id, filter=ChannelParticipantsAdmins)]
+    if event.sender_id not in admins:
+        return await event.respond(
+            "⚠️ üᴢɢüɴüᴍ, ʙᴜ ᴋᴏᴍᴜᴛᴜ sᴀᴅᴇᴄᴇ ʏᴇᴛiᴋiʟi ᴋᴜʟʟᴀɴᴀʙiʟiʀ", 
+            reply_to=event.message.id
+        )
+
+    if event.pattern_match.group(1):
+        mode = "text_on_cmd"
+        msg = event.pattern_match.group(1)
+    elif event.reply_to_msg_id:
+        mode = "text_on_reply"
+        msg = event.reply_to_msg_id
+    else:
+        return await event.respond(
+            "⛔ ișʟᴇᴍᴇ ʙᴀșʟᴀᴍᴀᴍ içiɴ, ʙiʀ ᴍᴇᴛiɴ ʙᴇʟiʀʟᴇᴍᴇɴ ʟᴀᴢɪᴍ", 
+            reply_to=event.message.id
+        )
+
+    sender = await event.get_sender()
+    first_name = sender.first_name
+    await event.respond(f"**ᴇᴛiᴋᴇᴛʟᴇᴍᴇ ișʟᴇᴍi ʙᴀșʟᴀᴅɪ** 🟢\nʙᴀșʟᴀᴛᴀɴ: {first_name}", reply_to=event.message.id)
+    
+    await asyncio.sleep(3)
+    tekli_calisan.append(event.chat_id)
+
+    users_batch = []
+    async for usr in client.iter_participants(event.chat_id):
+        if usr.bot or usr.deleted:
+            continue
+
+        if event.chat_id not in tekli_calisan:
+            await event.respond(f"**ᴇᴛiᴋᴇᴛʟᴇᴍᴇ ișʟᴇᴍi ᴅᴜʀᴅᴜ** 🔴\nᴅᴜʀᴅᴜʀᴀɴ: {first_name}", reply_to=event.message.id)
+            return
+
+        emoji = random.choice(emojis)
+        users_batch.append(f"{emoji} [{usr.first_name}](tg://user?id={usr.id})")
+
+        if len(users_batch) == 5:
+            if mode == "text_on_cmd":
+                await client.send_message(event.chat_id, f"📢 {msg} | {' '.join(users_batch)}", parse_mode='md')
+            else:
+                await client.send_message(event.chat_id, f"📢 {' '.join(users_batch)}", reply_to=msg, parse_mode='md')
+            users_batch = []
+            await asyncio.sleep(2)
+
+    if users_batch:
+        if mode == "text_on_cmd":
+            await client.send_message(event.chat_id, f"📢 {msg} | {' '.join(users_batch)}", parse_mode='md')
+        else:
+          await client.send_message(event.chat_id, f"📢 {' '.join(users_batch)}", reply_to=msg, parse_mode='md')
+            
+@client.on(events.NewMessage(pattern='^(?i)/cancel'))
+async def cancel(event):
+    global tekli_calisan
+    if event.chat_id in tekli_calisan:  # Liste kontrolü
+        tekli_calisan.remove(event.chat_id)
         
+
 print("[INFO] - 🥰 Artz , Başarıyla Aktifleştirildi...")
 client.run_until_disconnected()
