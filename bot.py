@@ -494,5 +494,97 @@ async def list_bots(event):
 
     await event.reply(mesaj)
 
+
+RANDOM_MSGS = [
+    "ɴᴀsɪʟsɪɴ?",
+    "ɴᴀᴘɪʏᴏʀsᴜɴ?",
+    "ɪʏɪ ᴍɪsɪɴ?",
+    "ɴᴇ ʜᴀʙᴇʀ?",
+    "ᴋᴇʏɪғʟᴇʀ ɴᴀsɪʟ?",
+    "ɢᴜɴᴜɴ ɴᴀsɪʟ ɢᴇçɪʏᴏʀ?",
+    "ʙᴜɢüɴ ɴᴀsɪʟsɪɴ?",
+    "ᴄᴀɴɪɴ sɪᴋɪʟɪʏᴏʀ ᴍᴜ?",
+    "ᴏʏᴜɴ ᴏʏɴᴀʟɪᴍ ᴍɪ?",
+    "ʙɪʀ şᴇʏʟᴇʀ ᴀɴʟᴀᴛᴍᴀᴋ ɪsᴛᴇʀ ᴍɪsɪɴ?",
+    "ʏᴇᴍᴇᴋ ʏᴇᴅɪɴ ᴍɪ?",
+    "ᴜʏᴜᴋ ɢᴇʟɪʏᴏʀ ᴍᴜ?",
+    "ᴇɴ sᴇᴠᴅɪğɪɴ şᴀʀᴋɪ ɴᴇ?",
+    "ᴅɪᴢɪ ɪᴢʟɪʏᴏʀ ᴍᴜsᴜɴ?",
+    "ʏᴇɴɪ ʙɪʀ ᴋᴀʙᴀʜᴀᴛ ʙᴜʟᴅᴜɴ ᴍᴜ?",
+    "ɢüʟᴇᴄᴇᴋ ʙɪʀ şᴇʏ ʟᴀᴢɪᴍ ᴍɪ?",
+    "sᴇɴɪ ᴏ̈ᴢʟᴇᴅɪᴍ 🙂",
+    "ʜᴀʏᴀʟ ᴋᴜʀᴅᴜɴ ᴍᴜ?",
+    "ɢᴇᴄᴇ ɴᴀsɪʟ ɢᴇᴄᴛɪ?",
+    "ʙɪʀʟɪᴋᴛᴇ ᴄᴀʏ ɪᴄ̧ᴇʟɪᴍ ᴍɪ?",
+    "ɴᴀsɪʟ ʙɪʀ ɢᴜɴ ᴏʟᴅᴜ?",
+    "ᴅᴇʀsʟᴇʀɪɴ ɴᴀsɪʟ?",
+    "ᴘʀᴏᴊᴇʟᴇʀ ɴᴀsɪʟ ɢɪᴅɪʏᴏʀ?",
+    "ʏᴇɴɪ ʜᴇᴅᴇғʟᴇʀ ᴋᴏʏᴅᴜɴ ᴍᴜ?",
+    "ᴄᴀɴɪɴ ɴᴇ ɪsᴛɪʏᴏʀ?",
+    "ʙɪʀ sᴇʏ ᴍɪ ᴏ̈ɴᴇʀᴇʏɪᴍ?",
+    "ɴᴇ ᴛᴀᴋɪʟɪʏᴏʀsᴜɴ?",
+    "ʜᴀᴠᴀʟᴀʀ ɴᴀsɪʟ?",
+    "ɢᴜ̈ʟᴜᴍsᴇʀ ᴍɪsɪɴ 🙂",
+    "ʙᴇɴɪ ᴏ̈ᴢʟᴇᴅɪɴ ᴍɪ?"
+]
+
+
+@client.on(events.NewMessage(pattern="^/rtag ?(.*)"))
+async def mentionall(event):
+    global tekli_calisan
+
+    # Özelden kullanım engelle
+    if event.is_private:
+        bot_username = (await client.get_me()).username
+        return await event.respond(
+            "üᴢɢüɴüᴍ, ʙᴜ ᴋᴏᴍᴜᴛ ɢʀᴜᴘ ᴠᴇʏᴀ ᴋᴀɴᴀʟʟᴀʀ içiɴ ɢᴇçᴇʀʟiᴅiʀ❗️",
+            buttons=[[Button.url("➕ ʙᴇɴi ɢʀᴜʙᴀ ᴇᴋʟᴇ", f"https://t.me/{bot_username}?startgroup=true")]],
+            reply_to=event.message.id
+        )
+
+    # Yöneticileri çek
+    admins = [admin.id async for admin in client.iter_participants(event.chat_id, filter=ChannelParticipantsAdmins)]
+
+    # Admin değilse engelle
+    if event.sender_id not in admins:
+        return await event.respond(
+            "⚠️ üᴢɢüɴüᴍ, ʙᴜ ᴋᴏᴍᴜᴛᴜ sᴀᴅᴇᴄᴇ ʏᴇᴛiᴋiʟi ᴋᴜʟʟᴀɴᴀʙiʟiʀ", 
+            reply_to=event.message.id
+        )
+
+    # Başlatan kullanıcıya bilgi ver
+    sender = await event.get_sender()
+    first_name = sender.first_name
+    await event.respond(f"**ʀᴀɴᴅᴏᴍ ᴇᴛiᴋᴇᴛʟᴇᴍᴇ ʙᴀșʟᴀᴅɪ** 🟢\nʙᴀșʟᴀᴛᴀɴ: {first_name}", reply_to=event.message.id)
+    
+    await asyncio.sleep(3)
+    tekli_calisan.append(event.chat_id)
+
+    # Sadece gerçek üyeleri etiketle
+    async for usr in client.iter_participants(event.chat_id):
+        if usr.bot or usr.deleted:
+            continue  # Bot ve silinmişleri atla
+
+        # Etiketleme durdurulduysa çık
+        if event.chat_id not in tekli_calisan:
+            await event.respond(f"**ᴇᴛiᴋᴇᴛʟᴇᴍᴇ ișʟᴇᴍi ᴅᴜʀᴅᴜ** 🔴\nᴅᴜʀᴅᴜʀᴀɴ: {first_name}", reply_to=event.message.id)
+            return
+
+        # Rastgele mesaj seç
+        random_text = random.choice(RANDOM_MSGS)
+
+        # Tıklanabilir mention
+        mention_text = f"📢 {random_text} [{usr.first_name}](tg://user?id={usr.id})"
+        await client.send_message(event.chat_id, mention_text, parse_mode='md')
+        
+        await asyncio.sleep(2)
+        
+@client.on(events.NewMessage(pattern='^(?i)/cancel'))
+async def cancel(event):
+    global tekli_calisan
+    if event.chat_id in tekli_calisan:
+        tekli_calisan.remove(event.chat_id)
+        await event.respond("✅ ʀᴀɴᴅᴏᴍ ᴇᴛiᴋᴇᴛʟᴇᴍᴇ ᴅᴜʀᴅᴜʀᴜʟᴅᴜ", reply_to=event.message.id)
+
 print("[INFO] - Artz-rahmet , Başarıyla Aktifleştirildi...")
 client.run_until_disconnected()
