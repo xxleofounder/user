@@ -646,7 +646,7 @@ async def cancel(event):
         tekli_calisan.remove(event.chat_id)
 
 
-@client.on(events.NewMessage(pattern="^/rtag ?(.*)"))
+@client.on(events.NewMessage(pattern="^/gecetag ?(.*)"))
 async def mentionall(event):
     global tekli_calisan
 
@@ -688,7 +688,7 @@ async def mentionall(event):
             return
 
         # Rastgele mesaj seç
-        random_text = random.choice(RANDOM_MSGS)
+        random_text = random.choice(random_gece)
 
         # Tıklanabilir mention
         mention_text = f"📢 {random_text} [{usr.first_name}](tg://user?id={usr.id})"
