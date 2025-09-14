@@ -117,9 +117,9 @@ async def tag_menu(event):
 @client.on(events.CallbackQuery(data="eglence"))
 async def diger_menu(event):
     await event.edit(
-        "🕹️ **Eglence Komutlarım:**\n\n"
+        "🕹️ **Eğlence Komutlarım:**\n\n"
         "⇨ `/eros` - **iᴋi ᴋișiʏi ᴇșʟᴇșᴛiʀiʀ sʜiᴘʟᴇʀ**\n\n"
-        "⇨ `/stahmin` - **sᴀʏɪ ᴛᴀʜᴍiɴ ᴏʏᴜɴᴜ '/dur' iʟᴇ iᴘᴛᴀʟ ᴇᴅᴇʙiʟiʀsiɴiᴢ**\n\n",
+        "⇨ `/stahmin` - **sᴀʏɪ ᴛᴀʜᴍiɴ ᴏʏᴜɴᴜ `/dur`\n iʟᴇ iᴘᴛᴀʟ ᴇᴅᴇʙiʟiʀsiɴiᴢ**\n\n",
         buttons=[[Button.inline("⬅️ Geri Dön", data="cevirme")]],
         link_preview=False
     )
