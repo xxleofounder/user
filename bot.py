@@ -189,59 +189,110 @@ async def ara(event):
         await status.delete()
 
 
-tahmin_aktif = {}  # chat_id: {"sayi": int, "deneme": int}
+tahmin_aktif = {}  # chat_id: {"sayi": int, "deneme": int, "task": asyncio.Task, "msg_id": int}
 
 # Oyunu başlat
-@client.on(events.NewMessage(pattern="^/sayıtahmin"))
-async def sayi_tahmin(event):
+async def oyun_baslat(event, edit_msg=None):
     chat_id = event.chat_id
-    if chat_id in tahmin_aktif:
-        return await event.respond("⚠️ Bu chat'te zaten bir oyun devam ediyor!", reply_to=event.message.id)
 
     sayi = random.randint(1, 1000)
-    tahmin_aktif[chat_id] = {"sayi": sayi, "deneme": 0}
-    await event.respond(
-        "🎲 1-1000 arasında bir sayı tuttum! Tahminini direkt chat'e yazabilirsin.",
-        reply_to=event.message.id
-    )
+    if chat_id in tahmin_aktif:
+        if tahmin_aktif[chat_id]["task"]:
+            tahmin_aktif[chat_id]["task"].cancel()
 
-# Kullanıcının tahminlerini kontrol et
+    tahmin_aktif[chat_id] = {"sayi": sayi, "deneme": 0, "task": None, "msg_id": None}
+
+    text = "🎲 1-1000 arasında bir sayı tuttum! Tahminini chat'e yazabilirsin.\n⏳ Eğer 3 dakika boyunca kimse yazmazsa oyun otomatik bitecek."
+
+    if edit_msg:
+        await edit_msg.edit(text, buttons=None)
+        tahmin_aktif[chat_id]["msg_id"] = edit_msg.id
+    else:
+        msg = await event.respond(text)
+        tahmin_aktif[chat_id]["msg_id"] = msg.id
+
+    async def auto_end():
+        await asyncio.sleep(180)
+        if chat_id in tahmin_aktif:
+            del tahmin_aktif[chat_id]
+            await event.respond("⏰ 3 dakika boyunca tahmin gelmedi. Oyun otomatik olarak sona erdi!")
+
+    tahmin_aktif[chat_id]["task"] = asyncio.create_task(auto_end())
+
+# /sayıtahmin komutu
+@client.on(events.NewMessage(pattern="^/sayıtahmin"))
+async def sayi_tahmin(event):
+    await oyun_baslat(event)
+
+# Tahmin kontrol
 @client.on(events.NewMessage)
 async def tahmin_kontrol(event):
     chat_id = event.chat_id
     if chat_id not in tahmin_aktif:
-        return  # oyun yoksa boş geç
+        return
 
     try:
         tahmin = int(event.text)
     except ValueError:
-        return  # sayı değilse boş geç
+        return
 
     tahmin_aktif[chat_id]["deneme"] += 1
     sayi = tahmin_aktif[chat_id]["sayi"]
     deneme = tahmin_aktif[chat_id]["deneme"]
 
+    # Görev reset
+    if tahmin_aktif[chat_id]["task"]:
+        tahmin_aktif[chat_id]["task"].cancel()
+        async def auto_end():
+            await asyncio.sleep(180)
+            if chat_id in tahmin_aktif:
+                del tahmin_aktif[chat_id]
+                await event.respond("⏰ 3 dakika boyunca tahmin gelmedi. Oyun otomatik olarak sona erdi!")
+        tahmin_aktif[chat_id]["task"] = asyncio.create_task(auto_end())
+
     if tahmin < sayi:
-        await event.respond("⬆️ Daha yüksek bir sayı söyle!")
+        await event.respond("⬆️ Daha yüksek bir sayı söyle!", reply_to=event.message.id)
     elif tahmin > sayi:
-        await event.respond("⬇️ Daha düşük bir sayı söyle!")
+        await event.respond("⬇️ Daha düşük bir sayı söyle!", reply_to=event.message.id)
     else:
         sender = await event.get_sender()
-        await event.respond(
-            f"🎉 Tebrikler! Doğru sayı **{sayi}** idi.\nBulan kişi: [{sender.first_name}](tg://user?id={sender.id})\nDeneme sayısı: {deneme}",
-            parse_mode='md'
+        msg_text = (
+            f"🎉 Tebrikler! Doğru sayı **{sayi}** idi.\n"
+            f"Bulan kişi: [{sender.first_name}](tg://user?id={sender.id})\n"
+            f"Deneme sayısı: {deneme}"
         )
-        del tahmin_aktif[chat_id]  # oyun bitti
 
-# Oyunu durdur
+        if tahmin_aktif[chat_id]["task"]:
+            tahmin_aktif[chat_id]["task"].cancel()
+        del tahmin_aktif[chat_id]
+
+        await event.respond(
+            msg_text,
+            buttons=[[Button.inline("Yeni Oyun 🎲", b"yeni_oyun")]],
+            parse_mode='md',
+            reply_to=event.message.id
+        )
+
+# Inline button callback
+@client.on(events.CallbackQuery(pattern=b"yeni_oyun"))
+async def yeni_oyun(event):
+    try:
+        await event.answer()  # butona tıklama efekti
+        await oyun_baslat(event, edit_msg=await event.get_message())
+    except Exception as e:
+        await event.respond(f"⚠️ Hata: {e}", reply_to=event.message.id)
+
+# /dur komutu
 @client.on(events.NewMessage(pattern="^/dur"))
 async def oyun_dur(event):
     chat_id = event.chat_id
     if chat_id in tahmin_aktif:
+        if tahmin_aktif[chat_id]["task"]:
+            tahmin_aktif[chat_id]["task"].cancel()
         del tahmin_aktif[chat_id]
-        await event.respond("🛑 Sayı tahmin oyunu durduruldu!")
+        await event.respond("🛑 Sayı tahmin oyunu durduruldu!", reply_to=event.message.id)
     else:
-        await event.respond("⚠️ Bu chat'te aktif bir oyun yok.")
+        await event.respond("⚠️ Bu chat'te aktif bir oyun yok.", reply_to=event.message.id)        
         
 @client.on(events.NewMessage(pattern="^/eros ?(.*)"))
 async def eros(event):
