@@ -111,16 +111,29 @@ async def tag_menu(event):
         link_preview=False
     )
 
+
+
+# Diğer menüsü
+@client.on(events.CallbackQuery(data="eglence"))
+async def diger_menu(event):
+    await event.edit(
+        "🕹️ **Eglence Komutlarım:**\n\n"
+        "⇨ `/eros` - **iᴋi ᴋișiʏi ᴇșʟᴇșᴛiʀiʀ sʜiᴘʟᴇʀ**\n\n"
+        "⇨ `/stahmin` - **sᴀʏɪ ᴛᴀʜᴍiɴ ᴏʏᴜɴᴜ '/dur' iʟᴇ iᴘᴛᴀʟ ᴇᴅᴇʙiʟiʀsiɴiᴢ**\n\n",
+        buttons=[[Button.inline("⬅️ Geri Dön", data="cevirme")]],
+        link_preview=False
+    )
+
 # Diğer menüsü
 @client.on(events.CallbackQuery(data="diger"))
 async def diger_menu(event):
     await event.edit(
         "📚 **Diğer Komutlarım:**\n\n"
-        "⇨ `/ara` - ʏᴏᴜᴛᴜʙᴇ'ᴅᴇɴ isᴛᴇᴅiɢiɴ ᴘᴀʀçᴀʏɪ iɴᴅiʀiʀ\n\n"
-        "⇨ `/song` - șᴀʀᴋɪ söᴢʟᴇʀiɴi ʙᴜʟᴜʀ\n\n"
-        "⇨ `/random` - ʀᴀsᴛɢᴇʟᴇ ᴘᴀʀçᴀ öɴᴇʀiʀ\n\n"
-        "⇨ `/bots` - ɢʀᴜᴘᴛᴀᴋi ʙᴏᴛʟᴀʀɪ ʟisᴛᴇʟᴇʀ\n\n"
-        "⇨ `/yenile` - sᴜɴᴜᴄᴜʏᴜ ʏᴇɴiᴅᴇɴ ʙᴀșʟᴀᴛɪʀ",
+        "⇨ `/ara` - **ʏᴏᴜᴛᴜʙᴇ'ᴅᴇɴ isᴛᴇᴅiɢiɴ ᴘᴀʀçᴀʏɪ iɴᴅiʀiʀ**\n\n"
+        "⇨ `/song` - **șᴀʀᴋɪ söᴢʟᴇʀiɴi ʙᴜʟᴜʀ**\n\n"
+        "⇨ `/random` - **ʀᴀsᴛɢᴇʟᴇ ᴘᴀʀçᴀ öɴᴇʀiʀ**\n\n"
+        "⇨ `/bots` - **ɢʀᴜᴘᴛᴀᴋi ʙᴏᴛʟᴀʀɪ ʟisᴛᴇʟᴇʀ**\n\n"
+        "⇨ `/yenile` - **sᴜɴᴜᴄᴜʏᴜ ʏᴇɴiᴅᴇɴ ʙᴀșʟᴀᴛɪʀ**",
         buttons=[[Button.inline("⬅️ Geri Dön", data="cevirme")]],
         link_preview=False
     )
@@ -189,7 +202,7 @@ async def ara(event):
         await status.delete()
 
 
-tahmin_aktif = {}  # chat_id: {"sayi": int, "deneme": int, "task": asyncio.Task, "msg_id": int}
+tahmin_aktif = {} 
 
 # Oyunu başlat
 async def oyun_baslat(event, edit_msg=None):
@@ -202,7 +215,7 @@ async def oyun_baslat(event, edit_msg=None):
 
     tahmin_aktif[chat_id] = {"sayi": sayi, "deneme": 0, "task": None, "msg_id": None}
 
-    text = "🎲 1-1000 arasında bir sayı tuttum! Tahminini chat'e yazabilirsin.\n⏳ Eğer 3 dakika boyunca kimse yazmazsa oyun otomatik bitecek."
+    text = "🎲 1-1000 arasında bir sayı tuttum! Tahminini chat'e yazabilirsin.\n\n⏳ Eğer 3 dakika boyunca kimse yazmazsa oyun otomatik bitecek."
 
     if edit_msg:
         await edit_msg.edit(text, buttons=None)
@@ -215,12 +228,12 @@ async def oyun_baslat(event, edit_msg=None):
         await asyncio.sleep(180)
         if chat_id in tahmin_aktif:
             del tahmin_aktif[chat_id]
-            await event.respond("⏰ 3 dakika boyunca tahmin gelmedi. Oyun otomatik olarak sona erdi!")
+            await event.respond("⏰ 3 dakika boyunca tahmin gelmedi, Oyun otomatik olarak sona erdi!")
 
     tahmin_aktif[chat_id]["task"] = asyncio.create_task(auto_end())
 
 # /sayıtahmin komutu
-@client.on(events.NewMessage(pattern="^/sayıtahmin"))
+@client.on(events.NewMessage(pattern="^/stahmin"))
 async def sayi_tahmin(event):
     await oyun_baslat(event)
 
@@ -247,13 +260,13 @@ async def tahmin_kontrol(event):
             await asyncio.sleep(180)
             if chat_id in tahmin_aktif:
                 del tahmin_aktif[chat_id]
-                await event.respond("⏰ 3 dakika boyunca tahmin gelmedi. Oyun otomatik olarak sona erdi!")
+                await event.respond("⏰ 3 dakika boyunca tahmin gelmedi, Oyun otomatik olarak sona erdi!")
         tahmin_aktif[chat_id]["task"] = asyncio.create_task(auto_end())
 
     if tahmin < sayi:
-        await event.respond("⬆️ Daha yüksek bir sayı söyle!", reply_to=event.message.id)
+        await event.respond("🔺 ᴅᴀʜᴀ ʏüᴋsᴇᴋ ʙiʀ sᴀʏɪ söʏʟᴇ!", reply_to=event.message.id)
     elif tahmin > sayi:
-        await event.respond("⬇️ Daha düşük bir sayı söyle!", reply_to=event.message.id)
+        await event.respond("🔻 ᴅᴀʜᴀ ᴅüșüᴋ ʙiʀ sᴀʏɪ söʏʟᴇ!", reply_to=event.message.id)
     else:
         sender = await event.get_sender()
         msg_text = (
@@ -268,7 +281,7 @@ async def tahmin_kontrol(event):
 
         await event.respond(
             msg_text,
-            buttons=[[Button.inline("Yeni Oyun 🎲", b"yeni_oyun")]],
+            buttons=[[Button.inline("**Yeni Oyun** 🎲", b"yeni_oyun")]],
             parse_mode='md',
             reply_to=event.message.id
         )
@@ -290,7 +303,7 @@ async def oyun_dur(event):
         if tahmin_aktif[chat_id]["task"]:
             tahmin_aktif[chat_id]["task"].cancel()
         del tahmin_aktif[chat_id]
-        await event.respond("🛑 Sayı tahmin oyunu durduruldu!", reply_to=event.message.id)
+        await event.respond("🔴 sᴀʏɪ ᴛᴀʜᴍiɴ ᴏʏᴜɴᴜ, ʙᴀșᴀʀɪʏʟᴀ ᴅᴜʀᴅᴜʀᴜʟᴅᴜ!", reply_to=event.message.id)
     else:
         await event.respond("⚠️ Bu chat'te aktif bir oyun yok.", reply_to=event.message.id)        
         
@@ -318,7 +331,7 @@ async def eros(event):
     else:
         # Yanıt yoksa rastgele 2 kişi seç
         if len(participants) < 2:
-            return await event.respond("Yeterli kullanıcı yok!")
+            return await event.respond("⚠️ ʏᴇᴛᴇʀʟi ᴋᴜʟʟᴀɴɪᴄɪ ʏᴏᴋ!")
         user1, user2 = random.sample(participants, 2)
 
     # Eros mesajı ve emoji
