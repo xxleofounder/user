@@ -1,9 +1,7 @@
 from telethon import Button
 from Config import tagmetin
 from telethon import TelegramClient, events, errors, Button
-from telethon.tl.types import ChannelParticipantsAdmins
-import ChannelParticipantsAdmins, UserStatusRecently, UserStatusOnline
-from asyncio import sleep
+from telethon.tl.types import ChannelParticipantsAdmins, UserStatusRecently, UserStatusOnlinefrom asyncio import sleep
 from Config import Config
 import asyncio
 import subprocess
