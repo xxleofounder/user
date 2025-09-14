@@ -582,9 +582,9 @@ async def mentionall(event):
 @client.on(events.NewMessage(pattern='^(?i)/cancel'))
 async def cancel(event):
     global tekli_calisan
-    if event.chat_id in tekli_calisan:  
+    if event.chat_id in tekli_calisan:  # Liste kontrolü
         tekli_calisan.remove(event.chat_id)
-
+    # Boş bırakıldı, kullanıcıya mesaj göndermiyor
 
 @client.on(events.NewMessage(pattern="^/aktiftag$"))
 async def aktiftag(event):
@@ -642,8 +642,9 @@ async def aktiftag(event):
 @client.on(events.NewMessage(pattern='^(?i)/cancel'))
 async def cancel(event):
     global tekli_calisan
-    if event.chat_id in tekli_calisan:
+    if event.chat_id in tekli_calisan:  # Liste kontrolü
         tekli_calisan.remove(event.chat_id)
+    # Boş bırakıldı, kullanıcıya mesaj göndermiyor
 
 print("[INFO] - Artz-rahmet , Başarıyla Aktifleştirildi...")
 client.run_until_disconnected()
