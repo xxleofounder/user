@@ -235,11 +235,18 @@ async def oyun_baslat(event, edit_msg=None):
 # /sayıtahmin komutu
 @client.on(events.NewMessage(pattern="^/stahmin"))
 async def sayi_tahmin(event):
+    if event.is_private:  # DM'de çalışmayı engelle
+        await event.respond("⚠️ Bu komut sadece gruplarda kullanılabilir.", reply_to=event.message.id)
+        return
     await oyun_baslat(event)
 
 # Tahmin kontrol
 @client.on(events.NewMessage)
 async def tahmin_kontrol(event):
+    if event.is_private:  # DM'de çalışmayı engelle
+        await event.respond("⚠️ Bu komut sadece gruplarda kullanılabilir.", reply_to=event.message.id)
+        return
+
     chat_id = event.chat_id
     if chat_id not in tahmin_aktif:
         return
@@ -289,6 +296,9 @@ async def tahmin_kontrol(event):
 # Inline button callback
 @client.on(events.CallbackQuery(pattern=b"yeni_oyun"))
 async def yeni_oyun(event):
+    if event.is_private:  # DM'de çalışmayı engelle
+        await event.answer("⚠️ Bu komut sadece gruplarda kullanılabilir.", alert=True)
+        return
     try:
         await event.answer()  # butona tıklama efekti
         await oyun_baslat(event, edit_msg=await event.get_message())
@@ -298,15 +308,18 @@ async def yeni_oyun(event):
 # /dur komutu
 @client.on(events.NewMessage(pattern="^/dur"))
 async def oyun_dur(event):
+    if event.is_private:  # DM'de çalışmayı engelle
+        await event.respond("⚠️ Bu komut sadece gruplarda kullanılabilir.", reply_to=event.message.id)
+        return
+
     chat_id = event.chat_id
     if chat_id in tahmin_aktif:
         if tahmin_aktif[chat_id]["task"]:
             tahmin_aktif[chat_id]["task"].cancel()
         del tahmin_aktif[chat_id]
         await event.respond("🔴 sᴀʏɪ ᴛᴀʜᴍiɴ ᴏʏᴜɴᴜ, ʙᴀșᴀʀɪʏʟᴀ ᴅᴜʀᴅᴜʀᴜʟᴅᴜ!", reply_to=event.message.id)
-    else:
-        await event.respond("⚠️ Bu chat'te aktif bir oyun yok.", reply_to=event.message.id)        
-        
+    
+
 @client.on(events.NewMessage(pattern="^/eros ?(.*)"))
 async def eros(event):
     bot_username = (await client.get_me()).username
