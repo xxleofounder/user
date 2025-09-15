@@ -250,49 +250,6 @@ async def song(event):
         await status.delete()
 
 
-@client.on(events.NewMessage(pattern="^/random$"))
-async def random_genre(event):
-    buttons = [
-        [Button.inline("🎤 ʀᴀᴘ", "Rap"), Button.inline("🎵 ᴘᴏᴘ", "Pop")],
-        [Button.inline("🎻 ᴀʀᴀʙᴇsᴋ", "Arabesk"), Button.inline("🎶 ᴅiɢ̆ᴇʀ", "Diger")]
-    ]
-    await event.respond("🎲 **ᴀʀᴀɴᴀᴄᴀᴋ şᴀʀᴋɪ ᴛᴜ̈ʀᴜ̈ɴᴜ̈ sᴇᴄ̧!:**", buttons=buttons, parse_mode="md")
-
-
-@client.on(events.CallbackQuery)
-async def callback_random(event):
-    choice = event.data.decode("utf-8")  # seçilen tür
-    if choice not in keywords:
-        await event.answer("❌ ʜᴀᴛᴀ: ʙɪʟɪɴᴍᴇʏᴇɴ ᴛᴜ̈ʀ")
-        return
-
-    await event.answer(f"🔎 {choice} ᴛᴜ̈ʀᴜ̈ɴᴅᴇ şᴀʀᴋɪ sᴇᴄ̧ɪʟɪʏᴏʀ...")
-    query = random.choice(keywords[choice])
-    status = await event.edit(f"⏳ '{query}' ᴛᴜ̈ʀᴜ̈ɴᴅᴇ ʀᴀsᴛɢᴇʟᴇ şᴀʀᴋɪ ᴀʀᴀɴɪʏᴏʀ...")
-
-    ydl_opts = {
-        "format": "bestaudio/best",
-        "noplaylist": True,
-        "quiet": True
-    }
-
-    try:
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(f"ytsearch:{query}", download=False)
-            if not info or "entries" not in info or len(info["entries"]) == 0:
-                await status.edit("❌ ᴏʜʜ, şᴀʀᴋɪʏɪ ʙᴜʟᴍᴀᴅɪᴍ")
-                return
-
-            video = info["entries"][0]
-            title = video.get("title", "Bilinmeyen Şarkı")
-            url = video.get("webpage_url")
-
-            await status.edit(f"🎶 **ʀᴀɴᴅᴏᴍ şᴀʀᴋɪ:**\n➡️ [{title}]({url})", parse_mode="md")
-
-    except Exception as e:
-        await status.edit(f"❌ ʜᴀᴛᴀ ᴏʟᴜşᴛᴜ: {e}")  
-
-
 
 @client.on(events.NewMessage(pattern="^/tektag ?(.*)"))
 async def mentionall(event):
