@@ -138,8 +138,7 @@ async def tahmin_kontrol(event):
                 del tahmin_aktif[chat_id]
                 await event.respond("⏰ 3 dakika boyunca tahmin gelmedi, Oyun otomatik olarak sona erdi!")
         tahmin_aktif[chat_id]["task"] = asyncio.create_task(auto_end())
-    
-if tahmin < sayi:
+    if tahmin < sayi:
         await event.respond("🔺 ᴅᴀʜᴀ ʏüᴋsᴇᴋ ʙiʀ sᴀʏɪ söʏʟᴇ!", reply_to=event.message.id)
     elif tahmin > sayi:
         await event.respond("🔻 ᴅᴀʜᴀ ᴅüșüᴋ ʙiʀ sᴀʏɪ söʏʟᴇ!", reply_to=event.message.id)
