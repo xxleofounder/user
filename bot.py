@@ -1127,7 +1127,77 @@ async def eros(event):
 
     # Mesajı gönder
     await event.respond(msg_text, reply_to=event.message.id, parse_mode='md')
-    
+
+
+tahmin_aktif = {} 
+
+# Oyunu başlat
+async def oyun_baslat(event, edit_msg=None):
+    chat_id = event.chat_id
+
+    sayi = random.randint(1, 1000)
+    if chat_id in tahmin_aktif:
+        if tahmin_aktif[chat_id]["task"]:
+            tahmin_aktif[chat_id]["task"].cancel()
+
+    tahmin_aktif[chat_id] = {"sayi": sayi, "deneme": 0, "task": None, "msg_id": None}
+
+    text = "🎲 1-1000 arasında bir sayı tuttum! Tahminini chat'e yazabilirsin.\n\n⏳ Eğer 3 dakika boyunca kimse yazmazsa oyun otomatik bitecek."
+
+    if edit_msg:
+        await edit_msg.edit(text, buttons=None)
+        tahmin_aktif[chat_id]["msg_id"] = edit_msg.id
+    else:
+        msg = await event.respond(text)
+        tahmin_aktif[chat_id]["msg_id"] = msg.id
+
+    async def auto_end():
+        await asyncio.sleep(180)
+        if chat_id in tahmin_aktif:
+            del tahmin_aktif[chat_id]
+            await event.respond("⏰ 3 dakika boyunca tahmin gelmedi, Oyun otomatik olarak sona erdi!")
+
+    tahmin_aktif[chat_id]["task"] = asyncio.create_task(auto_end())
+
+# /sayıtahmin komutu
+@client.on(events.NewMessage(pattern="^/stahmin"))
+async def sayi_tahmin(event):
+    if event.is_private:  # DM'de çalışmayı engelle
+        bot = await client.get_me()
+        bot_username = bot.username
+        await event.respond(
+            "🤖 Beni gruba ekleyerek sayı tahmin oyununu oynayabilirsiniz!",
+            buttons=[
+                [Button.url("➕ Beni Gruba Ekle", f"https://t.me/{botUsername}?startgroup=true")]
+            ],
+            reply_to=event.message.id  # reply olarak göndersin
+        )
+        return
+    await oyun_baslat(event)
+
+# Tahmin kontrol
+@client.on(events.NewMessage)
+async def tahmin_kontrol(event):
+    if event.is_private:  # DM'de çalışmayı engelle
+        await event.respond(
+            "🤖 Beni gruba ekleyerek sayı tahmin oyununu oynayabilirsiniz!",
+            buttons=[
+                [Button.url("➕ Beni Gruba Ekle", f"https://t.me/{botUsername}?startgroup=true")]
+            ],
+            reply_to=event.message.id  # reply olarak göndersin
+        )
+        return
+
+    chat_id = event.chat_id
+    if chat_id not in tahmin_aktif:
+        return
+
+    try:
+        tahmin = int(event.text)
+    except ValueError:
+        return
+
+
 
 print("[INFO] - 🥰 Artz , Başarıyla Aktifleştirildi...")
 client.run_until_disconnected()
