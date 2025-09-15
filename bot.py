@@ -1200,37 +1200,38 @@ async def tahmin_kontrol(event):
     deneme = tahmin_aktif[chat_id]["deneme"]
 
     # Görev reset
+if tahmin_aktif[chat_id]["task"]:
+    tahmin_aktif[chat_id]["task"].cancel()
+    async def auto_end():
+        await asyncio.sleep(180)
+        if chat_id in tahmin_aktif:
+            del tahmin_aktif[chat_id]
+            await event.respond("⏰ 3 dakika boyunca tahmin gelmedi, Oyun otomatik olarak sona erdi!")
+    tahmin_aktif[chat_id]["task"] = asyncio.create_task(auto_end())
+
+if tahmin < sayi:
+    await event.respond("🔺 ᴅᴀʜᴀ ʏüᴋsᴇᴋ ʙiʀ sᴀʏɪ söʏʟᴇ!", reply_to=event.message.id)
+elif tahmin > sayi:
+    await event.respond("🔻 ᴅᴀʜᴀ ᴅüșüᴋ ʙiʀ sᴀʏɪ söʏʟᴇ!", reply_to=event.message.id)
+else:
+    sender = await event.get_sender()
+    msg_text = (
+        f"🎉 Tebrikler! Doğru sayı **{sayi}** idi.\n"
+        f"Bulan kişi: [{sender.first_name}](tg://user?id={sender.id})\n"
+        f"Deneme sayısı: {deneme}"
+    )
+
     if tahmin_aktif[chat_id]["task"]:
         tahmin_aktif[chat_id]["task"].cancel()
-        async def auto_end():
-            await asyncio.sleep(180)
-            if chat_id in tahmin_aktif:
-                del tahmin_aktif[chat_id]
-                await event.respond("⏰ 3 dakika boyunca tahmin gelmedi, Oyun otomatik olarak sona erdi!")
-        tahmin_aktif[chat_id]["task"] = asyncio.create_task(auto_end())
-    if tahmin < sayi:
-        await event.respond("🔺 ᴅᴀʜᴀ ʏüᴋsᴇᴋ ʙiʀ sᴀʏɪ söʏʟᴇ!", reply_to=event.message.id)
-    elif tahmin > sayi:
-        await event.respond("🔻 ᴅᴀʜᴀ ᴅüșüᴋ ʙiʀ sᴀʏɪ söʏʟᴇ!", reply_to=event.message.id)
-    else:
-        sender = await event.get_sender()
-        msg_text = (
-            f"🎉 Tebrikler! Doğru sayı **{sayi}** idi.\n"
-            f"Bulan kişi: [{sender.first_name}](tg://user?id={sender.id})\n"
-            f"Deneme sayısı: {deneme}"
-        )
+    del tahmin_aktif[chat_id]
 
-        if tahmin_aktif[chat_id]["task"]:
-            tahmin_aktif[chat_id]["task"].cancel()
-        del tahmin_aktif[chat_id]
-
-        await event.respond(
-            msg_text,
-            buttons=[[Button.inline("🎲 Yeni Oyun", b"yeni_oyun")]],
-            parse_mode='md',
-            reply_to=event.message.id
-        )
-
+    await event.respond(
+        msg_text,
+        buttons=[[Button.inline("🎲 Yeni Oyun", "yeni_oyun")]],  # <- burayı string yaptık
+        parse_mode='md',
+        reply_to=event.message.id
+    )
+    
 # Inline button callback
 @client.on(events.CallbackQuery(pattern=b"yeni_oyun"))
 async def yeni_oyun(event):
