@@ -1289,7 +1289,8 @@ async def xox_restart(event):
     if chat_id in games:
         await event.answer("Oyun zaten devam ediyor!", alert=True)
         return
-    await event.edit("Yeni oyun için onay bekleniyor...", buttons=None)
+    message = await event.get_message()
+    await message.edit("🎮 6x6 XOX oyunu yeniden başladı!", buttons=None)
     await start_xox(event)
 
 @client.on(events.NewMessage(pattern="^/off$"))
@@ -1298,8 +1299,14 @@ async def stop_xox(event):
         return
     chat_id = event.chat_id
     if chat_id in games:
+        msg_id = games[chat_id]["msg_id"]
+        try:
+            await event.client.delete_messages(chat_id, msg_id)  # tablo mesajını sil
+        except:
+            pass
         del games[chat_id]
         await event.respond("🛑 XOX oyunu bitirildi!", reply_to=event.message.id)
-    
+
+
 print("[INFO] ᴀʀᴛᴢ Bot çalışıyor...")
 client.run_until_disconnected()
