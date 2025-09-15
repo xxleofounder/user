@@ -1217,33 +1217,20 @@ async def start_xox(event):
     if chat_id in games:
         await event.respond("⚠️ Bu sohbette zaten bir XOX oyunu var!", reply_to=event.message.id)
         return
-    confirm_buttons = [
-        [Button.inline("Evet", f"xox_confirm:{sender.id}:yes"), Button.inline("İptal", f"xox_confirm:{sender.id}:no")]
-    ]
-    await event.respond("XOX oyunu başlatılsın mı?", buttons=confirm_buttons, reply_to=event.message.id)
-
-@client.on(events.CallbackQuery(pattern=b"xox_confirm:(\\d+):(yes|no)"))
-async def confirm_xox(event):
-    sender_id, choice = map(str, event.data.decode().split(":")[1:])
-    sender_id = int(sender_id)
-    if event.sender_id != sender_id:
-        await event.answer("Sen başlatıcı değilsin!", alert=True)
-        return
-    chat_id = event.chat_id
-    if choice == "no":
-        await event.edit("Oyun iptal edildi.", buttons=None)
-        return
     size = 6
     board = [["⬜"] * size for _ in range(size)]
-    message = await event.get_message()
+    msg = await event.respond(
+        f"🎮 6x6 XOX oyunu başladı!\n❌: {sender.first_name} ilk hamleyi yapar.",
+        buttons=make_buttons(board),
+        reply_to=event.message.id
+    )
     games[chat_id] = {
         "board": board,
         "turn": "❌",
-        "players": [event.sender_id],
-        "player_names": {event.sender_id: event.sender.first_name},
-        "msg_id": message.id
+        "players": [sender.id],
+        "player_names": {sender.id: sender.first_name},
+        "msg_id": msg.id
     }
-    await event.edit(f"🎮 6x6 XOX oyunu başladı!\n❌: {event.sender.first_name} ilk hamleyi yapar.", buttons=make_buttons(board))
 
 @client.on(events.CallbackQuery(pattern=b"xox:(\\d+):(\\d+)"))
 async def xox_move(event):
@@ -1253,6 +1240,8 @@ async def xox_move(event):
     game = games[chat_id]
     r, c = map(int, event.data.decode().split(":")[1:])
     sender = event.sender
+
+    # 2. oyuncu katılımı
     if sender.id not in game["players"]:
         if len(game["players"]) < 2:
             game["players"].append(sender.id)
@@ -1260,6 +1249,7 @@ async def xox_move(event):
         else:
             await event.answer("Bu oyunda sadece 2 oyuncu oynayabilir!", alert=True)
             return
+
     symbol = "❌" if sender.id == game["players"][0] else "⭕"
     if game["turn"] != symbol:
         await event.answer("Sıra sende değil!", alert=True)
@@ -1267,8 +1257,10 @@ async def xox_move(event):
     if game["board"][r][c] != "⬜":
         await event.answer("Burası dolu!", alert=True)
         return
+
     game["board"][r][c] = symbol
     winner = check_winner(game["board"])
+
     if winner:
         if winner == "draw":
             text = "🤝 Berabere! Oyun bitti."
@@ -1279,6 +1271,7 @@ async def xox_move(event):
         await event.edit(text, buttons=restart_btn)
         del games[chat_id]
         return
+
     game["turn"] = "⭕" if game["turn"] == "❌" else "❌"
     current_player = [name for pid, name in game["player_names"].items() if (game["turn"]=="❌" and pid==game["players"][0]) or (game["turn"]=="⭕" and pid==game["players"][1])]
     await event.edit(f"🎮 6x6 XOX Oyunu\nSıra: {game['turn']} - {current_player[0]}", buttons=make_buttons(game["board"]))
@@ -1286,12 +1279,21 @@ async def xox_move(event):
 @client.on(events.CallbackQuery(pattern=b"xox_restart"))
 async def xox_restart(event):
     chat_id = event.chat_id
-    if chat_id in games:
-        await event.answer("Oyun zaten devam ediyor!", alert=True)
-        return
     message = await event.get_message()
     await message.edit("🎮 6x6 XOX oyunu yeniden başladı!", buttons=None)
-    await start_xox(event)
+    size = 6
+    board = [["⬜"] * size for _ in range(size)]
+    msg = await event.respond(
+        "Yeni oyun başladı!",
+        buttons=make_buttons(board)
+    )
+    games[chat_id] = {
+        "board": board,
+        "turn": "❌",
+        "players": [],
+        "player_names": {},
+        "msg_id": msg.id
+    }
 
 @client.on(events.NewMessage(pattern="^/off$"))
 async def stop_xox(event):
@@ -1299,14 +1301,12 @@ async def stop_xox(event):
         return
     chat_id = event.chat_id
     if chat_id in games:
-        msg_id = games[chat_id]["msg_id"]
         try:
-            await event.client.delete_messages(chat_id, msg_id)  # tablo mesajını sil
+            await event.client.delete_messages(chat_id, games[chat_id]["msg_id"])
         except:
             pass
         del games[chat_id]
         await event.respond("🛑 XOX oyunu bitirildi!", reply_to=event.message.id)
-
 
 print("[INFO] ᴀʀᴛᴢ Bot çalışıyor...")
 client.run_until_disconnected()
