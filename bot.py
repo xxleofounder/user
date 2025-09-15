@@ -1145,7 +1145,7 @@ async def start_game(event):
 
     await event.respond(
         f"🎯 **1-1000 ᴀʀᴀsɪ ʙiʀ sᴀʏɪ ᴀᴋʟɪᴍᴅᴀ ᴛᴜᴛᴛᴜᴍ!**\n\n"
-        f"⏳ **3ᴅᴋ ʙᴏʏᴜɴᴄᴀ ʙiʀ ᴛᴀʜᴍiɴ ɢᴇʟᴍᴇᴢsᴇ ᴏʏᴜɴ ᴏᴛᴏᴍᴀᴛiᴋ iᴘᴛᴀʟ ᴏʟᴜᴄᴀᴋ, iʏi ᴏʏᴜɴʟᴀʀ..."
+        f"⏳ **3ᴅᴋ ʙᴏʏᴜɴᴄᴀ ʙiʀ ᴛᴀʜᴍiɴ ɢᴇʟᴍᴇᴢsᴇ ᴏʏᴜɴ ᴏᴛᴏᴍᴀᴛiᴋ iᴘᴛᴀʟ ᴏʟᴜᴄᴀᴋ, iʏi ᴏʏᴜɴʟᴀʀ...**"
         
     )
 
@@ -1175,7 +1175,7 @@ async def guess_number(event):
     else:
         await event.respond(
             f"🎉 Tebrikler {event.sender.first_name}! 🎊\n"
-            f"Doğru sayı: **{number}**", reply_to=event.id
+            f"🟢 ᴀᴋʟɪᴍᴅᴀᴋi sᴀʏɪ: **{number}**", reply_to=event.id
         )
         games[chat_id]["active"] = False
         if games[chat_id]["task"]:
