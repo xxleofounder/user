@@ -1129,27 +1129,31 @@ async def eros(event):
 games = {}
 
 @client.on(events.NewMessage(pattern="^/stahmin"))
+@client.on(events.NewMessage(pattern="^/stahmin"))
 async def start_game(event):
+    chat_id = event.chat_id
+
+    # DM kontrolü
     if event.is_private:
-         await event.respond(
+        await event.respond(
             "üᴢɢüɴüᴍ, ʙᴜ ᴋᴏᴍᴜᴛ ɢʀᴜᴘ ᴠᴇʏᴀ ᴋᴀɴᴀʟʟᴀʀ içiɴ ɢᴇçᴇʀʟiᴅiʀ❗️",
             buttons=[[Button.url("➕ ʙᴇɴi ɢʀᴜʙᴀ ᴇᴋʟᴇ", f"https://t.me/{botUsername}?startgroup=true")]],
             reply_to=event.message.id
         )
+        return
 
-    chat_id = event.chat_id
-
+    # Oyun zaten aktif mi kontrolü
     if chat_id in games and games[chat_id]["active"]:
         await event.respond("⚠️ ᴏʏᴜɴ ᴢᴀᴛᴇɴ ᴀᴋᴛiғ! ᴅᴇᴠᴀᴍ ᴇᴅᴇʙiʟiʀsiɴiᴢ..", reply_to=event.id)
         return
 
+    # Yeni sayı üret
     number = random.randint(1, 1000)
     games[chat_id] = {"number": number, "active": True, "task": None}
 
     await event.respond(
         f"🎯 **1-1000 ᴀʀᴀsɪ ʙiʀ sᴀʏɪ ᴀᴋʟɪᴍᴅᴀ ᴛᴜᴛᴛᴜᴍ!**\n\n"
         f"⏳ **3ᴅᴋ ʙᴏʏᴜɴᴄᴀ ʙiʀ ᴛᴀʜᴍiɴ ɢᴇʟᴍᴇᴢsᴇ ᴏʏᴜɴ ᴏᴛᴏᴍᴀᴛiᴋ iᴘᴛᴀʟ ᴏʟᴜᴄᴀᴋ, iʏi ᴏʏᴜɴʟᴀʀ...**"
-        
     )
 
     games[chat_id]["task"] = asyncio.create_task(auto_end_game(chat_id))
