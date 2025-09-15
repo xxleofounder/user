@@ -8,8 +8,6 @@ import subprocess
 import yt_dlp
 import lyricsgenius
 
-import eglence
-
 from telethon import TelegramClient, events, errors, Button
 from telethon.tl.types import ChannelParticipantsAdmins, UserStatusRecently, UserStatusOnline
 
