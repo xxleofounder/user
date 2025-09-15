@@ -1174,128 +1174,131 @@ async def stop_game(event):
         await event.respond("⚠️ șᴜ ᴀɴᴅᴀ ᴀᴋᴛiғ ʙiʀ ᴏʏᴜɴ ʏᴏᴋ:(", reply_to=event.id)
 
 
+
+games = {}
+
+def make_buttons(board):
+    return [[Button.inline(cell, f"xox:{r}:{c}") for c, cell in enumerate(row)] for r, row in enumerate(board)]
+
 def check_winner(board):
     size = len(board)
-    # Satırlar
     for row in board:
-        for i in range(size - 4):
-            segment = row[i:i+5]
-            if segment[0] != "⬜" and segment.count(segment[0]) == 5:
+        for i in range(size - 3):
+            segment = row[i:i+4]
+            if segment[0] != "⬜" and segment.count(segment[0]) == 4:
                 return segment[0]
-
-    # Sütunlar
     for c in range(size):
-        for r in range(size - 4):
-            segment = [board[r+i][c] for i in range(5)]
-            if segment[0] != "⬜" and segment.count(segment[0]) == 5:
+        for r in range(size - 3):
+            segment = [board[r+i][c] for i in range(4)]
+            if segment[0] != "⬜" and segment.count(segment[0]) == 4:
                 return segment[0]
-
-    # Çapraz (sol üst → sağ alt)
-    for r in range(size - 4):
-        for c in range(size - 4):
-            segment = [board[r+i][c+i] for i in range(5)]
-            if segment[0] != "⬜" and segment.count(segment[0]) == 5:
+    for r in range(size - 3):
+        for c in range(size - 3):
+            segment = [board[r+i][c+i] for i in range(4)]
+            if segment[0] != "⬜" and segment.count(segment[0]) == 4:
                 return segment[0]
-
-    # Çapraz (sağ üst → sol alt)
-    for r in range(size - 4):
-        for c in range(4, size):
-            segment = [board[r+i][c-i] for i in range(5)]
-            if segment[0] != "⬜" and segment.count(segment[0]) == 5:
+    for r in range(size - 3):
+        for c in range(3, size):
+            segment = [board[r+i][c-i] for i in range(4)]
+            if segment[0] != "⬜" and segment.count(segment[0]) == 4:
                 return segment[0]
-
-    # Boş varsa oyun devam
     for row in board:
         if "⬜" in row:
             return None
     return "draw"
 
-def make_buttons(board):
-    return [[Button.inline(cell, f"xox:{r}:{c}") for c, cell in enumerate(row)] for r, row in enumerate(board)]
-
 @client.on(events.NewMessage(pattern="^/xox$"))
 async def start_xox(event):
-    if event.is_private:  # DM’de çalışmasın
+    if event.is_private:
         return
-
     chat_id = event.chat_id
+    sender = event.sender
     if chat_id in games:
         await event.respond("⚠️ Bu sohbette zaten bir XOX oyunu var!")
         return
+    confirm_buttons = [
+        [Button.inline("Evet", f"xox_confirm:{sender.id}:yes"), Button.inline("İptal", f"xox_confirm:{sender.id}:no")]
+    ]
+    await event.respond("XOX oyunu başlatılsın mı?", buttons=confirm_buttons)
 
-    size = 9
+@client.on(events.CallbackQuery(pattern=b"xox_confirm:(\\d+):(yes|no)"))
+async def confirm_xox(event):
+    sender_id, choice = map(str, event.data.decode().split(":")[1:])
+    sender_id = int(sender_id)
+    if event.sender_id != sender_id:
+        await event.answer("Sen başlatıcı değilsin!", alert=True)
+        return
+    chat_id = event.chat_id
+    if choice == "no":
+        await event.edit("Oyun iptal edildi.", buttons=None)
+        return
+    size = 6
     board = [["⬜"] * size for _ in range(size)]
     games[chat_id] = {
         "board": board,
         "turn": "❌",
-        "players": [event.sender_id],  # İlk oyuncu
+        "players": [event.sender_id],
+        "player_names": {event.sender_id: event.sender.first_name},
+        "msg_id": event.message.id
     }
-
-    await event.respond(
-        f"🎮 9x9 XOX Oyunu Başladı!\n❌ ilk hamleyi yapar. (5 aynı sembol kazanır)",
-        buttons=make_buttons(board)
-    )
+    await event.edit(f"🎮 6x6 XOX oyunu başladı!\n❌: {event.sender.first_name} ilk hamleyi yapar.", buttons=make_buttons(board))
 
 @client.on(events.CallbackQuery(pattern=b"xox:(\\d+):(\\d+)"))
 async def xox_move(event):
     chat_id = event.chat_id
     if chat_id not in games:
         return
-
     game = games[chat_id]
     r, c = map(int, event.data.decode().split(":")[1:])
-
-    # Oyuncu kaydı
-    if event.sender_id not in game["players"]:
+    sender = event.sender
+    if sender.id not in game["players"]:
         if len(game["players"]) < 2:
-            game["players"].append(event.sender_id)
+            game["players"].append(sender.id)
+            game["player_names"][sender.id] = sender.first_name
         else:
             await event.answer("Bu oyunda sadece 2 oyuncu oynayabilir!", alert=True)
             return
-
-    player_symbol = "❌" if event.sender_id == game["players"][0] else "⭕"
-
-    # Sıra kontrolü
-    if game["turn"] != player_symbol:
+    symbol = "❌" if sender.id == game["players"][0] else "⭕"
+    if game["turn"] != symbol:
         await event.answer("Sıra sende değil!", alert=True)
         return
-
-    # Hücre boş mu?
     if game["board"][r][c] != "⬜":
         await event.answer("Burası dolu!", alert=True)
         return
-
-    # Hamleyi işle
-    game["board"][r][c] = player_symbol
-
-    # Kazanan var mı?
+    game["board"][r][c] = symbol
     winner = check_winner(game["board"])
     if winner:
         if winner == "draw":
             text = "🤝 Berabere! Oyun bitti."
         else:
-            text = f"🏆 Kazanan: {winner}"
-        await event.edit(text, buttons=make_buttons(game["board"]))
+            winner_name = [name for pid, name in game["player_names"].items() if (symbol=="❌" and pid==game["players"][0]) or (symbol=="⭕" and pid==game["players"][1])]
+            text = f"🏆 Kazanan: {winner_name[0]}"
+        restart_btn = [[Button.inline("Yeniden Başlat", "xox_restart")]]
+        await event.edit(text, buttons=restart_btn)
         del games[chat_id]
         return
-
-    # Sıra değiştir
     game["turn"] = "⭕" if game["turn"] == "❌" else "❌"
+    current_player = [name for pid, name in game["player_names"].items() if (game["turn"]=="❌" and pid==game["players"][0]) or (game["turn"]=="⭕" and pid==game["players"][1])]
+    await event.edit(f"🎮 6x6 XOX Oyunu\nSıra: {game['turn']} - {current_player[0]}", buttons=make_buttons(game["board"]))
 
-    await event.edit(
-        f"🎮 9x9 XOX Oyunu\nSıra: {game['turn']} (5 aynı sembol kazanır)",
-        buttons=make_buttons(game["board"])
-    )
+@client.on(events.CallbackQuery(pattern=b"xox_restart"))
+async def xox_restart(event):
+    chat_id = event.chat_id
+    if chat_id in games:
+        await event.answer("Oyun zaten devam ediyor!", alert=True)
+        return
+    await event.edit("Yeni oyun için onay bekleniyor...", buttons=None)
+    await start_xox(event)
 
 @client.on(events.NewMessage(pattern="^/off$"))
 async def stop_xox(event):
-    if event.is_private:  # DM’de çalışmasın
+    if event.is_private:
         return
-
     chat_id = event.chat_id
     if chat_id in games:
         del games[chat_id]
         await event.respond("🛑 XOX oyunu bitirildi!")
+
 
 print("[INFO] ᴀʀᴛᴢ Bot çalışıyor...")
 client.run_until_disconnected()
