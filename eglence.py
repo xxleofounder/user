@@ -1,3 +1,3 @@
 from telethon import events, Button
-from main import client  # client objuz
+from bot import client
 import asyncio
