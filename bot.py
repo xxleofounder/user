@@ -1129,7 +1129,6 @@ async def eros(event):
 games = {}
 
 @client.on(events.NewMessage(pattern="^/stahmin"))
-@client.on(events.NewMessage(pattern="^/stahmin"))
 async def start_game(event):
     chat_id = event.chat_id
 
