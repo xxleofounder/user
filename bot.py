@@ -119,7 +119,7 @@ async def diger_menu(event):
     await event.edit(
         "🕹️ **Eğlence Komutlarım:**\n\n"
         "⇨ `/eros` - **iᴋi ᴋișiʏi ᴇșʟᴇșᴛiʀiʀ sʜiᴘʟᴇʀ**\n\n"
-        "⇨ `/stahmin` - **sᴀʏɪ ᴛᴀʜᴍiɴ ᴏʏᴜɴᴜ`/dur`\niʟᴇ iᴘᴛᴀʟ ᴇᴅᴇʙiʟiʀsiɴiᴢ**\n\n",
+        "⇨ `/stahmin` - **sᴀʏɪ ᴛᴀʜᴍiɴ ᴏʏᴜɴᴜ` /dur`\niʟᴇ iᴘᴛᴀʟ ᴇᴅᴇʙiʟiʀsiɴiᴢ**\n\n",
         buttons=[[Button.inline("⬅️ Geri Dön", data="cevirme")]],
         link_preview=False
     )
@@ -236,7 +236,15 @@ async def oyun_baslat(event, edit_msg=None):
 @client.on(events.NewMessage(pattern="^/stahmin"))
 async def sayi_tahmin(event):
     if event.is_private:  # DM'de çalışmayı engelle
-        await event.respond("⚠️ Bu komut sadece gruplarda kullanılabilir.", reply_to=event.message.id)
+        bot = await client.get_me()
+        bot_username = bot.username
+        await event.respond(
+            "🤖 Beni gruba ekleyerek sayı tahmin oyununu oynayabilirsiniz!",
+            buttons=[
+                [Button.url("➕ Gruba Ekle", f"https://t.me/{bot_username}?startgroup=true")]
+            ],
+            reply_to=event.message.id  # reply olarak göndersin
+        )
         return
     await oyun_baslat(event)
 
@@ -244,7 +252,10 @@ async def sayi_tahmin(event):
 @client.on(events.NewMessage)
 async def tahmin_kontrol(event):
     if event.is_private:  # DM'de çalışmayı engelle
-        await event.respond("⚠️ Bu komut sadece gruplarda kullanılabilir.", reply_to=event.message.id)
+        await event.respond(
+            "⚠️ Bu komut sadece gruplarda kullanılabilir.",
+            reply_to=event.message.id
+        )
         return
 
     chat_id = event.chat_id
@@ -297,7 +308,13 @@ async def tahmin_kontrol(event):
 @client.on(events.CallbackQuery(pattern=b"yeni_oyun"))
 async def yeni_oyun(event):
     if event.is_private:  # DM'de çalışmayı engelle
-        await event.answer("⚠️ Bu komut sadece gruplarda kullanılabilir.", alert=True)
+        await event.respond(
+            "🤖 Beni gruba ekleyerek sayı tahmin oyununu oynayabilirsiniz!",
+            buttons=[
+                [Button.url("➕ Gruba Ekle", f"https://t.me/{bot_username}?startgroup=true")]
+            ],
+            reply_to=event.message.id  # reply olarak göndersin
+        )
         return
     try:
         await event.answer()  # butona tıklama efekti
@@ -309,7 +326,13 @@ async def yeni_oyun(event):
 @client.on(events.NewMessage(pattern="^/dur"))
 async def oyun_dur(event):
     if event.is_private:  # DM'de çalışmayı engelle
-        await event.respond("⚠️ Bu komut sadece gruplarda kullanılabilir.", reply_to=event.message.id)
+        await event.respond(
+            "🤖 Beni gruba ekleyerek sayı tahmin oyununu oynayabilirsiniz!",
+            buttons=[
+                [Button.url("➕ Gruba Ekle", f"https://t.me/{bot_username}?startgroup=true")]
+            ],
+            reply_to=event.message.id  # reply olarak göndersin
+        )
         return
 
     chat_id = event.chat_id
