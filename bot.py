@@ -1127,146 +1127,87 @@ async def eros(event):
     await event.respond(msg_text, reply_to=event.message.id, parse_mode='md')
 
 
-import random
-import asyncio
-from telethon import events, Button
-from bot import client
-
-# Oyun verileri
-oyunlar = {}  # {chat_id: {"sayi": int, "aktif": bool, "task": asyncio.Task}}
-
-# /stahmin komutu -> oyunu başlat
-@client.on(events.NewMessage(pattern="^/stahmin$"))
-async def start_tahmin(event):
-    if not event.is_group:
-        await event.respond("⚠️ Bu komut sadece gruplarda kullanılabilir.")
+@client.on(events.NewMessage(pattern="^/stahmin"))
+async def start_game(event):
+    if event.is_private:
+        await event.respond("❌ Bu komut özel mesajda kullanılamaz, lütfen bir grup sohbetinde deneyin.")
         return
 
     chat_id = event.chat_id
 
-    if chat_id in oyunlar and oyunlar[chat_id]["aktif"]:
-        await event.respond("⚠️ Zaten aktif bir oyun var! Önce /dur ile bitirin.")
+    if chat_id in games and games[chat_id]["active"]:
+        await event.respond("⚠️ Oyun zaten aktif! Tahminlerinizi yapmaya devam edin.", reply_to=event.id)
         return
 
-    sayi = random.randint(1, 1000)
-    oyunlar[chat_id] = {"sayi": sayi, "aktif": True, "task": None}
+    number = random.randint(1, 1000)
+    games[chat_id] = {"number": number, "active": True, "task": None}
 
-    msg = await event.respond(
-        "🎲 **Sayı Tahmin Oyunu Başladı!**\n\n"
-        "1 ile 1000 arasında bir sayı tuttum 🔒\n"
-        "Tahmin etmek için sadece sayıyı yazmanız yeterli! 🚀\n\n"
-        "⏳ Eğer **3 dakika boyunca kimse tahmin yapmazsa** oyun otomatik bitecek."
+    await event.respond(
+        f"🎯 **Sayı Tahmin Oyunu Başladı!**\n"
+        f"1️⃣ - 1000️⃣ arası bir sayı tuttum.\n"
+        f"💡 Tahmininizi bu mesaja **yanıt vererek** yazabilirsiniz!"
     )
 
-    # İlk bekleme başlat
-    oyunlar[chat_id]["task"] = asyncio.create_task(auto_end(chat_id, msg))
+    games[chat_id]["task"] = asyncio.create_task(auto_end_game(chat_id))
 
-
-# Tahminleri kontrol et
 @client.on(events.NewMessage())
-async def tahmin_et(event):
-    if not event.is_group:
+async def guess_number(event):
+    if event.is_private:
         return
 
     chat_id = event.chat_id
-    if chat_id not in oyunlar or not oyunlar[chat_id]["aktif"]:
+
+    if chat_id not in games or not games[chat_id]["active"]:
         return
 
-    # sadece sayı mesajlarını al
-    if not event.text.isdigit():
-        return
-
-    tahmin = int(event.text)
-    sayi = oyunlar[chat_id]["sayi"]
-
-    # Kullanıcı tahmin yaptı → 3dk sayacı resetle
-    if oyunlar[chat_id]["task"]:
-        oyunlar[chat_id]["task"].cancel()
-    oyunlar[chat_id]["task"] = asyncio.create_task(auto_end(chat_id, event))
-
-    if tahmin == sayi:
-        oyunlar[chat_id]["aktif"] = False
-        if oyunlar[chat_id]["task"]:
-            oyunlar[chat_id]["task"].cancel()
-
-        await event.reply(
-            f"🎉 **Tebrikler {event.sender.first_name}!**\n"
-            f"🔑 Doğru sayıyı buldun: **{sayi}**",
-            buttons=[[Button.inline("🔄 Yeni Oyun Başlat", data=f"newgame_{chat_id}")]]
-        )
-
-    elif tahmin < sayi:
-        await event.reply("🔼 Daha **büyük** bir sayı dene!")
-    else:
-        await event.reply("🔽 Daha **küçük** bir sayı dene!")
-
-
-# /dur komutu -> oyunu bitir
-@client.on(events.NewMessage(pattern="^/dur$"))
-async def stop_tahmin(event):
-    if not event.is_group:
-        return
-
-    chat_id = event.chat_id
-    if chat_id not in oyunlar or not oyunlar[chat_id]["aktif"]:
-        await event.reply("⚠️ Şu anda aktif bir oyun yok.")
-        return
-
-    oyunlar[chat_id]["aktif"] = False
-    if oyunlar[chat_id]["task"]:
-        oyunlar[chat_id]["task"].cancel()
-    await event.reply("🛑 Oyun sonlandırıldı.")
-
-
-# Oyun otomatik bitirme (3 dk boyunca kimse oynamazsa)
-async def auto_end(chat_id, msg_event):
     try:
-        await asyncio.sleep(180)  # 3 dakika
-        if chat_id in oyunlar and oyunlar[chat_id]["aktif"]:
-            oyunlar[chat_id]["aktif"] = False
-            await msg_event.respond("⌛ **3 dakika boyunca kimse oynamadı!**\n🛑 Oyun otomatik olarak sona erdi.")
+        tahmin = int(event.raw_text)
+    except ValueError:
+        return
+
+    number = games[chat_id]["number"]
+
+    if tahmin < number:
+        await event.respond(f"🔺 {event.sender.first_name}, daha büyük bir sayı söyle! ({tahmin})", reply_to=event.id)
+    elif tahmin > number:
+        await event.respond(f"🔻 {event.sender.first_name}, daha küçük bir sayı söyle! ({tahmin})", reply_to=event.id)
+    else:
+        await event.respond(
+            f"🎉 Tebrikler {event.sender.first_name}! 🎊\n"
+            f"Doğru sayı: **{number}**", reply_to=event.id
+        )
+        games[chat_id]["active"] = False
+        if games[chat_id]["task"]:
+            games[chat_id]["task"].cancel()
+        await event.respond("✅ Oyunu yeniden başlatmak için /tahmin yazabilirsiniz.", reply_to=event.id)
+
+async def auto_end_game(chat_id):
+    try:
+        await asyncio.sleep(180)
+        if chat_id in games and games[chat_id]["active"]:
+            games[chat_id]["active"] = False
+            await client.send_message(
+                chat_id,
+                "⏰ 3 dakika boyunca tahmin gelmedi. Oyun kapatıldı.\n"
+                "🟢 Yeni oyun başlatmak için /tahmin yazabilirsiniz."
+            )
     except asyncio.CancelledError:
         pass
 
+@client.on(events.NewMessage(pattern="^/off"))
+async def stop_game(event):
+    if event.is_private:
+        return
 
-# Inline buton -> Yeni Oyun
-@client.on(events.CallbackQuery(pattern=b"newgame_(\d+)"))
-async def new_game(event):
-    chat_id = int(event.pattern_match.group(1))
+    chat_id = event.chat_id
 
-    # Eski oyunu kapat
-    if chat_id in oyunlar and oyunlar[chat_id]["aktif"]:
-        oyunlar[chat_id]["aktif"] = False
-        if oyunlar[chat_id]["task"]:
-            oyunlar[chat_id]["task"].cancel()
+    if chat_id in games and games[chat_id]["active"]:
+        games[chat_id]["active"] = False
+        if games[chat_id]["task"]:
+            games[chat_id]["task"].cancel()
+        await event.respond("🛑 Oyun manuel olarak durduruldu. /tahmin ile yeniden başlatabilirsiniz.", reply_to=event.id)
+    else:
+        await event.respond("⚠️ Şu anda aktif bir oyun yok.", reply_to=event.id)
 
-    # Yeni sayı üret
-    sayi = random.randint(1, 1000)
-    oyunlar[chat_id] = {"sayi": sayi, "aktif": True, "task": None}
-
-    await event.edit(
-        "🎲 **Yeni Sayı Tahmin Oyunu Başladı!**\n\n"
-        "1 ile 1000 arasında yeni bir sayı tuttum 🔒\n"
-        "Tahmin etmek için sadece sayıyı yazın! 🚀\n\n"
-        "⏳ Eğer **3 dakika boyunca kimse tahmin yapmazsa** oyun otomatik bitecek."
-    )
-
-    oyunlar[chat_id]["task"] = asyncio.create_task(auto_end(chat_id, event))
-
-
-from bot import client, oyunlar  # oyunlar dict’in burada tanımlı olduğunu varsayalım
-
-async def main():
-    print("[INFO] - 🥰 Artz , Başarıyla Aktifleştirildi...")
-    try:
-        await client.run_until_disconnected()
-    finally:
-        # Tüm async task'leri iptal et
-        for chat_id in list(oyunlar.keys()):
-            task = oyunlar[chat_id].get("task")
-            if task:
-                task.cancel()
-        await client.disconnect()
-        print("[INFO] - Bot düzgün şekilde kapatıldı.")
-
-asyncio.run(main())
+print("[INFO] Bot çalışıyor...")
+client.run_until_disconnected()
