@@ -1216,5 +1216,129 @@ async def stop_game(event):
     else:
         await event.respond("⚠️ șᴜ ᴀɴᴅᴀ ᴀᴋᴛiғ ʙiʀ ᴏʏᴜɴ ʏᴏᴋ:(", reply_to=event.id)
 
+
+def check_winner(board):
+    size = len(board)
+    # Satırlar
+    for row in board:
+        for i in range(size - 4):
+            segment = row[i:i+5]
+            if segment[0] != "⬜" and segment.count(segment[0]) == 5:
+                return segment[0]
+
+    # Sütunlar
+    for c in range(size):
+        for r in range(size - 4):
+            segment = [board[r+i][c] for i in range(5)]
+            if segment[0] != "⬜" and segment.count(segment[0]) == 5:
+                return segment[0]
+
+    # Çapraz (sol üst → sağ alt)
+    for r in range(size - 4):
+        for c in range(size - 4):
+            segment = [board[r+i][c+i] for i in range(5)]
+            if segment[0] != "⬜" and segment.count(segment[0]) == 5:
+                return segment[0]
+
+    # Çapraz (sağ üst → sol alt)
+    for r in range(size - 4):
+        for c in range(4, size):
+            segment = [board[r+i][c-i] for i in range(5)]
+            if segment[0] != "⬜" and segment.count(segment[0]) == 5:
+                return segment[0]
+
+    # Boş varsa oyun devam
+    for row in board:
+        if "⬜" in row:
+            return None
+    return "draw"
+
+def make_buttons(board):
+    return [[Button.inline(cell, f"xox:{r}:{c}") for c, cell in enumerate(row)] for r, row in enumerate(board)]
+
+@client.on(events.NewMessage(pattern="^/xox$"))
+async def start_xox(event):
+    if event.is_private:  # DM’de çalışmasın
+        return
+
+    chat_id = event.chat_id
+    if chat_id in games:
+        await event.respond("⚠️ Bu sohbette zaten bir XOX oyunu var!")
+        return
+
+    size = 9
+    board = [["⬜"] * size for _ in range(size)]
+    games[chat_id] = {
+        "board": board,
+        "turn": "❌",
+        "players": [event.sender_id],  # İlk oyuncu
+    }
+
+    await event.respond(
+        f"🎮 9x9 XOX Oyunu Başladı!\n❌ ilk hamleyi yapar. (5 aynı sembol kazanır)",
+        buttons=make_buttons(board)
+    )
+
+@client.on(events.CallbackQuery(pattern=b"xox:(\\d+):(\\d+)"))
+async def xox_move(event):
+    chat_id = event.chat_id
+    if chat_id not in games:
+        return
+
+    game = games[chat_id]
+    r, c = map(int, event.data.decode().split(":")[1:])
+
+    # Oyuncu kaydı
+    if event.sender_id not in game["players"]:
+        if len(game["players"]) < 2:
+            game["players"].append(event.sender_id)
+        else:
+            await event.answer("Bu oyunda sadece 2 oyuncu oynayabilir!", alert=True)
+            return
+
+    player_symbol = "❌" if event.sender_id == game["players"][0] else "⭕"
+
+    # Sıra kontrolü
+    if game["turn"] != player_symbol:
+        await event.answer("Sıra sende değil!", alert=True)
+        return
+
+    # Hücre boş mu?
+    if game["board"][r][c] != "⬜":
+        await event.answer("Burası dolu!", alert=True)
+        return
+
+    # Hamleyi işle
+    game["board"][r][c] = player_symbol
+
+    # Kazanan var mı?
+    winner = check_winner(game["board"])
+    if winner:
+        if winner == "draw":
+            text = "🤝 Berabere! Oyun bitti."
+        else:
+            text = f"🏆 Kazanan: {winner}"
+        await event.edit(text, buttons=make_buttons(game["board"]))
+        del games[chat_id]
+        return
+
+    # Sıra değiştir
+    game["turn"] = "⭕" if game["turn"] == "❌" else "❌"
+
+    await event.edit(
+        f"🎮 9x9 XOX Oyunu\nSıra: {game['turn']} (5 aynı sembol kazanır)",
+        buttons=make_buttons(game["board"])
+    )
+
+@client.on(events.NewMessage(pattern="^/off$"))
+async def stop_xox(event):
+    if event.is_private:  # DM’de çalışmasın
+        return
+
+    chat_id = event.chat_id
+    if chat_id in games:
+        del games[chat_id]
+        await event.respond("🛑 XOX oyunu bitirildi!")
+
 print("[INFO] ᴀʀᴛᴢ Bot çalışıyor...")
 client.run_until_disconnected()
