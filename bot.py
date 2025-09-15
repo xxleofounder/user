@@ -1208,7 +1208,7 @@ async def stop_game(event):
             games[chat_id]["task"].cancel()
         await event.respond("🔴 ᴏʏᴜɴ ᴍᴀɴᴜᴇʟ ᴏʟᴀʀᴀᴋ ᴅᴜʀᴅᴜʀᴜʟᴅᴜ, /stahmin iʟᴇ ʏᴇɴiᴅᴇɴ ʙᴀșʟᴀᴛᴀʙiʟiʀsiɴiᴢ.", reply_to=event.id)
     else:
-        await event.respond("⚠️ șᴜ ᴀɴᴅᴀ ᴀᴋᴛiғ ʙiʀ ᴏʏᴜɴ ʏᴏᴋ :(", reply_to=event.id)
+        await event.respond("⚠️ șᴜ ᴀɴᴅᴀ ᴀᴋᴛiғ ʙiʀ ᴏʏᴜɴ ʏᴏᴋ:(", reply_to=event.id)
 
 print("[INFO] ᴀʀᴛᴢ Bot çalışıyor...")
 client.run_until_disconnected()
