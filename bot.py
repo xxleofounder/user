@@ -1253,5 +1253,20 @@ async def new_game(event):
 
     oyunlar[chat_id]["task"] = asyncio.create_task(auto_end(chat_id, event))
 
-print("[INFO] - 🥰 Artz , Başarıyla Aktifleştirildi...")
-client.run_until_disconnected()
+
+from bot import client, oyunlar  # oyunlar dict’in burada tanımlı olduğunu varsayalım
+
+async def main():
+    print("[INFO] - 🥰 Artz , Başarıyla Aktifleştirildi...")
+    try:
+        await client.run_until_disconnected()
+    finally:
+        # Tüm async task'leri iptal et
+        for chat_id in list(oyunlar.keys()):
+            task = oyunlar[chat_id].get("task")
+            if task:
+                task.cancel()
+        await client.disconnect()
+        print("[INFO] - Bot düzgün şekilde kapatıldı.")
+
+asyncio.run(main())
