@@ -253,8 +253,11 @@ async def sayi_tahmin(event):
 async def tahmin_kontrol(event):
     if event.is_private:  # DM'de çalışmayı engelle
         await event.respond(
-            "⚠️ Bu komut sadece gruplarda kullanılabilir.",
-            reply_to=event.message.id
+            "🤖 Beni gruba ekleyerek sayı tahmin oyununu oynayabilirsiniz!",
+            buttons=[
+                [Button.url("➕ Gruba Ekle", f"https://t.me/{bot_username}?startgroup=true")]
+            ],
+            reply_to=event.message.id  # reply olarak göndersin
         )
         return
 
