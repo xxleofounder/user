@@ -241,7 +241,7 @@ async def sayi_tahmin(event):
         await event.respond(
             "🤖 Beni gruba ekleyerek sayı tahmin oyununu oynayabilirsiniz!",
             buttons=[
-                [Button.url("➕ Gruba Ekle", f"https://t.me/{bot_username}?startgroup=true")]
+                [Button.url("➕ Beni Gruba Ekle", f"https://t.me/{botUsername}?startgroup=true")]
             ],
             reply_to=event.message.id  # reply olarak göndersin
         )
@@ -255,7 +255,7 @@ async def tahmin_kontrol(event):
         await event.respond(
             "🤖 Beni gruba ekleyerek sayı tahmin oyununu oynayabilirsiniz!",
             buttons=[
-                [Button.url("➕ Gruba Ekle", f"https://t.me/{bot_username}?startgroup=true")]
+                [Button.url("➕ Beni Gruba Ekle", f"https://t.me/{botUsername}?startgroup=true")]
             ],
             reply_to=event.message.id  # reply olarak göndersin
         )
@@ -314,7 +314,7 @@ async def yeni_oyun(event):
         await event.respond(
             "🤖 Beni gruba ekleyerek sayı tahmin oyununu oynayabilirsiniz!",
             buttons=[
-                [Button.url("➕ Gruba Ekle", f"https://t.me/{bot_username}?startgroup=true")]
+                [Button.url("➕ Beni Gruba Ekle", f"https://t.me/{botUsername}?startgroup=true")]
             ],
             reply_to=event.message.id  # reply olarak göndersin
         )
@@ -332,7 +332,7 @@ async def oyun_dur(event):
         await event.respond(
             "🤖 Beni gruba ekleyerek sayı tahmin oyununu oynayabilirsiniz!",
             buttons=[
-                [Button.url("➕ Gruba Ekle", f"https://t.me/{bot_username}?startgroup=true")]
+                [Button.url("➕ Beni Gruba Ekle", f"https://t.me/{botUsername}?startgroup=true")]
             ],
             reply_to=event.message.id  # reply olarak göndersin
         )
@@ -354,7 +354,7 @@ async def eros(event):
     if event.is_private:
         return await event.respond(
             "üᴢɢüɴüᴍ, ʙᴜ ᴋᴏᴍᴜᴛ ɢʀᴜᴘ ᴠᴇʏᴀ ᴋᴀɴᴀʟʟᴀʀ içiɴ ɢᴇçᴇʀʟiᴅiʀ❗️",
-            buttons=[[Button.url("➕ ʙᴇɴi ɢʀᴜʙᴀ ᴇᴋʟᴇ", f"https://t.me/{bot_username}?startgroup=true")]],
+            buttons=[[Button.url("➕ ʙᴇɴi ɢʀᴜʙᴀ ᴇᴋʟᴇ", f"https://t.me/{botUserName}?startgroup=true")]],
             reply_to=event.message.id
         )
 
@@ -494,7 +494,7 @@ async def mentionall(event):
         bot_username = (await client.get_me()).username
         return await event.respond(
             "üᴢɢüɴüᴍ, ʙᴜ ᴋᴏᴍᴜᴛ ɢʀᴜᴘ ᴠᴇʏᴀ ᴋᴀɴᴀʟʟᴀʀ içiɴ ɢᴇçᴇʀʟiᴅiʀ❗️",
-            buttons=[[Button.url("➕ ʙᴇɴi ɢʀᴜʙᴀ ᴇᴋʟᴇ", f"https://t.me/{bot_username}?startgroup=true")]],
+            buttons=[[Button.url("➕ ʙᴇɴi ɢʀᴜʙᴀ ᴇᴋʟᴇ", f"https://t.me/{botUsername}?startgroup=true")]],
             reply_to=event.message.id
         )
 
@@ -562,7 +562,7 @@ async def mentionalll(event):
         bot_username = (await client.get_me()).username
         return await event.respond(
             "üᴢɢüɴüᴍ, ʙᴜ ᴋᴏᴍᴜᴛ ɢʀᴜᴘ ᴠᴇʏᴀ ᴋᴀɴᴀʟʟᴀʀ içiɴ ɢᴇçᴇʀʟiᴅiʀ❗️",
-            buttons=[[Button.url("➕ ʙᴇɴi ɢʀᴜʙᴀ ᴇᴋʟᴇ", f"https://t.me/{bot_username}?startgroup=true")]],
+            buttons=[[Button.url("➕ ʙᴇɴi ɢʀᴜʙᴀ ᴇᴋʟᴇ", f"https://t.me/{botUsername}?startgroup=true")]],
             reply_to=event.message.id
         )
 
