@@ -1126,6 +1126,7 @@ async def eros(event):
     # Mesajı gönder
     await event.respond(msg_text, reply_to=event.message.id, parse_mode='md')
 
+games = {}
 
 @client.on(events.NewMessage(pattern="^/stahmin"))
 async def start_game(event):
