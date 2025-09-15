@@ -132,3 +132,64 @@ async def tahmin_kontrol(event):
                 await event.respond("⏰ 3 dakika boyunca tahmin gelmedi, Oyun otomatik olarak sona erdi!")
         tahmin_aktif[chat_id]["task"] = asyncio.create_task(auto_end())
     
+if tahmin < sayi:
+        await event.respond("🔺 ᴅᴀʜᴀ ʏüᴋsᴇᴋ ʙiʀ sᴀʏɪ söʏʟᴇ!", reply_to=event.message.id)
+    elif tahmin > sayi:
+        await event.respond("🔻 ᴅᴀʜᴀ ᴅüșüᴋ ʙiʀ sᴀʏɪ söʏʟᴇ!", reply_to=event.message.id)
+    else:
+        sender = await event.get_sender()
+        msg_text = (
+            f"🎉 Tebrikler! Doğru sayı **{sayi}** idi.\n"
+            f"Bulan kişi: [{sender.first_name}](tg://user?id={sender.id})\n"
+            f"Deneme sayısı: {deneme}"
+        )
+
+        if tahmin_aktif[chat_id]["task"]:
+            tahmin_aktif[chat_id]["task"].cancel()
+        del tahmin_aktif[chat_id]
+
+        await event.respond(
+            msg_text,
+            buttons=[[Button.inline("🎲 Yeni Oyun", b"yeni_oyun")]],
+            parse_mode='md',
+            reply_to=event.message.id
+        )
+
+# Inline button callback
+@client.on(events.CallbackQuery(pattern=b"yeni_oyun"))
+async def yeni_oyun(event):
+    if event.is_private:  # DM'de çalışmayı engelle
+        await event.respond(
+            "🤖 Beni gruba ekleyerek sayı tahmin oyununu oynayabilirsiniz!",
+            buttons=[
+                [Button.url("➕ Beni Gruba Ekle", f"https://t.me/{botUsername}?startgroup=true")]
+            ],
+            reply_to=event.message.id  # reply olarak göndersin
+        )
+        return
+    try:
+        await event.answer()  # butona tıklama efekti
+        await oyun_baslat(event, edit_msg=await event.get_message())
+    except Exception as e:
+        await event.respond(f"⚠️ Hata: {e}", reply_to=event.message.id)
+
+# /dur komutu
+@client.on(events.NewMessage(pattern="^/dur"))
+async def oyun_dur(event):
+    if event.is_private:  # DM'de çalışmayı engelle
+        await event.respond(
+            "🤖 Beni gruba ekleyerek sayı tahmin oyununu oynayabilirsiniz!",
+            buttons=[
+                [Button.url("➕ Beni Gruba Ekle", f"https://t.me/{botUsername}?startgroup=true")]
+            ],
+            reply_to=event.message.id  # reply olarak göndersin
+        )
+        return
+
+    chat_id = event.chat_id
+    if chat_id in tahmin_aktif:
+        if tahmin_aktif[chat_id]["task"]:
+            tahmin_aktif[chat_id]["task"].cancel()
+        del tahmin_aktif[chat_id]
+        await event.respond("🔴 sᴀʏɪ ᴛᴀʜᴍiɴ ᴏʏᴜɴᴜ, ʙᴀșᴀʀɪʏʟᴀ ᴅᴜʀᴅᴜʀᴜʟᴅᴜ!", reply_to=event.message.id)
+                
