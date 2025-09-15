@@ -1174,6 +1174,7 @@ async def stop_game(event):
         await event.respond("⚠️ șᴜ ᴀɴᴅᴀ ᴀᴋᴛiғ ʙiʀ ᴏʏᴜɴ ʏᴏᴋ:(", reply_to=event.id)
 
 
+from telethon import events, Button
 
 games = {}
 
@@ -1214,12 +1215,12 @@ async def start_xox(event):
     chat_id = event.chat_id
     sender = event.sender
     if chat_id in games:
-        await event.respond("⚠️ Bu sohbette zaten bir XOX oyunu var!")
+        await event.respond("⚠️ Bu sohbette zaten bir XOX oyunu var!", reply_to=event.message.id)
         return
     confirm_buttons = [
         [Button.inline("Evet", f"xox_confirm:{sender.id}:yes"), Button.inline("İptal", f"xox_confirm:{sender.id}:no")]
     ]
-    await event.respond("XOX oyunu başlatılsın mı?", buttons=confirm_buttons)
+    await event.respond("XOX oyunu başlatılsın mı?", buttons=confirm_buttons, reply_to=event.message.id)
 
 @client.on(events.CallbackQuery(pattern=b"xox_confirm:(\\d+):(yes|no)"))
 async def confirm_xox(event):
@@ -1234,12 +1235,13 @@ async def confirm_xox(event):
         return
     size = 6
     board = [["⬜"] * size for _ in range(size)]
+    message = await event.get_message()
     games[chat_id] = {
         "board": board,
         "turn": "❌",
         "players": [event.sender_id],
         "player_names": {event.sender_id: event.sender.first_name},
-        "msg_id": event.message.id
+        "msg_id": message.id
     }
     await event.edit(f"🎮 6x6 XOX oyunu başladı!\n❌: {event.sender.first_name} ilk hamleyi yapar.", buttons=make_buttons(board))
 
@@ -1297,8 +1299,7 @@ async def stop_xox(event):
     chat_id = event.chat_id
     if chat_id in games:
         del games[chat_id]
-        await event.respond("🛑 XOX oyunu bitirildi!")
-
-
+        await event.respond("🛑 XOX oyunu bitirildi!", reply_to=event.message.id)
+    
 print("[INFO] ᴀʀᴛᴢ Bot çalışıyor...")
 client.run_until_disconnected()
