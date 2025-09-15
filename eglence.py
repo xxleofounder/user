@@ -2,6 +2,13 @@ from telethon import events, Button
 from bot import client
 import asyncio
 
+import time
+import re
+import random
+from telethon import TelegramClient, events, errors, Button
+from telethon.tl.types import ChannelParticipantsAdmins, UserStatusRecently, UserStatusOnline
+
+
 @client.on(events.NewMessage(pattern="^/eros ?(.*)"))
 async def eros(event):
     bot_username = (await client.get_me()).username
