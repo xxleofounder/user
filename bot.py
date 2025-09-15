@@ -1131,8 +1131,11 @@ games = {}
 @client.on(events.NewMessage(pattern="^/stahmin"))
 async def start_game(event):
     if event.is_private:
-        await event.respond("❌ ʙᴜ ᴋᴏᴍᴜᴛ, sᴀᴅᴇᴄᴇ ɢʀᴜᴘʟᴀʀᴅᴀ ᴋᴜʟʟᴀɴɪʟᴀʙiʟiʀ.")
-        return
+         await event.respond(
+            "üᴢɢüɴüᴍ, ʙᴜ ᴋᴏᴍᴜᴛ ɢʀᴜᴘ ᴠᴇʏᴀ ᴋᴀɴᴀʟʟᴀʀ içiɴ ɢᴇçᴇʀʟiᴅiʀ❗️",
+            buttons=[[Button.url("➕ ʙᴇɴi ɢʀᴜʙᴀ ᴇᴋʟᴇ", f"https://t.me/{botUsername}?startgroup=true")]],
+            reply_to=event.message.id
+        )
 
     chat_id = event.chat_id
 
