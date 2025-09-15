@@ -119,7 +119,7 @@ async def diger_menu(event):
     await event.edit(
         "🕹️ **Eğlence Komutlarım:**\n\n"
         "⇨ `/eros` - **iᴋi ᴋișiʏi ᴇșʟᴇșᴛiʀiʀ sʜiᴘʟᴇʀ**\n\n"
-        "⇨ `/stahmin` - **sᴀʏɪ ᴛᴀʜᴍiɴ ᴏʏᴜɴᴜ` /dur`\niʟᴇ iᴘᴛᴀʟ ᴇᴅᴇʙiʟiʀsiɴiᴢ**\n\n",
+        "⇨ `/stahmin` - **sᴀʏɪ ᴛᴀʜᴍiɴ ᴏʏᴜɴᴜ `/dur` iʟᴇ iᴘᴛᴀʟ ᴇᴅᴇʙiʟiʀsiɴiᴢ**\n\n",
         buttons=[[Button.inline("⬅️ Geri Dön", data="cevirme")]],
         link_preview=False
     )
@@ -302,7 +302,7 @@ async def tahmin_kontrol(event):
 
         await event.respond(
             msg_text,
-            buttons=[[Button.inline("**Yeni Oyun** 🎲", b"yeni_oyun")]],
+            buttons=[[Button.inline("🎲 Yeni Oyun", b"yeni_oyun")]],
             parse_mode='md',
             reply_to=event.message.id
         )
