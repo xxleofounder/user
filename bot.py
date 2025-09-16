@@ -1543,9 +1543,9 @@ async def show_id(event):
     if event.is_reply:
         reply = await event.get_reply_message()
         user = await client.get_entity(reply.sender_id)
-        await client.send_message(event.chat_id, f"👤 **{user.first_name}**\n🆔 ID: `{user.id}`")
+        await client.send_message(event.chat_id, f"👤 **{user.first_name}** 🆔 ID: `{user.id}`", reply_to=event.id))
     else:
-        await client.send_message(event.chat_id, f"🧑 Senin ID: `{event.sender_id}`")
+        await client.send_message(event.chat_id, f"🧑 Senin ID: `{event.sender_id}`", reply_to=event.id))
 
 
 # /info komutu: Kullanıcının bilgilerini gösterir
@@ -1558,15 +1558,15 @@ async def show_info(event):
         user = await client.get_entity(event.sender_id)
 
     info_text = (
-        f"👤 **Kullanıcı Bilgileri**\n"
+        f"**User info**\n\n"
         f"📝 Ad: {user.first_name or 'Yok'}\n"
         f"📛 Soyad: {user.last_name or 'Yok'}\n"
-        f"💻 Kullanıcı Adı: @{user.username or 'Yok'}\n"
+        f"💻 Username: @{user.username or 'Yok'}\n"
         f"🆔 ID: {user.id}\n"
-        f"📖 Bio: {getattr(user, 'about', 'Yok')}\n"
+        f"📖 Biyografi: {getattr(user, 'about', 'Yok')}\n"
     )
 
-    await client.send_message(event.chat_id, info_text)
+    await client.send_message(event.chat_id, info_text, reply_to=event.id)
 
 print("[INFO] - ᴀʀᴛᴢ ᴘʀᴏᴊᴇᴄᴛ, ᴀᴋᴛiғ 🟢")
 client.run_until_disconnected()
