@@ -118,8 +118,10 @@ async def tag_menu(event):
 async def diger_menu(event):
     await event.edit(
         "🕹️ **Eğlence Komutlarım:**\n\n"
-        "⇨ `/eros` - **iᴋi ᴋișiʏi ᴇșʟᴇșᴛiʀiʀ sʜiᴘʟᴇʀ**\n\n"
-        "⇨ `/stahmin` - **sᴀʏɪ ᴛᴀʜᴍiɴ ᴏʏᴜɴᴜ \n`/off` iʟᴇ iᴘᴛᴀʟ ᴇᴅᴇʙiʟiʀsiɴiᴢ**\n\n",
+        "⇨ `/eros` - **iᴋi ᴋișiʏi ᴇșʟᴇșᴛiʀiʀ, sʜiᴘʟᴇʀ**\n\n"
+        "⇨ `/xox` - **iᴋi ᴋiși ᴀʀᴀsɪɴᴅᴀ xᴏx ᴏʏᴜɴᴜ ᴀçᴀʀ**\n\n"
+        "⇨ `/stahmin` - **sᴀʏɪ ᴛᴀʜᴍiɴ ᴏʏᴜɴᴜ 1-1000 ᴀʀᴀsɪɴᴅᴀ**\n\n"
+        "🔻 **ʙᴏᴛᴜᴍᴜᴢᴅᴀᴋi ᴏʏᴜɴʟᴀʀɪ, `/off` ᴋᴏᴍᴜᴛᴜ ʏᴀʀᴅɪᴍɪ iʟᴇ iᴘᴛᴀʟ ᴇᴅᴇʙiʟiʀsiɴiᴢ.**",
         buttons=[[Button.inline("⬅️ Geri Dön", data="cevirme")]],
         link_preview=False
     )
@@ -1180,27 +1182,27 @@ def render_board(board):
 
 def check_winner(board, symbol):
     size = len(board)
-    needed = 4  # 4 yan yana kazanır
+    needed = 4  
 
-    # Yatay
+    
     for r in range(size):
         for c in range(size - needed + 1):
             if all(board[r][c+i] == symbol for i in range(needed)):
                 return True
 
-    # Dikey
+
     for c in range(size):
         for r in range(size - needed + 1):
             if all(board[r+i][c] == symbol for i in range(needed)):
                 return True
 
-    # Çapraz (↘)
+    
     for r in range(size - needed + 1):
         for c in range(size - needed + 1):
             if all(board[r+i][c+i] == symbol for i in range(needed)):
                 return True
 
-    # Çapraz (↙)
+    
     for r in range(size - needed + 1):
         for c in range(needed - 1, size):
             if all(board[r+i][c-i] == symbol for i in range(needed)):
@@ -1215,15 +1217,15 @@ def check_draw(board):
 @client.on(events.NewMessage(pattern="^/xox"))
 async def start_xox(event):
     if event.is_private:
-        return  # DM'de çalışmasın
+        return  
 
     chat_id = event.chat_id
     if chat_id in xox_games:
-        return  # Zaten aktif oyun varsa görmezden gel
+        return  
 
     size = 6
     board = [["⬜" for _ in range(size)] for _ in range(size)]
-    msg = await event.respond("🎮 6x6 XOX Oyunu\n\n🧑 Oyuncu bekleniyor...", buttons=render_board(board))
+    msg = await event.respond("🎮 xᴏx ᴏʏᴜɴᴜ ᴀᴋᴛiғ\n\n🧑 ᴏʏᴜɴᴄᴜʟᴀʀ ʙᴇᴋʟᴇɴiʏᴏʀ...", buttons=render_board(board))
 
     xox_games[chat_id] = {
         "board": board,
@@ -1266,16 +1268,16 @@ async def xox_move(event):
     # Kazanan kontrolü
     if check_winner(game["board"], game["turn"]):
         winner = await event.client.get_entity(event.sender_id)
-        await event.edit(f"🏆 Kazanan: {winner.first_name}", buttons=[
-            [Button.inline("Yeniden Başlat 🔄", data="restart_xox")]
+        await event.edit(f"🎉 ᴛᴇʙʀiᴋʟᴇʀ, ᴋᴀᴢᴀɴᴀɴ: {winner.first_name}", buttons=[
+            [Button.inline("🔄 ʏᴇɴi ᴏʏᴜɴ", data="restart_xox")]
         ])
         del xox_games[chat_id]
         return
 
     # Beraberlik kontrolü
     if check_draw(game["board"]):
-        await event.edit("🤝 Oyun berabere bitti!", buttons=[
-            [Button.inline("Yeniden Başlat 🔄", data="restart_xox")]
+        await event.edit("🤝 ᴏʏᴜɴ ʙᴇʀᴀʙᴇʀᴇ ʙiᴛᴛi!", buttons=[
+            [Button.inline("🔄 ʏᴇɴi ᴏʏᴜɴ", data="restart_xox")]
         ])
         del xox_games[chat_id]
         return
@@ -1287,12 +1289,12 @@ async def xox_move(event):
     player_text = ""
     if len(game["players"]) >= 1:
         p1 = await event.client.get_entity(game["players"][0])
-        player_text += f"👤 1. Oyuncu: {p1.first_name}\n"
+        player_text += f"👤 1. ᴏʏᴜɴᴄᴜ: {p1.first_name}\n"
     if len(game["players"]) == 2:
         p2 = await event.client.get_entity(game["players"][1])
-        player_text += f"👤 2. Oyuncu: {p2.first_name}\n\n👉 Hamle sırası: {p2.first_name if game['turn']=='⭕' else p1.first_name}"
+        player_text += f"👤 2. ᴏʏᴜɴᴄᴜ: {p2.first_name}\n\n👉 Hamle sırası: {p2.first_name if game['turn']=='⭕' else p1.first_name}"
 
-    await event.edit(f"🎮 6x6 XOX Oyunu\n\n{player_text}", buttons=render_board(game["board"]))
+    await event.edit(f"🎮 xᴏx ᴏʏᴜɴᴜ\n\n{player_text}", buttons=render_board(game["board"]))
 
 
 @client.on(events.CallbackQuery(pattern="restart_xox"))
@@ -1300,7 +1302,7 @@ async def restart_xox(event):
     chat_id = event.chat_id
     size = 6
     board = [["⬜" for _ in range(size)] for _ in range(size)]
-    msg = await event.edit("🎮 6x6 XOX Oyunu\n\n🧑 Oyuncu bekleniyor...", buttons=render_board(board))
+    msg = await event.edit("🎮 xᴏx ᴏʏᴜɴᴜ ᴀᴋᴛiғ\n\n🧑 ᴏʏᴜɴᴄᴜʟᴀʀ ʙᴇᴋʟᴇɴiʏᴏʀ...", buttons=render_board(board))
 
     xox_games[chat_id] = {
         "board": board,
@@ -1321,7 +1323,7 @@ async def stop_xox(event):
         except Exception:
             pass
         del xox_games[chat_id]
-        await event.reply("❌ XOX oyunu sonlandırıldı.")    
+        await event.reply("❌ xᴏx ᴏʏᴜɴᴜ ʙᴀșᴀʀɪʏʟᴀ sᴏɴʟᴀɴᴅɪʀɪʟᴅɪ, ʏᴇɴi ᴏʏᴜɴ içiɴ `/xox` ᴋᴏᴍᴜᴛᴜɴᴜ ᴋᴜʟʟᴀɴᴀʙiʟiʀsiɴiᴢ.")    
         
-print("[INFO] ᴀʀᴛᴢ Bot çalışıyor...")
+print("[INFO] - ᴀʀᴛᴢ ᴘʀᴏᴊᴇᴄᴛ, ᴀᴋᴛiғ 🟢")
 client.run_until_disconnected()
