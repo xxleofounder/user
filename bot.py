@@ -1382,99 +1382,105 @@ async def tasmakas_handler(event):
         await event.edit("✊ Taş, Kağıt, Makas! Seç:", buttons=buttons)
 
 
+from telethon import events
+import random
 
 # 🎲 /zar
 @client.on(events.NewMessage(pattern="^/zar$"))
 async def zar(event):
-    if not event.is_group:
-        return
-    await client.send_message(event.chat_id, "🎲", reply_to=event.id)
+    sonuc = random.randint(1, 6)
+    await client.send_message(event.chat_id, f"🎲 Zar sonucu: {sonuc}", reply_to=event.id)
 
 # 🎯 /dart
 @client.on(events.NewMessage(pattern="^/dart$"))
 async def dart(event):
-    if not event.is_group:
-        return
-    await client.send_message(event.chat_id, "🎯", reply_to=event.id)
+    sonuc = random.randint(1, 6)
+    await client.send_message(event.chat_id, f"🎯 Dart sonucu: {sonuc}", reply_to=event.id)
 
 # 🎰 /slot
 @client.on(events.NewMessage(pattern="^/slot$"))
 async def slot(event):
-    if not event.is_group:
-        return
-    await client.send_message(event.chat_id, "🎰", reply_to=event.id)
+    slotlar = ["🍒", "🍋", "🍊", "🍉", "⭐"]
+    sonuc = " | ".join(random.choices(slotlar, k=3))
+    await client.send_message(event.chat_id, f"🎰 Slot sonucu: {sonuc}", reply_to=event.id)
 
 # ⚽ /futbool
 @client.on(events.NewMessage(pattern="^/futbool$"))
 async def futbool(event):
-    if not event.is_group:
-        return
-    await client.send_message(event.chat_id, "⚽", reply_to=event.id)
+    gol = random.choice(["Gol! ⚽", "Kaçtı! ❌"])
+    await client.send_message(event.chat_id, gol, reply_to=event.id)
 
 # 🎳 /bowling
 @client.on(events.NewMessage(pattern="^/bowling$"))
 async def bowling(event):
-    if not event.is_group:
-        return
-    await client.send_message(event.chat_id, "🎳", reply_to=event.id)
+    skor = random.randint(0, 10)
+    await client.send_message(event.chat_id, f"🎳 Bowling skoru: {skor}", reply_to=event.id)
 
 # 🪙 /coin
 @client.on(events.NewMessage(pattern="^/coin$"))
 async def coin(event):
-    if not event.is_group:
-        return
     sonuc = random.choice(["🪙 Yazı", "🪙 Tura"])
     await client.send_message(event.chat_id, f"» {sonuc}", reply_to=event.id)
 
-# 👋 /slap
+# 👋 /slap (sadece grupta)
 @client.on(events.NewMessage(pattern="^/slap$"))
 async def slap(event):
     if not event.is_group:
         return
     if event.is_reply:
         reply = await event.get_reply_message()
-        user = f"[{reply.sender.first_name}](tg://user?id={reply.sender_id})"
-        await client.send_message(event.chat_id, f"👋 {user} tokatlandı!", reply_to=event.id)
+        await client.send_message(
+            event.chat_id,
+            f"{event.sender.first_name} {reply.sender.first_name}’yi tokatladı!",
+            reply_to=event.id
+        )
     else:
         await client.send_message(event.chat_id, "❌ Tokatlamak için bir mesaja yanıtlamalısın!", reply_to=event.id)
 
-# 👢 /kick
+# 👢 /kick (sadece grupta)
 @client.on(events.NewMessage(pattern="^/kick$"))
 async def kick(event):
     if not event.is_group:
         return
     if event.is_reply:
         reply = await event.get_reply_message()
-        user = f"[{reply.sender.first_name}](tg://user?id={reply.sender_id})"
-        await client.send_message(event.chat_id, f"👢 {user} gruptan atıldı!", reply_to=event.id)
+        await client.send_message(
+            event.chat_id,
+            f"{event.sender.first_name} {reply.sender.first_name}’yi gruptan attı!",
+            reply_to=event.id
+        )
     else:
         await client.send_message(event.chat_id, "❌ Kicklemek için bir mesaja yanıtlamalısın!", reply_to=event.id)
 
-# 😘 /kiss
+# 😘 /kiss (sadece grupta)
 @client.on(events.NewMessage(pattern="^/kiss$"))
 async def kiss(event):
     if not event.is_group:
         return
     if event.is_reply:
         reply = await event.get_reply_message()
-        user = f"[{reply.sender.first_name}](tg://user?id={reply.sender_id})"
-        await client.send_message(event.chat_id, f"😘 {user} öpüldü!", reply_to=event.id)
+        await client.send_message(
+            event.chat_id,
+            f"{event.sender.first_name} {reply.sender.first_name}’yi öptü!",
+            reply_to=event.id
+        )
     else:
         await client.send_message(event.chat_id, "❌ Öpmek için bir mesaja yanıtlamalısın!", reply_to=event.id)
 
-# 🤗 /saril
+# 🤗 /saril (sadece grupta)
 @client.on(events.NewMessage(pattern="^/saril$"))
 async def saril(event):
     if not event.is_group:
         return
-        first_name = user.first_name
     if event.is_reply:
         reply = await event.get_reply_message()
-        user = f"[{reply.sender.first_name}](tg://user?id={reply.sender_id})"
-        await client.send_message(event.chat_id, f"🤗 hey {first_name}, {user}'e sarıldı!", reply_to=event.id)
+        await client.send_message(
+            event.chat_id,
+            f"{event.sender.first_name} {reply.sender.first_name}’yi sarıldı!",
+            reply_to=event.id
+        )
     else:
         await client.send_message(event.chat_id, "❌ Sarılmak için bir mesaja yanıtlamalısın!", reply_to=event.id)
-
 
 
 # /destek komutu
