@@ -121,6 +121,7 @@ async def diger_menu(event):
         "⇨ `/eros` - **iᴋi ᴋișiʏi ᴇșʟᴇșᴛiʀiʀ, sʜiᴘʟᴇʀ**\n\n"
         "⇨ `/xox` - **iᴋi ᴋiși ᴀʀᴀsɪɴᴅᴀ xᴏx ᴏʏᴜɴᴜ ᴀçᴀʀ**\n\n"
         "⇨ `/stahmin` - **sᴀʏɪ ᴛᴀʜᴍiɴ ᴏʏᴜɴᴜ 1-1000**\n\n"
+        
         "🔻 **ᴏʏᴜɴʟᴀʀɪ, `/off` ᴋᴏᴍᴜᴛᴜ ʏᴀʀᴅɪᴍɪ iʟᴇ iᴘᴛᴀʟ ᴇᴅᴇʙiʟiʀsiɴiᴢ.**",
         buttons=[[Button.inline("⬅️ Geri Dön", data="cevirme")]],
         link_preview=False
@@ -1327,7 +1328,7 @@ async def stop_xox(event):
 
 
 # /tasmakas komutu (sadece grup)
-@client.on(events.NewMessage(pattern="^/tasmakas"))
+@client.on(events.NewMessage(pattern="^/tkm"))
 async def tasmakas_start(event):
     if event.is_private:
         await event.respond("❌ Bu oyun sadece gruplarda oynanabilir!")
