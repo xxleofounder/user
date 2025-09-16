@@ -1467,12 +1467,14 @@ async def kiss(event):
 async def saril(event):
     if not event.is_group:
         return
+        first_name = user.first_name
     if event.is_reply:
         reply = await event.get_reply_message()
         user = f"[{reply.sender.first_name}](tg://user?id={reply.sender_id})"
-        await client.send_message(event.chat_id, f"🤗 {user} sarıldı!", reply_to=event.id)
+        await client.send_message(event.chat_id, f"🤗 hey {first_name}, {user}'e sarıldı!", reply_to=event.id)
     else:
         await client.send_message(event.chat_id, "❌ Sarılmak için bir mesaja yanıtlamalısın!", reply_to=event.id)
+
 
 
 # /destek komutu
@@ -1510,10 +1512,23 @@ async def destek(event):
             return
 
         if event_cb.data == b"onay":
+            # Grup adı
+            grup_adi = event.chat.title if event.chat else "DM"
+
+            # Kullanıcı username
+            username = event.sender.username if event.sender.username else "Yok"
+
             # Mesajı admin ID'ye gönder
-            await client.send_message(ADMIN_ID,
-                                      f"📩 Destek mesajı:\n\nKullanıcı: {event.sender_id}\nMesaj: {destek_mesaj}")
+            destek_metni = f"""📩 _Destek mesajı:_
+
+**Grup adı:** {grup_adi}
+**Kullanıcı UserName:** {username}
+**Kullanıcı:** {event.sender_id}
+**Mesaj:** {destek_mesaj}"""
+            
+            await client.send_message(ADMIN_ID, destek_metni)
             await event_cb.edit(f"✅ Destek mesajınız ekibe iletildi.")
+
         elif event_cb.data == b"iptal":
             await event_cb.edit(f"❌ Destek işlemi iptal edildi.")
 
