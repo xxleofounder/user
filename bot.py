@@ -120,6 +120,7 @@ async def diger_menu(event):
         "🕹️ **Eğlence Komutlarım:**\n\n"
         "⇨ `/eros` - **iᴋi ᴋișiʏi ᴇșʟᴇșᴛiʀiʀ, sʜiᴘʟᴇʀ**\n\n"
         "⇨ `/xox` - **iᴋi ᴋiși ᴀʀᴀsɪɴᴅᴀ xᴏx ᴏʏᴜɴᴜ ᴀçᴀʀ**\n\n"
+        "⇨ `tkm` - **ʙᴏᴛʟᴀ ᴛᴀș/ᴋᴀɢɪᴛ/ᴍᴀᴋᴀs ᴏʏɴᴀ**
         "⇨ `/stahmin` - **sᴀʏɪ ᴛᴀʜᴍiɴ ᴏʏᴜɴᴜ 1-1000**\n\n"
         
         "🔻 **ᴏʏᴜɴʟᴀʀɪ, `/off` ᴋᴏᴍᴜᴛᴜ ʏᴀʀᴅɪᴍɪ iʟᴇ iᴘᴛᴀʟ ᴇᴅᴇʙiʟiʀsiɴiᴢ.**",
