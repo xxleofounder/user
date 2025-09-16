@@ -1170,11 +1170,8 @@ async def stop_game(event):
         if games[chat_id]["task"]:
             games[chat_id]["task"].cancel()
         await event.respond("🔴 ᴏʏᴜɴ ᴍᴀɴᴜᴇʟ ᴏʟᴀʀᴀᴋ ᴅᴜʀᴅᴜʀᴜʟᴅᴜ, /stahmin iʟᴇ ʏᴇɴiᴅᴇɴ ʙᴀșʟᴀᴛᴀʙiʟiʀsiɴiᴢ.", reply_to=event.id)
-    else:
-        await event.respond("⚠️ șᴜ ᴀɴᴅᴀ ᴀᴋᴛiғ ʙiʀ ᴏʏᴜɴ ʏᴏᴋ:(", reply_to=event.id)
+    
 
-
-from telethon import events, Button
 
 xox_games = {}
 
