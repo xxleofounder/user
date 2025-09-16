@@ -1535,5 +1535,38 @@ async def destek(event):
         elif event_cb.data == b"iptal":
             await event_cb.edit(f"❌ Destek işlemi iptal edildi.")
 
+
+
+# /id komutu: Kullanıcının ID'sini gösterir
+@client.on(events.NewMessage(pattern="^/id$"))
+async def show_id(event):
+    if event.is_reply:
+        reply = await event.get_reply_message()
+        user = await client.get_entity(reply.sender_id)
+        await client.send_message(event.chat_id, f"👤 **{user.first_name}**\n🆔 ID: `{user.id}`")
+    else:
+        await client.send_message(event.chat_id, f"🧑 Senin ID: `{event.sender_id}`")
+
+
+# /info komutu: Kullanıcının bilgilerini gösterir
+@client.on(events.NewMessage(pattern="^/info$"))
+async def show_info(event):
+    if event.is_reply:
+        reply = await event.get_reply_message()
+        user = await client.get_entity(reply.sender_id)
+    else:
+        user = await client.get_entity(event.sender_id)
+
+    info_text = (
+        f"👤 **Kullanıcı Bilgileri**\n"
+        f"📝 Ad: {user.first_name or 'Yok'}\n"
+        f"📛 Soyad: {user.last_name or 'Yok'}\n"
+        f"💻 Kullanıcı Adı: @{user.username or 'Yok'}\n"
+        f"🆔 ID: {user.id}\n"
+        f"📖 Bio: {getattr(user, 'about', 'Yok')}\n"
+    )
+
+    await client.send_message(event.chat_id, info_text)
+
 print("[INFO] - ᴀʀᴛᴢ ᴘʀᴏᴊᴇᴄᴛ, ᴀᴋᴛiғ 🟢")
 client.run_until_disconnected()
