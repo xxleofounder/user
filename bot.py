@@ -1313,17 +1313,18 @@ async def restart_xox(event):
     }
 
 
-@client.on(events.NewMessage(pattern="^/off"))
+@client.on(events.NewMessage(pattern="^/off$"))
 async def stop_xox(event):
     chat_id = event.chat_id
+
     if chat_id in xox_games:
         try:
             msg_id = xox_games[chat_id]["msg_id"]
-            await event.client.delete_messages(chat_id, msg_id)
-        except:
+            await client.delete_messages(chat_id, msg_id) 
+        except Exception:
             pass
         del xox_games[chat_id]
-        await event.respond("🛑 XOX oyunu kapatıldı!")            
-    
+        await event.reply("❌ XOX oyunu sonlandırıldı.")    
+        
 print("[INFO] ᴀʀᴛᴢ Bot çalışıyor...")
 client.run_until_disconnected()
