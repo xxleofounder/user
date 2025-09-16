@@ -1545,7 +1545,7 @@ async def show_id(event):
         user = await client.get_entity(reply.sender_id)
         await client.send_message(event.chat_id, f"👤 **{user.first_name}** 🆔 ID: `{user.id}`", reply_to=event.id)
     else:
-        await client.send_message(event.chat_id, f"🧑 Senin ID: `{event.sender_id}`", reply_to=event.id))
+        await client.send_message(event.chat_id, f"🧑 Senin ID: `{event.sender_id}`", reply_to=event.id)
 
 
 # /info komutu: Kullanıcının bilgilerini gösterir
