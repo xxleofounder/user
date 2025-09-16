@@ -1175,146 +1175,104 @@ async def stop_game(event):
 
 
 from telethon import events, Button
+import asyncio
 
-games = {}
+xox_games = {}
 
-def make_buttons(board):
-    return [[Button.inline(cell, f"xox:{r}:{c}") for c, cell in enumerate(row)] for r, row in enumerate(board)]
+def build_board(board):
+    return [[Button.inline(board[r][c], data=f"xox_{r}_{c}") for c in range(6)] for r in range(6)]
 
-def check_winner(board):
-    size = len(board)
-    for row in board:
-        for i in range(size - 3):
-            segment = row[i:i+4]
-            if segment[0] != "⬜" and segment.count(segment[0]) == 4:
-                return segment[0]
-    for c in range(size):
-        for r in range(size - 3):
-            segment = [board[r+i][c] for i in range(4)]
-            if segment[0] != "⬜" and segment.count(segment[0]) == 4:
-                return segment[0]
-    for r in range(size - 3):
-        for c in range(size - 3):
-            segment = [board[r+i][c+i] for i in range(4)]
-            if segment[0] != "⬜" and segment.count(segment[0]) == 4:
-                return segment[0]
-    for r in range(size - 3):
-        for c in range(3, size):
-            segment = [board[r+i][c-i] for i in range(4)]
-            if segment[0] != "⬜" and segment.count(segment[0]) == 4:
-                return segment[0]
-    for row in board:
-        if "⬜" in row:
-            return None
-    return "draw"
-
-async def send_new_board(chat_id):
-    size = 6
-    board = [["⬜"] * size for _ in range(size)]
-    msg = await client.send_message(chat_id, "🎮 6x6 XOX Oyunu başladı!", buttons=make_buttons(board))
-    games[chat_id] = {
-        "board": board,
-        "turn": "❌",
-        "players": [],
-        "player_names": {},
-        "msg_id": msg.id
-    }
+def render_text(game):
+    text = "🎮 6x6 XOX Oyunu\n\n"
+    if len(game["players"]) >= 1:
+        text += f"👤 1. Oyuncu: {game['players'][0][1]}\n"
+    if len(game["players"]) == 2:
+        text += f"👤 2. Oyuncu: {game['players'][1][1]}\n"
+        text += f"\n👉 Hamle sırası: {game['turn_name']}"
+    return text
 
 @client.on(events.NewMessage(pattern="^/xox$"))
 async def start_xox(event):
-    if event.is_private:
-        return
     chat_id = event.chat_id
-    if chat_id in games:
-        await event.respond("⚠️ Bu sohbette zaten bir XOX oyunu var!", reply_to=event.message.id)
-        return
-    await send_new_board(chat_id)
+    board = [["⬜" for _ in range(6)] for _ in range(6)]
+    msg = await event.respond("🎮 6x6 XOX Oyunu başladı!", buttons=build_board(board))
+    xox_games[chat_id] = {
+        "board": board,
+        "players": [],
+        "turn": "❌",
+        "turn_name": "",
+        "msg_id": msg.id
+    }
 
-@client.on(events.CallbackQuery(pattern=b"xox:(\\d+):(\\d+)"))
+@client.on(events.CallbackQuery(pattern=b"xox_"))
 async def xox_move(event):
     chat_id = event.chat_id
-    if chat_id not in games:
+    game = xox_games.get(chat_id)
+    if not game:
         return
-    game = games[chat_id]
-    r, c = map(int, event.data.decode().split(":")[1:])
-    sender = event.sender
 
-    # Oyuncu ekle
-    if sender.id not in game["players"]:
-        if len(game["players"]) < 2:
-            game["players"].append(sender.id)
-            game["player_names"][sender.id] = sender.first_name
-        else:
-            await event.answer("Bu oyunda sadece 2 oyuncu oynayabilir!", alert=True)
-            return
+    r, c = map(int, event.data.decode().split("_")[1:])
+    player = (event.sender_id, (await event.get_sender()).first_name)
 
-    symbol = "❌" if sender.id == game["players"][0] else "⭕"
+    if len(game["players"]) < 2 and player not in game["players"]:
+        game["players"].append(player)
 
-    if game["turn"] != symbol:
+    # Eğer oyuncu hamle sırası için atanmadıysa
+    if game["turn_name"] == "":
+        if game["turn"] == "❌":
+            game["turn_name"] = game["players"][0][1]
+
+    # Sıra kontrolü
+    current_player = game["players"][0] if game["turn"] == "❌" else game["players"][1] if len(game["players"]) == 2 else None
+    if not current_player or player[0] != current_player[0]:
         await event.answer("Sıra sende değil!", alert=True)
         return
+
     if game["board"][r][c] != "⬜":
-        await event.answer("Burası dolu!", alert=True)
+        await event.answer("Buraya zaten oynandı!", alert=True)
         return
 
-    # Hamleyi yap
-    game["board"][r][c] = symbol
+    game["board"][r][c] = game["turn"]
 
-    # Kazanan kontrolü
-    winner = check_winner(game["board"])
-    if winner:
-        if winner == "draw":
-            text = "🤝 Berabere! Oyun bitti."
-        else:
-            winner_name = game["player_names"].get(sender.id, "Bilinmeyen")
-            text = f"🏆 Kazanan: {winner_name}"
-        restart_btn = [[Button.inline("Yeniden Başlat", "xox_restart")]]
-        await event.edit(text, buttons=restart_btn)
-        del games[chat_id]
-        return
-
-    # Sıra değiştir
-    game["turn"] = "⭕" if game["turn"] == "❌" else "❌"
-    turn_player = [pid for pid in game["players"] if (game["turn"] == "❌" and pid == game["players"][0]) or (game["turn"] == "⭕" and pid == game["players"][1])]
-    if turn_player:
-        turn_name = game["player_names"].get(turn_player[0], "???")
+    # Hamle sonrası sıra değiştir
+    if game["turn"] == "❌":
+        game["turn"] = "⭕"
+        if len(game["players"]) == 2:
+            game["turn_name"] = game["players"][1][1]
     else:
-        turn_name = "???"
+        game["turn"] = "❌"
+        game["turn_name"] = game["players"][0][1]
 
-    oyuncu_listesi = []
-    if len(game["players"]) > 0:
-        oyuncu_listesi.append(f"1. Oyuncu: {game['player_names'][game['players'][0]]}")
-    if len(game["players"]) > 1:
-        oyuncu_listesi.append(f"2. Oyuncu: {game['player_names'][game['players'][1]]}")
-
-    text = "🎮 6x6 XOX Oyunu\n" + "\n".join(oyuncu_listesi) + f"\n\nHamle sırası: {game['turn']} {turn_name}"
-
-    # Hamle yapıldığı anda tabloyu güncelle
-    await event.edit(text, buttons=make_buttons(game["board"]))
-
-@client.on(events.CallbackQuery(pattern=b"xox_restart"))
-async def xox_restart(event):
-    chat_id = event.chat_id
-    # Eski tabloyu ve yeniden başlat mesajını sil
-    try:
-        await client.delete_messages(chat_id, [event.message_id, games[chat_id]["msg_id"]])
-    except:
-        pass
-    await send_new_board(chat_id)
+    await event.edit(render_text(game), buttons=build_board(game["board"]))
 
 @client.on(events.NewMessage(pattern="^/off$"))
 async def stop_xox(event):
-    if event.is_private:
-        return
     chat_id = event.chat_id
-    if chat_id in games:
+    if chat_id in xox_games:
+        msg_id = xox_games[chat_id]["msg_id"]
         try:
-            await client.delete_messages(chat_id, games[chat_id]["msg_id"])
+            await client.delete_messages(chat_id, msg_id)
         except:
             pass
-        del games[chat_id]
-        await event.respond("🛑 XOX oyunu bitirildi!", reply_to=event.message.id)
-    
+        del xox_games[chat_id]
+        await event.respond("⛔ XOX oyunu bitirildi!")
+
+@client.on(events.CallbackQuery(pattern=b"restart_xox"))
+async def restart_xox(event):
+    chat_id = event.chat_id
+    game = xox_games.get(chat_id)
+    if not game:
+        return
+
+    # Yeni boş tablo
+    board = [["⬜" for _ in range(6)] for _ in range(6)]
+    game["board"] = board
+    game["turn"] = "❌"
+    game["turn_name"] = ""
+    game["players"] = []
+
+    await event.edit("🎮 6x6 XOX Oyunu yeniden başladı!", buttons=build_board(board))
+            
     
 print("[INFO] ᴀʀᴛᴢ Bot çalışıyor...")
 client.run_until_disconnected()
