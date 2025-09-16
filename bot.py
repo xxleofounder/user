@@ -1380,5 +1380,98 @@ async def tasmakas_handler(event):
         ]
         await event.edit("✊ Taş, Kağıt, Makas! Seç:", buttons=buttons)
 
+
+
+# 🎲 /zar
+@client.on(events.NewMessage(pattern="^/zar$"))
+async def zar(event):
+    if not event.is_group:
+        return
+    await client.send_message(event.chat_id, "🎲", reply_to=event.id)
+
+# 🎯 /dart
+@client.on(events.NewMessage(pattern="^/dart$"))
+async def dart(event):
+    if not event.is_group:
+        return
+    await client.send_message(event.chat_id, "🎯", reply_to=event.id)
+
+# 🎰 /slot
+@client.on(events.NewMessage(pattern="^/slot$"))
+async def slot(event):
+    if not event.is_group:
+        return
+    await client.send_message(event.chat_id, "🎰", reply_to=event.id)
+
+# ⚽ /futbool
+@client.on(events.NewMessage(pattern="^/futbool$"))
+async def futbool(event):
+    if not event.is_group:
+        return
+    await client.send_message(event.chat_id, "⚽", reply_to=event.id)
+
+# 🎳 /bowling
+@client.on(events.NewMessage(pattern="^/bowling$"))
+async def bowling(event):
+    if not event.is_group:
+        return
+    await client.send_message(event.chat_id, "🎳", reply_to=event.id)
+
+# 🪙 /coin
+@client.on(events.NewMessage(pattern="^/coin$"))
+async def coin(event):
+    if not event.is_group:
+        return
+    sonuc = random.choice(["🪙 Yazı", "🪙 Tura"])
+    await client.send_message(event.chat_id, f"» {sonuc}", reply_to=event.id)
+
+# 👋 /slap
+@client.on(events.NewMessage(pattern="^/slap$"))
+async def slap(event):
+    if not event.is_group:
+        return
+    if event.is_reply:
+        reply = await event.get_reply_message()
+        user = f"[{reply.sender.first_name}](tg://user?id={reply.sender_id})"
+        await client.send_message(event.chat_id, f"👋 {user} tokatlandı!", reply_to=event.id)
+    else:
+        await client.send_message(event.chat_id, "❌ Tokatlamak için bir mesaja yanıtlamalısın!", reply_to=event.id)
+
+# 👢 /kick
+@client.on(events.NewMessage(pattern="^/kick$"))
+async def kick(event):
+    if not event.is_group:
+        return
+    if event.is_reply:
+        reply = await event.get_reply_message()
+        user = f"[{reply.sender.first_name}](tg://user?id={reply.sender_id})"
+        await client.send_message(event.chat_id, f"👢 {user} gruptan atıldı!", reply_to=event.id)
+    else:
+        await client.send_message(event.chat_id, "❌ Kicklemek için bir mesaja yanıtlamalısın!", reply_to=event.id)
+
+# 😘 /kiss
+@client.on(events.NewMessage(pattern="^/kiss$"))
+async def kiss(event):
+    if not event.is_group:
+        return
+    if event.is_reply:
+        reply = await event.get_reply_message()
+        user = f"[{reply.sender.first_name}](tg://user?id={reply.sender_id})"
+        await client.send_message(event.chat_id, f"😘 {user} öpüldü!", reply_to=event.id)
+    else:
+        await client.send_message(event.chat_id, "❌ Öpmek için bir mesaja yanıtlamalısın!", reply_to=event.id)
+
+# 🤗 /saril
+@client.on(events.NewMessage(pattern="^/saril$"))
+async def saril(event):
+    if not event.is_group:
+        return
+    if event.is_reply:
+        reply = await event.get_reply_message()
+        user = f"[{reply.sender.first_name}](tg://user?id={reply.sender_id})"
+        await client.send_message(event.chat_id, f"🤗 {user} sarıldı!", reply_to=event.id)
+    else:
+        await client.send_message(event.chat_id, "❌ Sarılmak için bir mesaja yanıtlamalısın!", reply_to=event.id)
+
 print("[INFO] - ᴀʀᴛᴢ ᴘʀᴏᴊᴇᴄᴛ, ᴀᴋᴛiғ 🟢")
 client.run_until_disconnected()
