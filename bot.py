@@ -1382,33 +1382,37 @@ async def tasmakas_handler(event):
         await event.edit("✊ Taş, Kağıt, Makas! Seç:", buttons=buttons)
 
 
-from telethon import events
-import random
 
 # 🎲 /zar
 @client.on(events.NewMessage(pattern="^/zar$"))
 async def zar(event):
-        await client.send_message(event.chat_id, f"🎲")
+    sonuc = random.randint(1, 6)
+    await client.send_message(event.chat_id, f"🎲 Zar sonucu: {sonuc}", reply_to=event.id)
 
 # 🎯 /dart
 @client.on(events.NewMessage(pattern="^/dart$"))
 async def dart(event):
-        await client.send_message(event.chat_id, f"🎯")
+    sonuc = random.randint(1, 6)
+    await client.send_message(event.chat_id, f"🎯 Dart sonucu: {sonuc}", reply_to=event.id)
 
 # 🎰 /slot
 @client.on(events.NewMessage(pattern="^/slot$"))
 async def slot(event):
-        await client.send_message(event.chat_id, f"🎰")
+    slotlar = ["🍒", "🍋", "🍊", "🍉", "⭐"]
+    sonuc = " | ".join(random.choices(slotlar, k=3))
+    await client.send_message(event.chat_id, f"🎰 Slot sonucu: {sonuc}", reply_to=event.id)
 
 # ⚽ /futbool
 @client.on(events.NewMessage(pattern="^/futbool$"))
 async def futbool(event):
-        await client.send_message(event.chat_id, f"⚽")
+    gol = random.choice(["Gol! ⚽", "Kaçtı! ❌"])
+    await client.send_message(event.chat_id, gol, reply_to=event.id)
 
 # 🎳 /bowling
 @client.on(events.NewMessage(pattern="^/bowling$"))
 async def bowling(event):
-        await client.send_message(event.chat_id, f"🎳")
+    skor = random.randint(0, 10)
+    await client.send_message(event.chat_id, f"🎳 Bowling skoru: {skor}", reply_to=event.id)
 
 # 🪙 /coin
 @client.on(events.NewMessage(pattern="^/coin$"))
@@ -1425,7 +1429,7 @@ async def slap(event):
         reply = await event.get_reply_message()
         await client.send_message(
             event.chat_id,
-            f"{event.sender.first_name} {reply.sender.first_name}’yi tokatladı!",
+            f"{event.sender.first_name} {reply.sender.first_name}’i tokatladı!",
             reply_to=event.id
         )
     else:
@@ -1440,7 +1444,7 @@ async def kick(event):
         reply = await event.get_reply_message()
         await client.send_message(
             event.chat_id,
-            f"{event.sender.first_name} {reply.sender.first_name}’yi gruptan attı!",
+            f"{event.sender.first_name} {reply.sender.first_name}’i gruptan attı!",
             reply_to=event.id
         )
     else:
@@ -1455,7 +1459,7 @@ async def kiss(event):
         reply = await event.get_reply_message()
         await client.send_message(
             event.chat_id,
-            f"{event.sender.first_name} {reply.sender.first_name}’yi öptü!",
+            f"{event.sender.first_name} {reply.sender.first_name}’e öptü!",
             reply_to=event.id
         )
     else:
@@ -1470,12 +1474,11 @@ async def saril(event):
         reply = await event.get_reply_message()
         await client.send_message(
             event.chat_id,
-            f"{event.sender.first_name} {reply.sender.first_name}’yi sarıldı!",
+            f"{event.sender.first_name} {reply.sender.first_name}’e sarıldı!",
             reply_to=event.id
         )
     else:
         await client.send_message(event.chat_id, "❌ Sarılmak için bir mesaja yanıtlamalısın!", reply_to=event.id)
-
 
 # /destek komutu
 @client.on(events.NewMessage(pattern="^/destek(?: (.+))?"))
