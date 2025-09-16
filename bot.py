@@ -120,8 +120,8 @@ async def diger_menu(event):
         "🕹️ **Eğlence Komutlarım:**\n\n"
         "⇨ `/eros` - **iᴋi ᴋișiʏi ᴇșʟᴇșᴛiʀiʀ, sʜiᴘʟᴇʀ**\n\n"
         "⇨ `/xox` - **iᴋi ᴋiși ᴀʀᴀsɪɴᴅᴀ xᴏx ᴏʏᴜɴᴜ ᴀçᴀʀ**\n\n"
-        "⇨ `/stahmin` - **sᴀʏɪ ᴛᴀʜᴍiɴ ᴏʏᴜɴᴜ 1-1000 ᴀʀᴀsɪɴᴅᴀ**\n\n"
-        "🔻 **ʙᴏᴛᴜᴍᴜᴢᴅᴀᴋi ᴏʏᴜɴʟᴀʀɪ, `/off` ᴋᴏᴍᴜᴛᴜ ʏᴀʀᴅɪᴍɪ iʟᴇ iᴘᴛᴀʟ ᴇᴅᴇʙiʟiʀsiɴiᴢ.**",
+        "⇨ `/stahmin` - **sᴀʏɪ ᴛᴀʜᴍiɴ ᴏʏᴜɴᴜ 1-1000**\n\n"
+        "🔻 **ᴏʏᴜɴʟᴀʀɪ, `/off` ᴋᴏᴍᴜᴛᴜ ʏᴀʀᴅɪᴍɪ iʟᴇ iᴘᴛᴀʟ ᴇᴅᴇʙiʟiʀsiɴiᴢ.**",
         buttons=[[Button.inline("⬅️ Geri Dön", data="cevirme")]],
         link_preview=False
     )
