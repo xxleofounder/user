@@ -1388,33 +1388,27 @@ import random
 # 🎲 /zar
 @client.on(events.NewMessage(pattern="^/zar$"))
 async def zar(event):
-    sonuc = random.randint(1, 6)
-    await client.send_message(event.chat_id, f"🎲", reply_to=event.id)
+        await client.send_message(event.chat_id, f"🎲")
 
 # 🎯 /dart
 @client.on(events.NewMessage(pattern="^/dart$"))
 async def dart(event):
-    sonuc = random.randint(1, 6)
-    await client.send_message(event.chat_id, f"🎯", reply_to=event.id)
+        await client.send_message(event.chat_id, f"🎯")
 
 # 🎰 /slot
 @client.on(events.NewMessage(pattern="^/slot$"))
 async def slot(event):
-    slotlar = ["🍒", "🍋", "🍊", "🍉", "⭐"]
-    sonuc = " | ".join(random.choices(slotlar, k=3))
-    await client.send_message(event.chat_id, f"🎰", event.id)
+        await client.send_message(event.chat_id, f"🎰")
 
 # ⚽ /futbool
 @client.on(events.NewMessage(pattern="^/futbool$"))
 async def futbool(event):
-    gol = random.choice(["Gol! ⚽", "Kaçtı! ❌"])
-    await client.send_message(event.chat_id, gol, reply_to=event.id)
+        await client.send_message(event.chat_id, f"⚽")
 
 # 🎳 /bowling
 @client.on(events.NewMessage(pattern="^/bowling$"))
 async def bowling(event):
-    skor = random.randint(0, 10)
-    await client.send_message(event.chat_id, f"🎳 Bowling skoru: {skor}", reply_to=event.id)
+        await client.send_message(event.chat_id, f"🎳")
 
 # 🪙 /coin
 @client.on(events.NewMessage(pattern="^/coin$"))
