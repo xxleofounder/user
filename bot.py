@@ -1325,100 +1325,104 @@ async def stop_xox(event):
         del xox_games[chat_id]
         await event.reply("❌ xᴏx ᴏʏᴜɴᴜ ʙᴀșᴀʀɪʏʟᴀ sᴏɴʟᴀɴᴅɪʀɪʟᴅɪ, ʏᴇɴi ᴏʏᴜɴ içiɴ `/xox` ᴋᴏᴍᴜᴛᴜɴᴜ ᴋᴜʟʟᴀɴᴀʙiʟiʀsiɴiᴢ.")    
 
-
+from telethon import TelegramClient, events, Button
+import random
 from difflib import SequenceMatcher
 
 
-aktif_oyunlar = {}  # chat_id: {"kelime": str, "mesaj_id": int}
+# Aktif oyunlar: chat_id -> {"kelime": str, "mesaj_id": int, "pas": int}
+aktif_oyunlar = {}
 
-# Kelime listeleri
-kelimeler_kolay = [
-    "elma", "armut", "masa", "araba", "telefon", "kitap",
-    "kalem", "çiçek", "şehir", "deniz", "güneş", "ay", "su", "kedi", "köpek", "ev", "top"
-]
-
-kelimeler_zor = [
-    "programlama", "algoritma", "asenkron", "veritabanı", "telekomünikasyon",
-    "bilgisayar", "matematik", "aritmetik", "kriptografi", "yapayzeka",
-    "işlemci", "donanım", "networking", "sibernetik", "yazılım", "fonksiyon"
-]
+# Kolay ve zor kelime listeleri
+kelimeler_kolay = ["elma", "armut", "masa", "araba", "telefon", "kitap", "kalem", "çiçek", "şehir", "deniz", "top", "ev", "kedi", "köpek", "yol", "su", "güneş", "ay", "bulut", "yağmur", "çanta", "bardak"]
+kelimeler_zor = ["programlama", "algoritma", "asenkron", "veritabanı", "telekomünikasyon", "bilgisayar", "matematik", "aritmetik", "kriptografi", "yapayzeka", "işlemci", "donanım", "networking", "sibernetik", "yazılım", "fonksiyon", "entegrasyon", "protokol", "optimizasyon", "modülasyon", "simülasyon", "kriptoloji"]
 
 # /sicaksoğuk komutu
-@client.on(events.NewMessage(pattern="^/sicaksoğuk"))
-async def sicak_soguk_start(event):
+@client.on(events.NewMessage(pattern="^/sicaksoguk"))
+async def start(event):
     if event.is_private:
         await event.respond("❌ Bu oyun sadece gruplarda oynanabilir!")
         return
-
+    start_mesaj = await event.reply("🎯 Hoş geldiniz! Kolay mı yoksa zor mu oynamak istersiniz?")
     await event.respond(
-        "Hangi zorlukta oynamak istersiniz?",
-        buttons=[
-            [Button.inline("Kolay", b"kolay"), Button.inline("Zor", b"zor")]
-        ]
+        "Seçiminizi yapın:",
+        buttons=[[Button.inline("Kolay", b"kolay"), Button.inline("Zor", b"zor")]],
+        reply_to=start_mesaj.id
     )
 
-# Inline button callback
+# /off komutu
+@client.on(events.NewMessage(pattern="^/off"))
+async def off(event):
+    chat_id = event.chat_id
+    if chat_id in aktif_oyunlar:
+        del aktif_oyunlar[chat_id]
+        await event.reply("❌ Oyun iptal edildi!", reply_to=event.message.id)
+    else:
+        await event.reply("⚠️ Aktif bir oyun yok!", reply_to=event.message.id)
+
+# Inline button handler (Pass)
 @client.on(events.CallbackQuery)
 async def button_handler(event):
     chat_id = event.chat_id
-
     if event.data in [b"kolay", b"zor"]:
         kelime_listesi = kelimeler_kolay if event.data == b"kolay" else kelimeler_zor
         kelime = random.choice(kelime_listesi)
         karisik_kelime = ''.join(random.sample(kelime, len(kelime)))
 
-        buttons = [
-            [Button.inline("Pass", b"pass"), Button.inline("Off", b"off")]
-        ]
+        buttons = [[Button.inline("🔄 Pass", b"pass")]]
+        mesaj = await event.edit(f"🎯 Yeni kelimeyi tahmin edin!\n\n`{karisik_kelime}`\nPas hakkınız: 3️⃣", buttons=buttons)
 
-        mesaj = await event.edit(
-            f"🎯 Yeni kelimeyi tahmin edin!\n\n`{karisik_kelime}`",
-            buttons=buttons
-        )
-
-        aktif_oyunlar[chat_id] = {"kelime": kelime, "mesaj_id": mesaj.id}
+        aktif_oyunlar[chat_id] = {"kelime": kelime, "mesaj_id": mesaj.id, "pas": 3}
 
     elif event.data == b"pass" and chat_id in aktif_oyunlar:
-        kelime_listesi = kelimeler_kolay + kelimeler_zor
-        kelime = random.choice(kelime_listesi)
-        karisik_kelime = ''.join(random.sample(kelime, len(kelime)))
+        oyun = aktif_oyunlar[chat_id]
+        if oyun["pas"] > 0:
+            oyun["pas"] -= 1
+            kelime_listesi = kelimeler_kolay + kelimeler_zor
+            kelime = random.choice(kelime_listesi)
+            karisik_kelime = ''.join(random.sample(kelime, len(kelime)))
+            oyun.update({"kelime": kelime})
 
-        buttons = [
-            [Button.inline("Pass", b"pass"), Button.inline("Off", b"off")]
-        ]
+            await event.edit(f"🔄 Yeni kelime: `{karisik_kelime}`\nPas hakkınız: {oyun['pas']}️⃣", buttons=[[Button.inline("🔄 Pass", b"pass")]])
+        else:
+            await event.answer("❌ Pas hakkınız kalmadı!", alert=True)
 
-        mesaj = await event.edit(
-            f"🔄 Yeni kelime: `{karisik_kelime}`",
-            buttons=buttons
-        )
-        aktif_oyunlar[chat_id] = {"kelime": kelime, "mesaj_id": mesaj.id}
-
-    elif event.data == b"off" and chat_id in aktif_oyunlar:
-        del aktif_oyunlar[chat_id]
-        await event.edit("❌ Oyun sonlandırıldı!")
-
-# Tahminleri dinle ve bot reply kullanarak cevap versin
+# Tahminleri dinle ve reply ile yanıtla
 @client.on(events.NewMessage(pattern=".*"))
 async def tahmin(event):
     chat_id = event.chat_id
     if chat_id not in aktif_oyunlar:
         return
 
-    kelime = aktif_oyunlar[chat_id]["kelime"]
+    oyun = aktif_oyunlar[chat_id]
+    kelime = oyun["kelime"]
     tahmin = event.text.strip().lower()
     oran = SequenceMatcher(None, kelime, tahmin).ratio()
+    yuzde = int(oran * 100)
 
-    if tahmin == kelime:
+    if tahmin == kelime.lower():
         await event.reply(f"🎉 Tebrikler {event.sender.first_name}! Doğru kelime: `{kelime}`")
         del aktif_oyunlar[chat_id]
-    elif oran > 0.7:
-        await event.reply("🔥 Çok sıcak!", reply_to=event.message.id)
-    elif oran > 0.4:
-        await event.reply("🌡️ Ilık", reply_to=event.message.id)
-    elif oran > 0.2:
-        await event.reply("❄️ Soğuk", reply_to=event.message.id)
     else:
-        await event.reply("🥶 Buz gibi!", reply_to=event.message.id)
+        # Hata harfi
+        for i, (t, k) in enumerate(zip(tahmin, kelime)):
+            if t != k:
+                fark = f"'{k[i]}' harfinden itibaren yanlış"
+                break
+        else:
+            fark = f"'{kelime[len(tahmin)]}' harfinden itibaren yanlış" if len(tahmin) < len(kelime) else "Tamamen yanlış"
+
+        # Sıcak-soğuk emoji
+        if oran > 0.7:
+            emoji = "🔥 Çok sıcak"
+        elif oran > 0.4:
+            emoji = "🌡 Benzerlik orta"
+        elif oran > 0.2:
+            emoji = "❄️ Buz kadar soğuk"
+        else:
+            emoji = "🥶 Çok soğuk"
+
+        await event.reply(f"{emoji}\n🌡 Benzerlik: {yuzde}%\n{fark}", reply_to=event.message.id)
 
 print("[INFO] - ᴀʀᴛᴢ ᴘʀᴏᴊᴇᴄᴛ, ᴀᴋᴛiғ 🟢")
 client.run_until_disconnected()
