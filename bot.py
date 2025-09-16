@@ -1239,7 +1239,7 @@ async def xox_move(event):
     r, c = map(int, event.data.decode().split(":")[1:])
     sender = event.sender
 
-    # oyuncu ekleme
+    # Oyuncu ekle
     if sender.id not in game["players"]:
         if len(game["players"]) < 2:
             game["players"].append(sender.id)
@@ -1248,7 +1248,6 @@ async def xox_move(event):
             await event.answer("Bu oyunda sadece 2 oyuncu oynayabilir!", alert=True)
             return
 
-    # sembol belirleme
     symbol = "❌" if sender.id == game["players"][0] else "⭕"
 
     if game["turn"] != symbol:
@@ -1258,37 +1257,49 @@ async def xox_move(event):
         await event.answer("Burası dolu!", alert=True)
         return
 
-    # hamleyi yap
+    # Hamleyi yap
     game["board"][r][c] = symbol
 
-    # kazanan kontrolü
+    # Kazanan kontrolü
     winner = check_winner(game["board"])
     if winner:
         if winner == "draw":
             text = "🤝 Berabere! Oyun bitti."
         else:
-            winner_name = [name for pid, name in game["player_names"].items() if (symbol=="❌" and pid==game["players"][0]) or (symbol=="⭕" and pid==game["players"][1])]
-            text = f"🏆 Kazanan: {winner_name[0]}"
+            winner_name = game["player_names"].get(sender.id, "Bilinmeyen")
+            text = f"🏆 Kazanan: {winner_name}"
         restart_btn = [[Button.inline("Yeniden Başlat", "xox_restart")]]
         await event.edit(text, buttons=restart_btn)
         del games[chat_id]
         return
 
-    # sıra değiştir
+    # Sıra değiştir
     game["turn"] = "⭕" if game["turn"] == "❌" else "❌"
-    current_player = [name for pid, name in game["player_names"].items() if (game["turn"]=="❌" and pid==game["players"][0]) or (game["turn"]=="⭕" and pid==game["players"][1])]
-    # tabloyu ve sıra bilgisini anında güncelle
-    await event.edit(f"🎮 6x6 XOX Oyunu\nSıra: {game['turn']} - {current_player[0]}", buttons=make_buttons(game["board"]))
+    turn_player = [pid for pid in game["players"] if (game["turn"] == "❌" and pid == game["players"][0]) or (game["turn"] == "⭕" and pid == game["players"][1])]
+    if turn_player:
+        turn_name = game["player_names"].get(turn_player[0], "???")
+    else:
+        turn_name = "???"
+
+    oyuncu_listesi = []
+    if len(game["players"]) > 0:
+        oyuncu_listesi.append(f"1. Oyuncu: {game['player_names'][game['players'][0]]}")
+    if len(game["players"]) > 1:
+        oyuncu_listesi.append(f"2. Oyuncu: {game['player_names'][game['players'][1]]}")
+
+    text = "🎮 6x6 XOX Oyunu\n" + "\n".join(oyuncu_listesi) + f"\n\nHamle sırası: {game['turn']} {turn_name}"
+
+    # Hamle yapıldığı anda tabloyu güncelle
+    await event.edit(text, buttons=make_buttons(game["board"]))
 
 @client.on(events.CallbackQuery(pattern=b"xox_restart"))
 async def xox_restart(event):
     chat_id = event.chat_id
-    # eski tabloyu sil
+    # Eski tabloyu ve yeniden başlat mesajını sil
     try:
-        await client.delete_messages(chat_id, games[chat_id]["msg_id"])
+        await client.delete_messages(chat_id, [event.message_id, games[chat_id]["msg_id"]])
     except:
         pass
-    # direkt yeni tablo oluştur
     await send_new_board(chat_id)
 
 @client.on(events.NewMessage(pattern="^/off$"))
@@ -1303,7 +1314,7 @@ async def stop_xox(event):
             pass
         del games[chat_id]
         await event.respond("🛑 XOX oyunu bitirildi!", reply_to=event.message.id)
-
+    
     
 print("[INFO] ᴀʀᴛᴢ Bot çalışıyor...")
 client.run_until_disconnected()
