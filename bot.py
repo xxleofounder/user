@@ -1389,20 +1389,20 @@ import random
 @client.on(events.NewMessage(pattern="^/zar$"))
 async def zar(event):
     sonuc = random.randint(1, 6)
-    await client.send_message(event.chat_id, f"🎲 Zar sonucu: {sonuc}", reply_to=event.id)
+    await client.send_message(event.chat_id, f"🎲", reply_to=event.id)
 
 # 🎯 /dart
 @client.on(events.NewMessage(pattern="^/dart$"))
 async def dart(event):
     sonuc = random.randint(1, 6)
-    await client.send_message(event.chat_id, f"🎯 Dart sonucu: {sonuc}", reply_to=event.id)
+    await client.send_message(event.chat_id, f"🎯", reply_to=event.id)
 
 # 🎰 /slot
 @client.on(events.NewMessage(pattern="^/slot$"))
 async def slot(event):
     slotlar = ["🍒", "🍋", "🍊", "🍉", "⭐"]
     sonuc = " | ".join(random.choices(slotlar, k=3))
-    await client.send_message(event.chat_id, f"🎰 Slot sonucu: {sonuc}", reply_to=event.id)
+    await client.send_message(event.chat_id, f"🎰", event.id)
 
 # ⚽ /futbool
 @client.on(events.NewMessage(pattern="^/futbool$"))
