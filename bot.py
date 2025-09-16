@@ -1345,25 +1345,39 @@ async def tasmakas_handler(event):
         await event.answer("❌ Bu oyun özel mesajlarda oynanamaz!", alert=True)
         return
 
-    secim = event.data.decode()  # 'tas', 'kagit', 'makas'
-    bot_secim = random.choice(["tas", "kagit", "makas"])
+    data = event.data.decode()
 
-    # Sonucu belirle
-    if secim == bot_secim:
-        sonuc = "🤝 Berabere!"
-    elif (secim == "tas" and bot_secim == "makas") or \
-         (secim == "kagit" and bot_secim == "tas") or \
-         (secim == "makas" and bot_secim == "kagit"):
-        sonuc = "🎉 Tebrikler, kazandınız!"
-    else:
-        sonuc = "💔 Maalesef kaybettiniz!"
+    if data in ["tas", "kagit", "makas"]:
+        secim = data
+        bot_secim = random.choice(["tas", "kagit", "makas"])
 
-    # Emoji ile bot ve kullanıcı seçimini göster
-    emoji_map = {"tas": "🪨 Taş", "kagit": "📄 Kağıt", "makas": "✂️ Makas"}
-    await event.edit(
-        f"🧑 Sen: {emoji_map[secim]}\n🤖 Bot: {emoji_map[bot_secim]}\n\n{sonuc}\n\nTekrar oynamak için /tasmakas yazabilirsiniz."
-    )
+        # Sonucu belirle
+        if secim == bot_secim:
+            sonuc = "🤝 Berabere!"
+        elif (secim == "tas" and bot_secim == "makas") or \
+             (secim == "kagit" and bot_secim == "tas") or \
+             (secim == "makas" and bot_secim == "kagit"):
+            sonuc = "🎉 Tebrikler, kazandınız!"
+        else:
+            sonuc = "💔 Maalesef kaybettiniz!"
 
+        emoji_map = {"tas": "🪨 Taş", "kagit": "📄 Kağıt", "makas": "✂️ Makas"}
+
+        # Sonuç mesajını editleyip "Yeniden Oyna" butonu ekle
+        yeniden_buttons = [[
+            Button.inline("🕹 Yeniden Oyna", b"yeniden")
+        ]]
+        await event.edit(
+            f"🧑 Sen: {emoji_map[secim]}\n🤖 Bot: {emoji_map[bot_secim]}\n\n{sonuc}",
+            buttons=yeniden_buttons
+        )
+
+    elif data == "yeniden":
+        # Mesajı editleyip yeni oyun başlat
+        buttons = [
+            [Button.inline("🪨 Taş", b"tas"), Button.inline("📄 Kağıt", b"kagit"), Button.inline("✂️ Makas", b"makas")]
+        ]
+        await event.edit("✊ Taş, Kağıt, Makas! Seç:", buttons=buttons)
 
 print("[INFO] - ᴀʀᴛᴢ ᴘʀᴏᴊᴇᴄᴛ, ᴀᴋᴛiғ 🟢")
 client.run_until_disconnected()
