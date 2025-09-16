@@ -1558,7 +1558,7 @@ async def show_info(event):
         user = await client.get_entity(event.sender_id)
 
     info_text = (
-        f"**User info**\n\n"
+        f"**User info:**\n\n"
         f"📝 Ad: {user.first_name or 'Yok'}\n"
         f"📛 Soyad: {user.last_name or 'Yok'}\n"
         f"💻 Username: @{user.username or 'Yok'}\n"
