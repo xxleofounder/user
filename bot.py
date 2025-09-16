@@ -28,6 +28,7 @@ bot_token = Config.BOT_TOKEN
 OWNER_ID = Config.OWNER_ID
 botUsername = Config.BOT_USERNAME
 ownerUser = Config.OWNER_USER
+ADMIN_ID = Config.ADMIN_ID
 
 client = TelegramClient('client', api_id, api_hash).start(bot_token=bot_token)
 
@@ -1472,6 +1473,49 @@ async def saril(event):
         await client.send_message(event.chat_id, f"🤗 {user} sarıldı!", reply_to=event.id)
     else:
         await client.send_message(event.chat_id, "❌ Sarılmak için bir mesaja yanıtlamalısın!", reply_to=event.id)
+
+
+# /destek komutu
+@client.on(events.NewMessage(pattern="^/destek(?: (.+))?"))
+async def destek(event):
+    destek_mesaj = event.pattern_match.group(1)
+
+    # Mesaj yoksa kullanım göster
+    if not destek_mesaj:
+        await event.respond("❌ Kullanım: `/destek <mesajınız>`", reply_to=event.id)
+        return
+
+    # Mesaj 5 harften kısa ise uyar
+    if len(destek_mesaj.strip()) < 5:
+        await event.respond("❌ Destek mesajı en az 5 karakter olmalıdır.", reply_to=event.id)
+        return
+
+    # Onay butonları
+    buttons = [
+        [Button.inline("✅ Onayla", b"onay"), Button.inline("❌ İptal", b"iptal")]
+    ]
+
+    msg = await event.respond(
+        f"📨 Destek mesajınızı ekibe iletmek istediğinize emin misiniz?\n\nMesaj: {destek_mesaj}",
+        buttons=buttons,
+        reply_to=event.id
+    )
+
+    # Callback handler
+    @client.on(events.CallbackQuery)
+    async def callback(event_cb):
+        # Sadece destek mesajını açan kullanıcı basabilir
+        if event_cb.sender_id != event.sender_id:
+            await event_cb.answer("❌ Bu buton size ait değil!", alert=True)
+            return
+
+        if event_cb.data == b"onay":
+            # Mesajı admin ID'ye gönder
+            await client.send_message(ADMIN_ID,
+                                      f"📩 Destek mesajı:\n\nKullanıcı: {event.sender_id}\nMesaj: {destek_mesaj}")
+            await event_cb.edit(f"✅ Destek mesajınız ekibe iletildi.")
+        elif event_cb.data == b"iptal":
+            await event_cb.edit(f"❌ Destek işlemi iptal edildi.")
 
 print("[INFO] - ᴀʀᴛᴢ ᴘʀᴏᴊᴇᴄᴛ, ᴀᴋᴛiғ 🟢")
 client.run_until_disconnected()
