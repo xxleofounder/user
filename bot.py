@@ -1326,5 +1326,44 @@ async def stop_xox(event):
         await event.reply("❌ xᴏx ᴏʏᴜɴᴜ ʙᴀșᴀʀɪʏʟᴀ sᴏɴʟᴀɴᴅɪʀɪʟᴅɪ, ʏᴇɴi ᴏʏᴜɴ içiɴ `/xox` ᴋᴏᴍᴜᴛᴜɴᴜ ᴋᴜʟʟᴀɴᴀʙiʟiʀsiɴiᴢ.")    
 
 
+# /tasmakas komutu (sadece grup)
+@client.on(events.NewMessage(pattern="^/tasmakas"))
+async def tasmakas_start(event):
+    if event.is_private:
+        await event.respond("❌ Bu oyun sadece gruplarda oynanabilir!")
+        return
+
+    buttons = [
+        [Button.inline("🪨 Taş", b"tas"), Button.inline("📄 Kağıt", b"kagit"), Button.inline("✂️ Makas", b"makas")]
+    ]
+    await event.reply("✊ Taş, Kağıt, Makas! Seçimini yap:", buttons=buttons)
+
+# Inline button handler
+@client.on(events.CallbackQuery)
+async def tasmakas_handler(event):
+    if event.is_private:
+        await event.answer("❌ Bu oyun özel mesajlarda oynanamaz!", alert=True)
+        return
+
+    secim = event.data.decode()  # 'tas', 'kagit', 'makas'
+    bot_secim = random.choice(["tas", "kagit", "makas"])
+
+    # Sonucu belirle
+    if secim == bot_secim:
+        sonuc = "🤝 Berabere!"
+    elif (secim == "tas" and bot_secim == "makas") or \
+         (secim == "kagit" and bot_secim == "tas") or \
+         (secim == "makas" and bot_secim == "kagit"):
+        sonuc = "🎉 Tebrikler, kazandınız!"
+    else:
+        sonuc = "💔 Maalesef kaybettiniz!"
+
+    # Emoji ile bot ve kullanıcı seçimini göster
+    emoji_map = {"tas": "🪨 Taş", "kagit": "📄 Kağıt", "makas": "✂️ Makas"}
+    await event.edit(
+        f"🧑 Sen: {emoji_map[secim]}\n🤖 Bot: {emoji_map[bot_secim]}\n\n{sonuc}\n\nTekrar oynamak için /tasmakas yazabilirsiniz."
+    )
+
+
 print("[INFO] - ᴀʀᴛᴢ ᴘʀᴏᴊᴇᴄᴛ, ᴀᴋᴛiғ 🟢")
 client.run_until_disconnected()
