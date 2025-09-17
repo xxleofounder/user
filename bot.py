@@ -1058,14 +1058,7 @@ async def cancel(event):
 async def eros(event):
     bot_username = (await client.get_me()).username
 
-    # Grup dışında kullanım kontrolü
-    if event.is_private:
-        return await event.respond(
-            "üᴢɢüɴüᴍ, ʙᴜ ᴋᴏᴍᴜᴛ ɢʀᴜᴘ ᴠᴇʏᴀ ᴋᴀɴᴀʟʟᴀʀ içiɴ ɢᴇçᴇʀʟiᴅiʀ❗️",
-            buttons=[[Button.url("➕ ʙᴇɴi ɢʀᴜʙᴀ ᴇᴋʟᴇ", f"https://t.me/{botUserName}?startgroup=true")]],
-            reply_to=event.message.id
-        )
-
+ 
     # Grup kullanıcılarını al
     participants = [u async for u in client.iter_participants(event.chat_id) if not u.bot and not u.deleted]
 
