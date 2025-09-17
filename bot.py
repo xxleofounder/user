@@ -36,6 +36,33 @@ client = TelegramClient('client', api_id, api_hash).start(bot_token=bot_token)
 GENIUS_TOKEN = "IEr1zibeW1gnG5yS0JTRqUFzo6iiL8-fOhQXWMGOhUK74zbKYfYwm8XmcO52oGL3"
 
  
+# Orijinal fonksiyonları sakla
+_original_send_message = client.send_message
+_original_edit_message = client.edit_message
+
+# Flood-safe send_message
+async def flood_safe_send(*args, **kwargs):
+    while True:
+        try:
+            return await _original_send_message(*args, **kwargs)
+        except errors.FloodWaitError as e:
+            await asyncio.sleep(e.seconds + 1)
+        except Exception:
+            break
+
+# Flood-safe edit_message
+async def flood_safe_edit(*args, **kwargs):
+    while True:
+        try:
+            return await _original_edit_message(*args, **kwargs)
+        except errors.FloodWaitError as e:
+            await asyncio.sleep(e.seconds + 1)
+        except Exception:
+            break
+
+# Fonksiyonları override et
+client.send_message = flood_safe_send
+client.edit_message = flood_safe_edit
 
 @client.on(events.NewMessage(pattern=rf"^/start(@{botUsername})?$"))
 async def start(event):
