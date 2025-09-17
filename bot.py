@@ -119,10 +119,21 @@ async def tag_menu(event):
 async def diger_menu(event):
     await event.edit(
         "🕹️ **Eğlence Komutlarım:**\n\n"
-        "⇨ `/eros` - **iᴋi ᴋișiʏi ᴇșʟᴇșᴛiʀiʀ, sʜiᴘʟᴇʀ**\n\n"
-        "⇨ `/xox` - **iᴋi ᴋiși ᴀʀᴀsɪɴᴅᴀ xᴏx ᴏʏᴜɴᴜ ᴀçᴀʀ**\n\n"
-        "⇨ `tkm` - **ʙᴏᴛʟᴀ ᴛᴀș/ᴋᴀɢɪᴛ/ᴍᴀᴋᴀs ᴏʏɴᴀ**\n\n"
-        "⇨ `/stahmin` - **sᴀʏɪ ᴛᴀʜᴍiɴ ᴏʏᴜɴᴜ 1-1000**\n\n"
+        "⇨ `/eros` - **iᴋi ᴋișiʏi ᴇșʟᴇșᴛiʀiʀ, sʜiᴘʟᴇʀ**\n"
+        "⇨ `/xox` - **iᴋi ᴋiși ᴀʀᴀsɪɴᴅᴀ xᴏx ᴏʏᴜɴᴜ ᴀçᴀʀ**\n"
+        "⇨ `tkm` - **ʙᴏᴛʟᴀ ᴛᴀș/ᴋᴀɢɪᴛ/ᴍᴀᴋᴀs ᴏʏɴᴀ**\n"
+        "⇨ `/stahmin` - **sᴀʏɪ ᴛᴀʜᴍiɴ ᴏʏᴜɴᴜ 1-1000**\n"
+        "⇨ `/saril` - **ᴍᴇsᴀᴊɪɴɪ ʏᴀɴɪᴛʟᴀ, sᴀʀɪʟ!**\n"
+        "⇨ `/kiss` - **ᴍᴇsᴀᴊɪɴɪ ʏᴀɴɪᴛʟᴀ, öᴘ!**\n"
+        "⇨ `/kick` - **ᴀʀᴋᴀᴅᴀșɪɴɪ ɢʀᴜᴘᴛᴀɴ șᴜᴛʟᴀ! (șᴀᴋᴀ)**\n"
+        "⇨ `/slap` - **ᴍᴇsᴀᴊɪɴɪ ʏᴀɴɪᴛʟᴀ, ᴛᴏᴋᴀᴛʟᴀ!**\n"
+        "⇨ `/dart` - **ʀᴀɴᴅᴏᴍ ᴅᴀʀᴛ ᴀᴛᴀʀ**\n"
+        "⇨ `/zar` -  **ʀᴀɴᴅᴏᴍ ᴢᴀʀ ᴀᴛᴀʀ**\n"
+        "⇨ `/bowling` - **ʀᴀɴᴅᴏᴍ ʙᴏᴡʟiɴɢ sᴋᴏʀᴜ**\n"
+        "⇨ `/futbool` - **ʀᴀɴᴅᴏᴍ șᴜᴛ çᴇᴋᴇʀ**\n"
+        "⇨ `/slot` - ** ʀᴀɴᴅᴏᴍ sʟᴏᴛ çᴇᴠiʀiʀ**\n"
+        "⇨ `/coin` - ** ʀᴀɴᴅᴏᴍ ʏᴀᴢɪ/ᴛᴜʀᴀ ᴀᴛᴀʀ**\n"
+
         
         "🔻 **ᴏʏᴜɴʟᴀʀɪ, `/off` ᴋᴏᴍᴜᴛᴜ ʏᴀʀᴅɪᴍɪ iʟᴇ iᴘᴛᴀʟ ᴇᴅᴇʙiʟiʀsiɴiᴢ.**",
         buttons=[[Button.inline("⬅️ Geri Dön", data="cevirme")]],
@@ -137,6 +148,9 @@ async def diger_menu(event):
         "⇨ `/ara` - **ʏᴏᴜᴛᴜʙᴇ'ᴅᴇɴ isᴛᴇᴅiɢiɴ ᴘᴀʀçᴀʏɪ iɴᴅiʀiʀ**\n\n"
         "⇨ `/song` - **șᴀʀᴋɪ söᴢʟᴇʀiɴi ʙᴜʟᴜʀ**\n\n"
         "⇨ `/bots` - **ɢʀᴜᴘᴛᴀᴋi ʙᴏᴛʟᴀʀɪ ʟisᴛᴇʟᴇʀ**\n\n"
+        "⇨ `destek` - **ᴏᴡɴᴇʀ'ᴇ ᴜʟᴀșᴀʙiʟiʀ, ʏᴀᴅᴀ ʙᴏᴛ ʜᴀᴋᴋɪɴᴅᴀ ʙiʀ sᴏʀᴜɴᴜ ʙiʟᴅiʀᴇʙiʟiʀsiɴiᴢ**\n\n"
+        "⇨ `id` - **ʏᴀɴɪᴛ ᴠᴇʀiʀsᴇɴ ᴋișiɴiɴ ᴠᴇʀᴍᴇᴢsᴇɴ sᴇɴiɴ iᴅ ᴠᴇʀiʀ**\n\n"
+        "⇨ `info` - **ʏᴀɴɪᴛ ᴠᴇʀiʀsᴇɴ ᴋișiɴiɴ ᴠᴇʀᴍᴇᴢsᴇɴ sᴇɴiɴ ɪɴғᴏ ᴠᴇʀiʀ**\n\n"
         "⇨ `/yenile` - **sᴜɴᴜᴄᴜʏᴜ ʏᴇɴiᴅᴇɴ ʙᴀșʟᴀᴛɪʀ**",
         buttons=[[Button.inline("⬅️ Geri Dön", data="cevirme")]],
         link_preview=False
@@ -1522,18 +1536,19 @@ async def destek(event):
             username = event.sender.username if event.sender.username else "Yok"
 
             # Mesajı admin ID'ye gönder
-            destek_metni = f"""📩 __Destek mesajı:__
+            destek_metni = f"""📩 __ʏᴇɴi ᴛiᴄᴋᴇᴛ:__
 
-**Grup adı:** {grup_adi}
-**Kullanıcı UserName:** {username}
-**Kullanıcı:** {event.sender_id}
-**Mesaj:** {destek_mesaj}"""
+**ɢʀᴜᴘ ᴀᴅɪ:** {grup_adi}
+
+**ᴜsᴇʀ ɴᴀᴍᴇ:** {username}
+**ᴜsᴇʀ ɪᴅ:** {event.sender_id}
+**iʟᴇᴛi:** {destek_mesaj}"""
             
             await client.send_message(ADMIN_ID, destek_metni)
-            await event_cb.edit(f"✅ Destek mesajınız ekibe iletildi.")
+            await event_cb.edit(f"🟢 ᴅᴇsᴛᴇᴋ ᴍᴇsᴀᴊɪɴɪᴢ ᴇᴋiʙiᴍiᴢᴇ iʟᴇᴛiʟᴅi, ᴇɴ ᴋɪsᴀ süʀᴇᴅᴇ ʏᴀʀᴅɪᴍ, ᴠᴇʏᴀ ᴅöɴüș ʏᴀᴘɪʟɪᴄᴀᴋᴛɪʀ.")
 
         elif event_cb.data == b"iptal":
-            await event_cb.edit(f"❌ Destek işlemi iptal edildi.")
+            await event_cb.edit(f"🔴 ᴛiᴄᴋᴇᴛ ᴀçɪʟᴍᴀᴅɪ, iʏi sᴏʜʙᴇᴛʟᴇʀ...")
 
 
 
@@ -1558,12 +1573,11 @@ async def show_info(event):
         user = await client.get_entity(event.sender_id)
 
     info_text = (
-        f"**User info:**\n\n"
-        f"📝 Ad: {user.first_name or 'Yok'}\n"
-        f"📛 Soyad: {user.last_name or 'Yok'}\n"
-        f"💻 Username: @{user.username or 'Yok'}\n"
-        f"🆔 ID: {user.id}\n"
-        f"📖 Biyografi: {getattr(user, 'about', 'Yok')}\n"
+        f"**ᴜsᴇʀ iɴғᴏ:**\n\n"
+        f"ᴜsᴇʀ ғiʀsᴛɴᴀᴍᴇ: {user.first_name or 'Yok'}\n"
+        f"ᴜsᴇʀɴᴀᴍᴇ: @{user.username or 'Yok'}\n"
+        f"ɪᴅ: {user.id}\n"
+        f"ʙiʏᴏɢʀᴀғɪ: {getattr(user, 'about', 'Yok')}\n"
     )
 
     await client.send_message(event.chat_id, info_text, reply_to=event.id)
