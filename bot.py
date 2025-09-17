@@ -1387,37 +1387,37 @@ async def tasmakas_handler(event):
 @client.on(events.NewMessage(pattern="^/zar$"))
 async def zar(event):
     sonuc = random.randint(1, 6)
-    await client.send_message(event.chat_id, f"🎲 Zar sonucu: {sonuc}", reply_to=event.id)
+    await client.send_message(event.chat_id, f"🎲 ᴢᴀʀ sᴏɴᴜᴄᴜ: {sonuc}", reply_to=event.id)
 
 # 🎯 /dart
 @client.on(events.NewMessage(pattern="^/dart$"))
 async def dart(event):
     sonuc = random.randint(1, 6)
-    await client.send_message(event.chat_id, f"🎯 Dart sonucu: {sonuc}", reply_to=event.id)
+    await client.send_message(event.chat_id, f"🎯 ᴅᴀʀᴛ sᴏɴᴜᴄᴜ: {sonuc}", reply_to=event.id)
 
 # 🎰 /slot
 @client.on(events.NewMessage(pattern="^/slot$"))
 async def slot(event):
     slotlar = ["🍒", "🍋", "🍊", "🍉", "⭐"]
     sonuc = " | ".join(random.choices(slotlar, k=3))
-    await client.send_message(event.chat_id, f"🎰 Slot sonucu: {sonuc}", reply_to=event.id)
+    await client.send_message(event.chat_id, f"🎰 sʟᴏᴛ sᴏɴᴜᴄᴜ: {sonuc}", reply_to=event.id)
 
 # ⚽ /futbool
 @client.on(events.NewMessage(pattern="^/futbool$"))
 async def futbool(event):
-    gol = random.choice(["Gol! ⚽", "Kaçtı! ❌"])
+    gol = random.choice(["ɢᴏʟʟ! ⚽", "ᴛᴏᴘ ᴋᴀçᴛɪ! ❌"])
     await client.send_message(event.chat_id, gol, reply_to=event.id)
 
 # 🎳 /bowling
 @client.on(events.NewMessage(pattern="^/bowling$"))
 async def bowling(event):
     skor = random.randint(0, 10)
-    await client.send_message(event.chat_id, f"🎳 Bowling skoru: {skor}", reply_to=event.id)
+    await client.send_message(event.chat_id, f"🎳 ʙᴏᴡʟiɴɢ sᴋᴏʀᴜ: {skor}", reply_to=event.id)
 
 # 🪙 /coin
 @client.on(events.NewMessage(pattern="^/coin$"))
 async def coin(event):
-    sonuc = random.choice(["🪙 Yazı", "🪙 Tura"])
+    sonuc = random.choice(["🪙 ʏᴀᴢɪ", "🪙 ᴛᴜʀᴀ"])
     await client.send_message(event.chat_id, f"» {sonuc}", reply_to=event.id)
 
 # 👋 /slap (sadece grupta)
@@ -1429,11 +1429,11 @@ async def slap(event):
         reply = await event.get_reply_message()
         await client.send_message(
             event.chat_id,
-            f"{event.sender.first_name} {reply.sender.first_name}’i tokatladı!",
+            f"{event.sender.first_name} {reply.sender.first_name}’i ᴛᴏᴋᴀᴛʟᴀᴅɪ!",
             reply_to=event.id
         )
     else:
-        await client.send_message(event.chat_id, "❌ Tokatlamak için bir mesaja yanıtlamalısın!", reply_to=event.id)
+        await client.send_message(event.chat_id, "ʙiʀisiɴi ᴛᴏᴋᴀᴛʟᴀᴍᴀᴋ içiɴ ᴍᴇsᴀᴊɪɴɪ ʏᴀɴɪᴛʟᴀ!", reply_to=event.id)
 
 # 👢 /kick (sadece grupta)
 @client.on(events.NewMessage(pattern="^/kick$"))
@@ -1444,11 +1444,11 @@ async def kick(event):
         reply = await event.get_reply_message()
         await client.send_message(
             event.chat_id,
-            f"{event.sender.first_name} {reply.sender.first_name}’i gruptan attı!",
+            f"{event.sender.first_name} {reply.sender.first_name}’i ɢʀᴜᴘᴛᴀɴ ᴀᴛᴛɪ!",
             reply_to=event.id
         )
     else:
-        await client.send_message(event.chat_id, "❌ Kicklemek için bir mesaja yanıtlamalısın!", reply_to=event.id)
+        await client.send_message(event.chat_id, "ᴋișiʏi ɢʀᴜᴘᴛᴀɴ ᴀᴛᴍᴀᴋ içiɴ ᴍᴇsᴀᴊɪɴɪ ʏᴀɴɪᴛʟᴀ!", reply_to=event.id)
 
 # 😘 /kiss (sadece grupta)
 @client.on(events.NewMessage(pattern="^/kiss$"))
@@ -1459,11 +1459,11 @@ async def kiss(event):
         reply = await event.get_reply_message()
         await client.send_message(
             event.chat_id,
-            f"{event.sender.first_name} {reply.sender.first_name}’e öptü!",
+            f"{event.sender.first_name} {reply.sender.first_name}’i öᴘᴛü!",
             reply_to=event.id
         )
     else:
-        await client.send_message(event.chat_id, "❌ Öpmek için bir mesaja yanıtlamalısın!", reply_to=event.id)
+        await client.send_message(event.chat_id, "ʙiʀisiɴi ōᴘᴍᴇᴋ içiɴ ᴍᴇsᴀᴊɪɴɪ ʏᴀɴɪᴛʟᴀ!!", reply_to=event.id)
 
 # 🤗 /saril (sadece grupta)
 @client.on(events.NewMessage(pattern="^/saril$"))
@@ -1474,11 +1474,11 @@ async def saril(event):
         reply = await event.get_reply_message()
         await client.send_message(
             event.chat_id,
-            f"{event.sender.first_name} {reply.sender.first_name}’e sarıldı!",
+            f"{event.sender.first_name} {reply.sender.first_name}’ᴇ sᴀʀɪʟᴅɪ!",
             reply_to=event.id
         )
     else:
-        await client.send_message(event.chat_id, "❌ Sarılmak için bir mesaja yanıtlamalısın!", reply_to=event.id)
+        await client.send_message(event.chat_id, "ʙiʀisiɴᴇ sᴀʀɪʟᴍᴀᴋ içiɴ ᴍᴇsᴀᴊɪɴɪ ʏᴀɴɪᴛʟᴀ!!", reply_to=event.id)
 
 # /destek komutu
 @client.on(events.NewMessage(pattern="^/destek(?: (.+))?"))
@@ -1487,21 +1487,21 @@ async def destek(event):
 
     # Mesaj yoksa kullanım göster
     if not destek_mesaj:
-        await event.respond("❌ Kullanım: `/destek <mesajınız>`", reply_to=event.id)
+        await event.respond("❌ ᴋᴜʟʟᴀɴɪᴍ: `/destek <mesajınız>`", reply_to=event.id)
         return
 
     # Mesaj 5 harften kısa ise uyar
     if len(destek_mesaj.strip()) < 5:
-        await event.respond("❌ Destek mesajı en az 5 karakter olmalıdır.", reply_to=event.id)
+        await event.respond("❌ ɢᴇçᴇʀsiᴢ ᴍᴇsᴀᴊ, ᴇɴ ᴀᴢ 5 ᴋᴀʀᴀᴋᴛᴇʀ ᴏʟᴍᴀʟɪᴅɪʀ ᴍᴇsᴀᴊ!", reply_to=event.id)
         return
 
     # Onay butonları
     buttons = [
-        [Button.inline("✅ Onayla", b"onay"), Button.inline("❌ İptal", b"iptal")]
+        [Button.inline("✅ ᴏɴᴀʏʟᴀ", b"onay"), Button.inline("❌ iᴘᴛᴀʟ", b"iptal")]
     ]
 
     msg = await event.respond(
-        f"📨 Destek mesajınızı ekibe iletmek istediğinize emin misiniz?\n\nMesaj: {destek_mesaj}",
+        f"📨 ᴅᴇsᴛᴇᴋ ᴍᴇsᴀᴊɪɴɪᴢɪ ᴇᴋiʙᴇ iʟᴇᴛᴍᴇᴋ isᴛᴇᴅiɢiɴiᴢᴇ ᴇᴍiɴ ᴍisiɴiᴢ?\n\nᴍᴇsᴀᴊ: {destek_mesaj}",
         buttons=buttons,
         reply_to=event.id
     )
