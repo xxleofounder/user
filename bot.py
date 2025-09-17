@@ -7,6 +7,7 @@ import logging
 import subprocess
 import yt_dlp
 import lyricsgenius
+from datetime import datetime
 
 from telethon import TelegramClient, events, errors, Button
 from telethon.tl.types import ChannelParticipantsAdmins, UserStatusRecently, UserStatusOnline
@@ -130,9 +131,9 @@ async def tag_menu(event):
 async def diger_menu(event):
     await event.edit(
         "🕹️ **Eğlence Komutlarım:**\n\n"
-        "⇨ `/xox` - **iᴋi ᴋiși ᴀʀᴀsɪɴᴅᴀ xᴏx ᴏʏᴜɴᴜ ᴀçᴀʀ**\n"
-        "⇨ `tkm` - **ʙᴏᴛʟᴀ ᴛᴀș/ᴋᴀɢɪᴛ/ᴍᴀᴋᴀs ᴏʏɴᴀ**\n"
-        "⇨ `/stahmin` - **sᴀʏɪ ᴛᴀʜᴍiɴ ᴏʏᴜɴᴜ 1-1000**\n\n"
+        "⇨ `/xox` - **iᴋi ᴋiși ᴀʀᴀsɪɴᴅᴀ xᴏx ᴏʏᴜɴᴜ**\n"
+        "⇨ `/tkm` - **ʙᴏᴛʟᴀ ᴛᴀș/ᴋᴀɢɪᴛ/ᴍᴀᴋᴀs ᴏʏɴᴀ**\n"
+        "⇨ `/stahmin` - **sᴀʏɪ ᴛᴀʜᴍiɴ ᴏʏᴜɴᴜ**\n\n"
         "⇨ `/eros` - **iᴋi ᴋișiʏi ᴇșʟᴇșᴛiʀiʀ, sʜiᴘʟᴇʀ**\n"
         "⇨ `/saril` - **ᴍᴇsᴀᴊɪɴɪ ʏᴀɴɪᴛʟᴀ, sᴀʀɪʟ!**\n"
         "⇨ `/kiss` - **ᴍᴇsᴀᴊɪɴɪ ʏᴀɴɪᴛʟᴀ, öᴘ!**\n"
@@ -1361,10 +1362,7 @@ async def tasmakas_start(event):
 # Inline button handler
 @client.on(events.CallbackQuery)
 async def tasmakas_handler(event):
-    if event.is_private:
-        await event.answer("❌ Bu oyun özel mesajlarda oynanamaz!", alert=True)
-        return
-
+    
     data = event.data.decode()
 
     if data in ["tas", "kagit", "makas"]:
@@ -1377,18 +1375,18 @@ async def tasmakas_handler(event):
         elif (secim == "tas" and bot_secim == "makas") or \
              (secim == "kagit" and bot_secim == "tas") or \
              (secim == "makas" and bot_secim == "kagit"):
-            sonuc = "🎉 Tebrikler, kazandınız!"
+            sonuc = "🎉 ᴛᴇʙʀiᴋʟᴇʀ, ᴋᴀᴢᴀɴᴅɪɴɪᴢ!"
         else:
-            sonuc = "💔 Maalesef kaybettiniz!"
+            sonuc = "💔 ᴍᴀᴀʟᴇsᴇғ ᴋᴀʏʙᴇᴛiɴiᴢ!"
 
         emoji_map = {"tas": "🪨 Taş", "kagit": "📄 Kağıt", "makas": "✂️ Makas"}
 
         # Sonuç mesajını editleyip "Yeniden Oyna" butonu ekle
         yeniden_buttons = [[
-            Button.inline("🕹 Yeniden Oyna", b"yeniden")
+            Button.inline("🕹 ʏᴇɴiᴅᴇɴ ᴏʏɴᴀ", b"yeniden")
         ]]
         await event.edit(
-            f"🧑 Sen: {emoji_map[secim]}\n🤖 Bot: {emoji_map[bot_secim]}\n\n{sonuc}",
+            f"🧑 sᴇɴ: {emoji_map[secim]}\n🤖 ʙᴏᴛ: {emoji_map[bot_secim]}\n\n{sonuc}",
             buttons=yeniden_buttons
         )
 
