@@ -266,7 +266,7 @@ async def yenile(event):
     mesaj = await event.reply("🔄 ʏᴇɴɪᴅᴇɴ ʙᴀşʟᴀᴛɪʟɪʏᴏʀ: %0")
 
     for yuzde in range(10, 101, 10):
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(2)
         await mesaj.edit(f"🔄 ʏᴇɴɪᴅᴇɴ ʙᴀşʟᴀᴛɪʟɪʏᴏʀ: %{yuzde}")
 
     try:
