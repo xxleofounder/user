@@ -148,9 +148,9 @@ async def diger_menu(event):
         "⇨ `/ara` - **ʏᴏᴜᴛᴜʙᴇ'ᴅᴇɴ isᴛᴇᴅiɢiɴ ᴘᴀʀçᴀʏɪ iɴᴅiʀiʀ**\n\n"
         "⇨ `/song` - **șᴀʀᴋɪ söᴢʟᴇʀiɴi ʙᴜʟᴜʀ**\n\n"
         "⇨ `/bots` - **ɢʀᴜᴘᴛᴀᴋi ʙᴏᴛʟᴀʀɪ ʟisᴛᴇʟᴇʀ**\n\n"
-        "⇨ `destek` - **ᴏᴡɴᴇʀ'ᴇ ᴜʟᴀșᴀʙiʟiʀ, ʏᴀᴅᴀ ʙᴏᴛ ʜᴀᴋᴋɪɴᴅᴀ ʙiʀ sᴏʀᴜɴᴜ ʙiʟᴅiʀᴇʙiʟiʀsiɴiᴢ**\n\n"
-        "⇨ `id` - **ʏᴀɴɪᴛ ᴠᴇʀiʀsᴇɴ ᴋișiɴiɴ ᴠᴇʀᴍᴇᴢsᴇɴ sᴇɴiɴ iᴅ ᴠᴇʀiʀ**\n\n"
-        "⇨ `info` - **ʏᴀɴɪᴛ ᴠᴇʀiʀsᴇɴ ᴋișiɴiɴ ᴠᴇʀᴍᴇᴢsᴇɴ sᴇɴiɴ ɪɴғᴏ ᴠᴇʀiʀ**\n\n"
+        "⇨ `/destek` - **ᴏᴡɴᴇʀ'ᴇ ᴜʟᴀșᴀʙiʟiʀ, ʏᴀᴅᴀ ʙᴏᴛ ʜᴀᴋᴋɪɴᴅᴀ ʙiʀ sᴏʀᴜɴᴜ ʙiʟᴅiʀᴇʙiʟiʀsiɴiᴢ**\n\n"
+        "⇨ `/id` - **ʏᴀɴɪᴛ ᴠᴇʀiʀsᴇɴ ᴋișiɴiɴ ᴠᴇʀᴍᴇᴢsᴇɴ sᴇɴiɴ iᴅ ᴠᴇʀiʀ**\n\n"
+        "⇨ `/info` - **ʏᴀɴɪᴛ ᴠᴇʀiʀsᴇɴ ᴋișiɴiɴ ᴠᴇʀᴍᴇᴢsᴇɴ sᴇɴiɴ ɪɴғᴏ ᴠᴇʀiʀ**\n\n"
         "⇨ `/yenile` - **sᴜɴᴜᴄᴜʏᴜ ʏᴇɴiᴅᴇɴ ʙᴀșʟᴀᴛɪʀ**",
         buttons=[[Button.inline("⬅️ Geri Dön", data="cevirme")]],
         link_preview=False
