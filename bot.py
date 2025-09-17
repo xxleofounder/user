@@ -1511,7 +1511,7 @@ async def destek(event):
     async def callback(event_cb):
         # Sadece destek mesajını açan kullanıcı basabilir
         if event_cb.sender_id != event.sender_id:
-            await event_cb.answer("❌ Bu buton size ait değil!", alert=True)
+            await event_cb.answer("ʙᴜ ʏᴀʀᴅɪᴍ ᴋᴏᴍᴜᴛᴜɴᴜ siᴢ ᴀçᴍᴀᴅɪɴɪᴢ!", alert=True)
             return
 
         if event_cb.data == b"onay":
@@ -1522,7 +1522,7 @@ async def destek(event):
             username = event.sender.username if event.sender.username else "Yok"
 
             # Mesajı admin ID'ye gönder
-            destek_metni = f"""📩 _Destek mesajı:_
+            destek_metni = f"""📩 __Destek mesajı:__
 
 **Grup adı:** {grup_adi}
 **Kullanıcı UserName:** {username}
