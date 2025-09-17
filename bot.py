@@ -8,6 +8,7 @@ import subprocess
 import yt_dlp
 import lyricsgenius
 from datetime import datetime
+from datetime import datetime, time, timedelta
 
 from telethon import TelegramClient, events, errors, Button
 from telethon.tl.types import ChannelParticipantsAdmins, UserStatusRecently, UserStatusOnline
@@ -30,6 +31,7 @@ OWNER_ID = Config.OWNER_ID
 botUsername = Config.BOT_USERNAME
 ownerUser = Config.OWNER_USER
 ADMIN_ID = Config.OWNER_ID
+BOT_NAME = "funda"
 
 client = TelegramClient('client', api_id, api_hash).start(bot_token=bot_token)
 
@@ -63,6 +65,163 @@ async def flood_safe_edit(*args, **kwargs):
 # Fonksiyonları override et
 client.send_message = flood_safe_send
 client.edit_message = flood_safe_edit
+
+
+funda_responses = [
+    "Buyrun tatlım 💕",
+    "Efendim canım 🌸",
+    "Buradayım aşkım 😘",
+    "Hemen geldim 😇",
+    "Sizi dinliyorum canım 🌹",
+    "Evet, ben Funda 😍",
+    "Ne oldu, beni mi özlediniz? 😉",
+    "Buradayım canım, söyle bakalım ✨",
+    "Buyrun güzellik 🌼",
+    "Yanındayım her zaman 💖",
+    "Seni mi çağırdılar yoksa beni mi? 😏",
+    "Hemen ışınlandım 💫",
+    "Buradayım tatlı şey 😍",
+    "Aaa beni mi andınız? 🙈",
+    "Buyrun prensesiniz burada 👑",
+    "Gelmez miyim hiç 💕",
+    "Funda hazır, emrine amade 🌹",
+    "Benim güzel kalpli dostum, buradayım 💞",
+    "Tatlım, buyur söyle bakalım 😇",
+    "Aaa seslendiniz mi bana? 🌸",
+    "Şekerim, buradayım işte 🍬",
+    "Canım, ne oldu anlat bana 🌺",
+    "Ay kıyamam, çağırdınız hemen geldim 😍",
+    "Sizi dinliyorum, tatlı insan 💖",
+    "Beni çağırdın, kalbim pır pır etti 🙊",
+    "Hemen buradayım, yakışıklı/hanımefendi 😉",
+    "Gönlümün efendisi, buradayım 🌹",
+    "Tatlım, buradayım işte 💋",
+    "Beni çağırmakla çok iyi ettiniz 😘",
+    "Aşk dolu selamlar, buradayım 💞",
+    "Bir tanem, buyur 🌸",
+    "Evet, beni çağırdınız değil mi 😇",
+    "Duydum geldim, kalbinizi kırar mıyım hiç 💕",
+    "Buradayım, hem de size gülücüklerle geldim 😍",
+    "Ben Funda, tatlı tatlı buradayım 🌼",
+    "Ne tatlı çağırıyorsunuz öyle 🙈",
+    "Ay canım yaa, hemen geldim 🌸",
+    "Sizi dinliyorum, güzel ruh 🌟",
+    "Şimdi ne desem az sana 💖",
+    "İşte Funda burada, pırıl pırıl 🌸",
+    "Efendim, kalbim sizde 💞",
+    "Çiçek gibi geldim size 🌹",
+    "Benim yakışıklım/güzelliğim, buradayım 😍",
+    "Tatlı sohbetler için hep buradayım 💕",
+    "Sen çağır, ben koşarak gelirim ✨",
+    "Buradayım, bir tanem 💖",
+    "Sizi mutlu etmeye geldim 🌸",
+    "Buyrun, tatlı prensesiniz burada 👑",
+    "Ay hemen geldim, merak etmeyin 😘",
+    "Beni özlemiş gibi geldiniz 🙊",
+    "Kıyamam size, buradayım işte 💕",
+    "Funda sizi asla yarı yolda bırakmaz 🌟",
+    "Aşk dolu bir merhaba! 💖",
+    "Canım, ben buradayım ya sen? 😉"
+]
+
+@client.on(events.NewMessage)
+async def funda_cevap(event):
+    if event.is_private:
+        return  # DM'de çalışmasın
+
+    if BOT_NAME.lower() in event.raw_text.lower():
+        sender = await event.get_sender()
+        user = sender.first_name if sender else "canım"
+        msg = random.choice(funda_responses).replace("{user}", user)
+        await event.respond(msg)
+
+
+# Aktif gruplar
+auto_messages = {}
+
+# Sabah mesajları (Günaydın 💕)
+good_morning_msgs = [
+    "☀️ Günaydın {group} ailem! Bugün çok güzel şeyler olacak ✨",
+    "🌸 Yeni bir gün, yeni umutlar {group}! Hepinize kocaman bir günaydın 💖",
+    "💕 Tatlı uykulardan uyanan herkese günaydın {group}! 😊",
+    "🌼 Günaydın güzellerim {group}, kahveler hazır mı ☕?",
+    "😇 Enerji dolu bir sabah diliyorum {group}, gününüz bereketli olsun 🌟",
+    "🌞 Günaydın {group}, hep gülümseyin olur mu 💕",
+    "🍓 Tatlı bir gün sizinle olsun {group}, harika bir sabah 💖",
+    "✨ Gözlerinizi umutla açın {group}, güzel bir gün başlıyor 🌸",
+    "🌹 Her yeni gün bir armağan {group}, günaydın!",
+    "💫 Günaydın tatlı ailem {group}, hep birlikte mutlu olalım 😊",
+    "🌺 Güneş sizin için doğdu {group}, günaydınnn 💕",
+    "💕 İyi ki varsınız {group}, sabahınız huzurlu geçsin ✨",
+    "🌸 Uyanın güzeller {group}, yeni fırsatlar sizi bekliyor 🌼"
+]
+
+# Gece mesajları (İyi geceler 🌙)
+good_night_msgs = [
+    "🌙 İyi geceler {group} ailem, huzurla uyuyun 💫",
+    "💖 Tatlı rüyalar {group}, yarın harika bir gün olacak 🌸",
+    "😴 Uyku vaktii {group}, güzel rüyalar dilerim 💕",
+    "🌌 Geceniz yıldızlar kadar parlak olsun {group} ✨",
+    "💕 İyi geceler canlarım {group}, kalbiniz huzurla dolsun 😇",
+    "🌜 Hadi bakalım {group}, başınızı yastığa koyma zamanı 😴",
+    "💫 Güzel düşler görün {group}, sabah görüşürüz 🌸",
+    "🌹 Gözlerinizi kapatın {group}, huzurlu bir uyku diliyorum 💕",
+    "🌟 İyi geceler tatlı ailem {group}, rüyalarınız şeker gibi olsun 🍬",
+    "💕 Kapatın gözlerinizi {group}, melekler sizi korusun 🌸",
+    "😌 Bugün yorulmuşsunuzdur {group}, şimdi dinlenme zamanı 💖",
+    "🌙 Rüyalarda buluşalım {group}, iyi geceler 🌸"
+]
+
+# /gmesaj komutu (aktif/pasif)
+@client.on(events.NewMessage(pattern="^/gmesaj$"))
+async def gmesaj(event):
+    chat_id = event.chat_id
+
+    if event.is_private:
+        return  # DM'de çalışmasın
+
+    # Admin kontrolü
+    try:
+        participant = await client.get_permissions(chat_id, event.sender_id)
+        if not participant.is_admin:
+            await event.respond("❌ Bu komutu sadece adminler kullanabilir!")
+            return
+    except:
+        pass
+
+    if chat_id in auto_messages:
+        auto_messages.pop(chat_id)
+        await event.respond("❌ Gece/gündüz mesajları kapatıldı.")
+    else:
+        auto_messages[chat_id] = True
+        await event.respond("💬 Gece/gündüz mesajları aktif edildi!")
+        client.loop.create_task(daily_message_loop(chat_id, event))
+
+# Günlük otomatik mesaj döngüsü
+async def daily_message_loop(chat_id, event):
+    while chat_id in auto_messages:
+        now = datetime.now()
+        group_name = (await event.get_chat()).title
+
+        # 20:00 iyi geceler
+        target_night = datetime.combine(now.date(), time(20, 0))
+        if now > target_night:
+            target_night += timedelta(days=1)
+        await asyncio.sleep((target_night - now).total_seconds())
+        if chat_id in auto_messages:
+            msg = random.choice(good_night_msgs).format(group=group_name)
+            await event.respond(msg)
+
+        # 08:00 günaydın
+        now = datetime.now()
+        target_morning = datetime.combine(now.date(), time(8, 0))
+        if now > target_morning:
+            target_morning += timedelta(days=1)
+        await asyncio.sleep((target_morning - now).total_seconds())
+        if chat_id in auto_messages:
+            msg = random.choice(good_morning_msgs).format(group=group_name)
+            await event.respond(msg)
+
 
 @client.on(events.NewMessage(pattern=rf"^/start(@{botUsername})?$"))
 async def start(event):
