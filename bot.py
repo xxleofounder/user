@@ -34,21 +34,16 @@ client = TelegramClient('client', api_id, api_hash).start(bot_token=bot_token)
 
 GENIUS_TOKEN = "IEr1zibeW1gnG5yS0JTRqUFzo6iiL8-fOhQXWMGOhUK74zbKYfYwm8XmcO52oGL3"
 
-# ʀᴀsᴛɢᴇʟᴇ ᴛᴜ̈ʀ
-keywords = {
-    "Rap": ["rap", "hiphop", "trap", "rap Türkçe"],
-    "Pop": ["pop", "slow", "pop Türkçe", "aşk"],
-    "Arabesk": ["arabesk", "türk arabesk", "arabesk slow"],
-    "Diger": ["türkü", "rock", "jazz", "klasik"]
-}
-  
-
+ 
 
 @client.on(events.NewMessage(pattern=rf"^/start(@{botUsername})?$"))
 async def start(event):
     user = await event.get_sender()
     first_name = user.first_name
+    username = f"@{user.username}" if user.username else "Yok"
+    user_id = user.id
 
+    # Kullanıcıya gönderilecek mesaj
     await event.respond(
         f"👋🏻 **Merhaba, {first_name}**\n\n"
         "📌 **Klasik etiketleme Özelliklerine sahip, Bir Etiketleme Botuyum. Çeşitli Özelliklere Sahibim.**\n\n"
@@ -61,8 +56,24 @@ async def start(event):
             ]
         ],
         link_preview=False,
-        reply_to=event.message.id  # İşte burası mesajı yanıt olarak gönderir
+        reply_to=event.message.id
     )
+
+    # Log bilgisi
+    tarih = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    log_mesaj = (
+        "📥 Yeni /start Kullanımı\n\n"
+        f"👤 İsim: {first_name}\n"
+        f"🆔 ID: `{user_id}`\n"
+        f"🔗 Username: {username}\n"
+        f"🕒 Tarih/Saat: {tarih}"
+    )
+
+    # Admin'e DM gönder
+    try:
+        await client.send_message(ADMIN_ID, log_mesaj)
+    except Exception as e:
+        print(f"Sorun: {e}")
 
 
 @client.on(events.ChatAction)
