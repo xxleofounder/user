@@ -124,16 +124,12 @@ funda_responses = [
     "Canım, ben buradayım ya sen? 😉"
 ]
 
-@client.on(events.NewMessage)
+@client.on(events.NewMessage(pattern="(?i)funda"))
 async def funda_cevap(event):
     if event.is_private:
-        return  # DM'de çalışmasın
-
-    if BOT_NAME.lower() in event.raw_text.lower():
-        sender = await event.get_sender()
-        user = sender.first_name if sender else "canım"
-        msg = random.choice(funda_responses).replace("{user}", user)
-        await event.respond(msg)
+        return
+    cevap = random.choice(funda_cevaplar)
+    await event.reply(cevap)
 
 
 # Aktif gruplar
@@ -184,17 +180,17 @@ async def gmesaj(event):
     try:
         participant = await client.get_permissions(chat_id, event.sender_id)
         if not participant.is_admin:
-            await event.respond("❌ Bu komutu sadece adminler kullanabilir!")
+            await event.reply("❌ Bu komutu sadece adminler kullanabilir!")
             return
     except:
         pass
 
     if chat_id in auto_messages:
         auto_messages.pop(chat_id)
-        await event.respond("❌ Gece/gündüz mesajları kapatıldı.")
+        await event.reply("❌ Gece/gündüz mesajları kapatıldı.")
     else:
         auto_messages[chat_id] = True
-        await event.respond("💬 Gece/gündüz mesajları aktif edildi!")
+        await event.reply("💬 Gece/gündüz mesajları aktif edildi!")
         client.loop.create_task(daily_message_loop(chat_id, event))
 
 # Günlük otomatik mesaj döngüsü
