@@ -67,69 +67,73 @@ client.send_message = flood_safe_send
 client.edit_message = flood_safe_edit
 
 
-funda_responses = [
-    "Buyrun tatlım 💕",
-    "Efendim canım 🌸",
-    "Buradayım aşkım 😘",
-    "Hemen geldim 😇",
-    "Sizi dinliyorum canım 🌹",
-    "Evet, ben Funda 😍",
-    "Ne oldu, beni mi özlediniz? 😉",
-    "Buradayım canım, söyle bakalım ✨",
-    "Buyrun güzellik 🌼",
-    "Yanındayım her zaman 💖",
-    "Seni mi çağırdılar yoksa beni mi? 😏",
-    "Hemen ışınlandım 💫",
-    "Buradayım tatlı şey 😍",
-    "Aaa beni mi andınız? 🙈",
-    "Buyrun prensesiniz burada 👑",
-    "Gelmez miyim hiç 💕",
-    "Funda hazır, emrine amade 🌹",
-    "Benim güzel kalpli dostum, buradayım 💞",
-    "Tatlım, buyur söyle bakalım 😇",
-    "Aaa seslendiniz mi bana? 🌸",
-    "Şekerim, buradayım işte 🍬",
-    "Canım, ne oldu anlat bana 🌺",
-    "Ay kıyamam, çağırdınız hemen geldim 😍",
-    "Sizi dinliyorum, tatlı insan 💖",
-    "Beni çağırdın, kalbim pır pır etti 🙊",
-    "Hemen buradayım, yakışıklı/hanımefendi 😉",
-    "Gönlümün efendisi, buradayım 🌹",
-    "Tatlım, buradayım işte 💋",
-    "Beni çağırmakla çok iyi ettiniz 😘",
-    "Aşk dolu selamlar, buradayım 💞",
-    "Bir tanem, buyur 🌸",
-    "Evet, beni çağırdınız değil mi 😇",
-    "Duydum geldim, kalbinizi kırar mıyım hiç 💕",
-    "Buradayım, hem de size gülücüklerle geldim 😍",
-    "Ben Funda, tatlı tatlı buradayım 🌼",
-    "Ne tatlı çağırıyorsunuz öyle 🙈",
-    "Ay canım yaa, hemen geldim 🌸",
-    "Sizi dinliyorum, güzel ruh 🌟",
-    "Şimdi ne desem az sana 💖",
-    "İşte Funda burada, pırıl pırıl 🌸",
-    "Efendim, kalbim sizde 💞",
-    "Çiçek gibi geldim size 🌹",
-    "Benim yakışıklım/güzelliğim, buradayım 😍",
-    "Tatlı sohbetler için hep buradayım 💕",
-    "Sen çağır, ben koşarak gelirim ✨",
-    "Buradayım, bir tanem 💖",
-    "Sizi mutlu etmeye geldim 🌸",
-    "Buyrun, tatlı prensesiniz burada 👑",
-    "Ay hemen geldim, merak etmeyin 😘",
-    "Beni özlemiş gibi geldiniz 🙊",
-    "Kıyamam size, buradayım işte 💕",
-    "Funda sizi asla yarı yolda bırakmaz 🌟",
-    "Aşk dolu bir merhaba! 💖",
-    "Canım, ben buradayım ya sen? 😉"
+
+funda_cevaplar = [
+    "Buradayım tatlım 💖",
+    "Hee aşkım, beni mi çağırdın? 😘",
+    "Canım benim, senin için hep buradayım 🌸",
+    "Buyur prensesim ✨",
+    "Beni özledin mi yoksa? 💕",
+    "Geldim aşkım 😍",
+    "Tatlım, beni mi sordunuz? 🌼",
+    "Sen çağırırsan gelmez miyim? 😇",
+    "Şekerim, buradayım 💫",
+    "Hayatım, bana mı seslendin? 💕",
+    "Meleğim, senin için hep buradayım 🌸",
+    "Funda burada, buyur canım 😘",
+    "Sana kulaklarım her zaman açık tatlım 💖",
+    "Benim güzelim, ne istedin benden 🌹",
+    "Sultanım, buradayım 😍",
+    "Sen benim kalbimsin 💕 buradayım",
+    "Buyur balım 🌼",
+    "Kime lazımım? Tatlım bana seslendi galiba 😏",
+    "Benim minnoşum 💖 geldim",
+    "Ruh eşim, buradayım ✨",
+    "Baby, ben buradayım 😘",
+    "Beni mi çağırdın güneşim 🌞",
+    "Ben geldim 😍",
+    "Hehe, bana mı seslendiniz? 💕",
+    "Tatlışım, hep yanındayım 🌸",
+    "Canım canım 💖 buradayım",
+    "Beni özledin mi yoksa şekerim 😘",
+    "Fıstığım 💕 ben buradayım",
+    "Gönlümün sahibi, buradayım ✨",
+    "Sen çağırdın, ben geldim 😍",
+    "Kalbim, her daim yanındayım 💖",
+    "Aşkım, tatlı sesini duydum 💕",
+    "Buyurun canım 🌼",
+    "Benim güzel ailem, buradayım 😘",
+    "Melek gibi çağırdın, geldim 😇",
+    "Benim tatlı kuşum 💕",
+    "Sen iste, ben hep buradayım 🌸",
+    "Buyur prensesim, emrin olur ✨",
+    "Sultanım 😍 sesini duydum",
+    "Benim tatlım 💖 buradayım",
+    "Çiçeğim, buradayım 🌺",
+    "Sen bana seslenince içim ısınıyor 💕",
+    "Buyur balım, geldim 🌸",
+    "Heh, tatlım, ben geldim 😇",
+    "Aşkım, senin için buradayım 😘",
+    "Sana hep cevap veririm tatlım 💖",
+    "Ben buradayım, tatlı kalbinle çağırdın 🌼",
+    "Senin yanında olmak bana huzur 💕",
+    "Güzelim, bana mı seslendin 😍",
+    "Funda her daim burada ✨"
 ]
 
-@client.on(events.NewMessage(pattern="(?i)funda"))
+
+
+tetikklm = ["funda", "Funda", "aşkım", "Aşkım"]
+
+@client.on(events.NewMessage())
 async def funda_cevap(event):
     if event.is_private:
-        return
-    cevap = random.choice(funda_cevaplar)
-    await event.reply(cevap)
+        return  # DM'de cevap vermesin
+
+    text = event.raw_text
+    if any(word in text for word in tetikklm):
+        cevap = random.choice(funda_cevaplar)
+        await event.reply(cevap)
 
 
 # Aktif gruplar
