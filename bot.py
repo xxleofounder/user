@@ -148,8 +148,8 @@ async def start(event):
     # Kullanıcıya gönderilecek mesaj
     await event.respond(
         f"**Selam tatlım {first_name}, ben Funda 🌸**\n\n"
-        "📌 **Klasik etiketleme Özelliklerine sahip, Bir Etiketleme Botuyum. Çeşitli Özelliklere Sahibim.**\n\n"
-        "🔔 **Komutlar ve destek için aşağıdaki butonları kullanabilirsin.**",
+        "💕 **Gruptaki Kullanıcılara Etiket atabilir, grup içi oyun açabilir yada extra komutlarım ile sana yardım edebilirim. Çok çeşitli özelliklerim bulunuyor, Beni denemek istemezmisin? Aşağıdaki butonlarla beni yönetebilirsin.**\n\n"
+        "🔔 **Unutma, hala gelişme aşamasındayım. beta sürümündeyim duyuruları sizlerle paylaşcağım aşklarım...**",
         buttons=[
             [Button.url("➕ Beni Gruba Ekle", f"https://t.me/{botUsername}?startgroup=true")],
             [
