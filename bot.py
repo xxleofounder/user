@@ -193,8 +193,8 @@ async def handler(event):
 
         await client.send_message(
             event.chat_id,
-            f"👋🏻 **Merhaba {firstname}, beni {chat.title} grubuna eklediğin için teşekkür ederim 🥰**\n\n"
-            "📌 Detaylı bilgi için aşağıdaki butonları kullanabilirsin:",
+            f"🌸**Merhaba tatlım {firstname}, beni {chat.title} grubuna eklediğin için teşekkür ederim 🥰**\n\n"
+            "⭐ Aşkım beni aşağıdaki buttonlar'dan yönetebilirsin:",
             buttons=[
                 [
                     Button.url("💬 Destek", f"https://t.me/{ownerUser}"),
@@ -275,9 +275,9 @@ async def starta(event):
     first_name = user.first_name
 
     await event.edit(
-        f"👋🏻 **Merhaba, {first_name}**\n\n"
-        "📌 **Klasik etiketleme Özelliklerine sahip, Bir Etiketleme Botuyum. Çeşitli Özelliklere Sahibim.**\n\n"
-        "🔔 **Komutlar ve destek için aşağıdaki butonları kullanabilirsin.**",
+        f"**Selam tatlım {first_name}, ben Funda 🌸**\n\n"
+        "💕 **Gruptaki Kullanıcılara Etiket atabilir, grup içi oyun açabilir yada extra komutlarım ile sana yardım edebilirim. Çok çeşitli özelliklerim bulunuyor, Beni denemek istemezmisin? Aşağıdaki butonlarla beni yönetebilirsin.**\n\n"
+        "🔔 **Unutma, hala gelişme aşamasındayım. beta sürümündeyim duyuruları sizlerle paylaşcağım aşklarım...**",
         buttons=[
             [Button.url("➕ Beni Gruba Ekle", f"https://t.me/{botUsername}?startgroup=true")],
             [
