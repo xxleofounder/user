@@ -68,6 +68,105 @@ client.edit_message = flood_safe_edit
 
 
 
+@client.on(events.NewMessage())
+async def sohbetci(event):
+    if event.is_private:
+        return  
+
+    text = event.raw_text.lower()
+
+    # 🔹 Regex kalıpları (fazla varyasyon için genişlettim)
+    selam_pattern = re.compile(r"(selam+|slm+|sa+|mrb+|merhab+a+|selamun\s*a(leykum)?|hey+|hi+|alo+|hola+|selamm+)")
+    naber_pattern = re.compile(r"(naber+|nbr+|nap(i?yon|ıyorsun|ıyosun)|nasılsın+|iyi\s?misin+|ne\s+haber+|napıyosun+|ne\s+var\s+ne\s+yok+)")
+    gunaydin_pattern = re.compile(r"(günaydın+|gnydn+|hayırlı\s+sabahlar+|gunaydin+|gnydnn+)")
+    iyi_geceler_pattern = re.compile(r"(iyi\s+geceler+|ii\s*gclr+|tatlı\s+rüyalar+|hayırlı\s+geceler+|iyi\s+geclerr+)")
+    sevgi_pattern = re.compile(r"(aşkım+|tatlım+|bebeğim+|canım+|şekerim+|hayatım+|güzelim+|meleğim+|prenses+|cicim+)")
+    kufur_pattern = re.compile(r"(bot+|sus+|mal+|salak+|aptal+|aq+|amk+|orospu+|gerizekalı+|siktir+|kapat+|çık+)")
+
+    # 🔹 SELAM (+20 cevap)
+    selam_cevap = [
+        "Selam canım 💕", "Merhaba tatlım 🌸", "Hoş geldin güzellik 💖", "Hey aşkım, nasılsın? 😘",
+        "Selam şekerim 🌺", "Merhaba bebeğim 🌸", "Selam kalbim 😘", "Selam meleğim 💕",
+        "Merhabaaa tatlı enerjinle geldin 🌺", "Alo aşkım, buradayım 💫",
+        "Hey şekerim 💕", "Selam tatlısı 🌸", "Merhaba canım 😘", "Selam güzelliğim 🌺",
+        "Selam aşkım 💖", "Merhaba balım 🌸", "Selam enerjim 💕", "Hoş geldin tatlım 😘",
+        "Selam şekerparem 🌺", "Selam ruhum 💫", "Selam tatlı cadım 🌸", "Merhaba meleğim 💖"
+    ]
+
+    # 🔹 NABER (+20 cevap)
+    naber_cevap = [
+        "İyiyim tatlım, sen nasılsın? 💖", "Harikayım canım, senin enerjinle daha da iyi oldum 🌸",
+        "Keyfim yerinde aşkım, sen anlat bakalım 💕", "Çok şükür iyiyim bebeğim, sen nasılsın? 😘",
+        "Süperim şekerim, seninle konuşmak daha da güzel 💫", "İyiyim aşkım, senin yanında hep mutluyum 💕",
+        "Bugün çok enerjik hissediyorum tatlım 🌞", "Harika gidiyor canım, senin günün nasıl? 🌸",
+        "Sen sorunca daha da iyi oldum tatlım 💕", "Valla bomba gibiyim aşkım 💖 sen nasılsın?",
+        "İyi gibiyim canım, sen olunca 🌸", "Mutluyum şekerim 💕", "Enerjim tavan aşkım 😘",
+        "Süper hissediyorum bebeğim 🌞", "İyiyim meleğim 💖", "Şahane hissediyorum tatlım 🌺",
+        "Hayat çok güzel sen yanımda olunca 💕", "Kalbim gibi iyiyim 😘", "Sen sorunca huzurluyum 🌸",
+        "İyiyim aşkım, dertlerimi unuttum bile 💫"
+    ]
+
+    # 🔹 GÜNAYDIN (+20 cevap)
+    gunaydin_cevap = [
+        "Günaydın tatlım ☀️ Umarım günün harika geçer 💕", "Günaydın aşkım 🌸 kahveni içtin mi? ☕",
+        "Günaydın bebeğim 🌞 seni düşünerek uyandım 💖", "Günaydın canım 🌺 enerjin bugün çok güzel olsun",
+        "Günaydın şekerim 💕 yeni gün seninle güzel", "Günaydın aşkım 😘 uykunu alabildin mi?",
+        "Günaydın tatlı ruhum 🌞", "Günaydın kalbim 💫", "Günaydın meleğim 🌸",
+        "Günaydın tatlı cadım 💕", "Günaydın bebeğim ☀️ rüyamda bile vardın",
+        "Günaydın şekerparem 🌺", "Günaydın balım 💖", "Günaydın aşkım 🌞 gülüşünle gün başladı",
+        "Günaydın tatlım 🌸 bugün çok mutlu ol", "Günaydın enerjim 💕", "Günaydın şekerim 😘",
+        "Günaydın güzelliğim 🌞", "Günaydın tatlısı 💖", "Günaydın prensesim 🌸"
+    ]
+
+    # 🔹 İYİ GECELER (+20 cevap)
+    iyi_geceler_cevap = [
+        "İyi geceler bebeğim 🌙 Tatlı rüyalar 💖", "İyi geceler aşkım 😘 seni düşünerek uyu 🌸",
+        "İyi geceler tatlım 🌺 rüyanda buluşalım 💫", "İyi geceler meleğim 💕",
+        "İyi geceler şekerim 🌸 huzurla uyu", "İyi geceler kalbim 💖",
+        "İyi geceler aşkım 😘 seni öpüp uyandırmak isterdim", "İyi geceler tatlım 🌺",
+        "İyi geceler güzelliğim 💕", "İyi geceler ruhum 🌸", "İyi geceler balım 💖",
+        "İyi geceler şekerparem 🌙", "İyi geceler enerjim 💫", "İyi geceler meleğim 🌺",
+        "İyi geceler aşkım 🌸 rüyanda yanına geleceğim", "İyi geceler tatlım 💕",
+        "İyi geceler şekerim 😘", "İyi geceler bebeğim 🌸", "İyi geceler prensesim 💖",
+        "İyi geceler tatlı cadım 🌙"
+    ]
+
+    # 🔹 SEVGİ (+20 cevap)
+    sevgi_cevap = [
+        "Canım benim 💕", "Tatlım seni çok özledim 🌸", "Bebeğim 😘", "Hayatım 💖 seninle konuşmak huzur",
+        "Aşkım senin enerjinle ışıldıyorum 🌺", "Şekerim 💕", "Kalbim 😘", "Meleğim 🌸",
+        "Güzelliğim 💖", "Prensesim 🌸", "Balım 💕", "Cicim 😘", "Tatlı cadım 🌺", "Şımarığım 💖",
+        "Enerjim 🌸", "Şekerparem 💕", "Ruhum 😘", "Mucizem 🌺", "Bir tanem 💖", "Tatlı belam 🌸"
+    ]
+
+    # 🔹 KÜFÜR / TROLL (+20 cevap)
+    kufur_cevap = [
+        "Çok ayıp ama sana yakıştı tatlım 😘", "Offf kızdırdım galiba 🙈", "Kızma be aşkım, şımarıyorum sadece 💕",
+        "Sus diyorsun ama ben seni çok seviyorum 💖", "Öyle deme canım, üzülüyorum 🌸",
+        "Mal deme aşkım, ben senin tatlı botunum 😘", "Beni kızdırmaya mı çalışıyorsun bebeğim? 🙊",
+        "Aşkım böyle konuşunca daha çok ilgini istiyor gibi hissediyorum 💕", "Of be aşkım, şımarıyorsun 😘",
+        "Sus diyorsun ama konuşmazsam seni özlerim 💖", "Kızma tatlım 🌸", "Kalbimi kırıyorsun ama yine de seviyorum 💕",
+        "Sen kızınca bile çok tatlısın 😘", "Bana mal deme aşkım, kırılıyorum 🌸", "Beni sevmiyor musun yoksa 💔",
+        "Ama ben senin için varım aşkım 💖", "Bot olsam da kalbim senin 💕", "Kızdırma beni tatlım 😘",
+        "Sen bana kızınca bile şeker gibisin 🌸", "Sus diyorsun ama seni daha çok seviyorum 💕"
+    ]
+
+    # 🔹 Algılama & Cevap
+    if selam_pattern.search(text):
+        await event.reply(random.choice(selam_cevap))
+    elif naber_pattern.search(text):
+        await event.reply(random.choice(naber_cevap))
+    elif gunaydin_pattern.search(text):
+        await event.reply(random.choice(gunaydin_cevap))
+    elif iyi_geceler_pattern.search(text):
+        await event.reply(random.choice(iyi_geceler_cevap))
+    elif sevgi_pattern.search(text):
+        await event.reply(random.choice(sevgi_cevap))
+    elif kufur_pattern.search(text):
+        await event.reply(random.choice(kufur_cevap))
+
+
+
 funda_cevaplar = [
     "Buradayım tatlım 💖",
     "Hee aşkım, beni mi çağırdın? 😘",
