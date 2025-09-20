@@ -11,7 +11,8 @@ class Config():
     OWNER_USER = "artzfounder"
     OWNER_ID = 8276543841
     BOT_TOKEN = "8209712439:AAH-TuZmh0ou1sUw5KtT7Ebox4Av7lQIkFg" 
-
+    BOT_NAME = "Funda"
+    
 
 tagmetin = """
 📚 **Tagger Komutlarım Aşağıda:**
