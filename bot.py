@@ -31,7 +31,7 @@ OWNER_ID = Config.OWNER_ID
 botUsername = Config.BOT_USERNAME
 ownerUser = Config.OWNER_USER
 ADMIN_ID = Config.OWNER_ID
-BOT_NAME = "funda"
+bot_name = "funda"
 
 client = TelegramClient('client', api_id, api_hash).start(bot_token=bot_token)
 
@@ -147,7 +147,7 @@ async def start(event):
 
     # Kullanıcıya gönderilecek mesaj
     await event.respond(
-        f"**Selam tatlım {first_name}, ben Funda 🌸**\n\n"
+        f"**Selam tatlım {first_name}, ben {bot_name} 🌸**\n\n"
         "💕 **Gruptaki Kullanıcılara Etiket atabilir, grup içi oyun açabilir yada extra komutlarım ile sana yardım edebilirim. Çok çeşitli özelliklerim bulunuyor, Beni denemek istemezmisin? Aşağıdaki butonlarla beni yönetebilirsin.**\n\n"
         "🔔 **Unutma, hala gelişme aşamasındayım. beta sürümündeyim duyuruları sizlerle paylaşcağım aşklarım...**",
         buttons=[
@@ -193,8 +193,8 @@ async def handler(event):
 
         await client.send_message(
             event.chat_id,
-            f"🌸**Merhaba tatlım {firstname}, beni {chat.title} grubuna eklediğin için teşekkür ederim 🥰**\n\n"
-            "⭐ Aşkım beni aşağıdaki buttonlar'dan yönetebilirsin:",
+            f"🌸 **Merhaba tatlım {firstname}, beni {chat.title} grubuna eklediğin için teşekkür ederim 🥰**\n\n"
+            "⭐ **Aşkım beni aşağıdaki buttonlar'dan yönetebilirsin:**",
             buttons=[
                 [
                     Button.url("💬 Destek", f"https://t.me/{ownerUser}"),
@@ -208,7 +208,7 @@ async def handler(event):
 @client.on(events.CallbackQuery(data="cevirme"))
 async def cevirme(event):
     await event.edit(
-        "🌿 Hangi komut menüsüne erişmek istiyorsun?",
+        "🌺 Hangi komut menüsüne erişmek istiyorsun bebeğim?",
         buttons=[
             [Button.inline("🏷️ Tagger Komutları", data="tag"), Button.inline("ℹ️ Diğer Komutlar", data="diger")],
             [Button.inline("🕹️ Eğlence Komutları", data="eglence")],
@@ -275,7 +275,7 @@ async def starta(event):
     first_name = user.first_name
 
     await event.edit(
-        f"**Selam tatlım {first_name}, ben Funda 🌸**\n\n"
+        f"**Selam tatlım {first_name}, ben {bot_name} 🌸**\n\n"
         "💕 **Gruptaki Kullanıcılara Etiket atabilir, grup içi oyun açabilir yada extra komutlarım ile sana yardım edebilirim. Çok çeşitli özelliklerim bulunuyor, Beni denemek istemezmisin? Aşağıdaki butonlarla beni yönetebilirsin.**\n\n"
         "🔔 **Unutma, hala gelişme aşamasındayım. beta sürümündeyim duyuruları sizlerle paylaşcağım aşklarım...**",
         buttons=[
