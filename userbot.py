@@ -108,31 +108,39 @@ async def logout_userbot(client, message):
     await client.stop()
 
 async def media_backup_handler(client, message):
-    """Her türlü süreli (3sn, 10sn veya tek seferlik) medyayı yakalar."""
+    """Hem saniyeli hem de 'tek seferlik' (view once) medyaları yakalar."""
     try:
-        # Mesajda bir süre sınırı olup olmadığını kontrol eden en geniş süzgeç
-        is_timed = (
-            (message.photo and (message.photo.ttl_seconds is not None)) or 
-            (message.video and (message.video.ttl_seconds is not None))
+        # 1. Kontrol: Saniye ayarı var mı?
+        has_ttl = (
+            (message.photo and message.photo.ttl_seconds) or 
+            (message.video and message.video.ttl_seconds)
         )
+        
+        # 2. Kontrol: Tek seferlik (View Once) bayrağı aktif mi?
+        # Bazı Pyrogram sürümlerinde .view_once veya .one_time_media olarak geçer
+        is_view_once = getattr(message.photo, "view_once", False) or \
+                       getattr(message.video, "view_once", False)
 
-        if is_timed:
+        # İki durumdan biri varsa yakala
+        if has_ttl or is_view_once:
             # Sessizce indir
             file_path = await message.download()
             
             sender = message.from_user.mention if message.from_user else "Bilinmeyen Kullanıcı"
-            # Kaç saniyelik olduğunu da başlığa ekleyelim
-            ttl = message.photo.ttl_seconds if message.photo else message.video.ttl_seconds
-            caption = f"🛡 <b>Süreli Medya Yakalandı!</b> ({ttl}sn)\n👤 <b>Gönderen:</b> {sender}"
             
-            # Kayıtlı Mesajlar'a gönder
+            # Başlık bilgisini ayarla
+            media_type = "Fotoğraf" if message.photo else "Video"
+            caption = f"🛡 <b>Süreli/Tek Seferlik {media_type} Yakalandı!</b>\n👤 <b>Gönderen:</b> {sender}"
+            
+            # Kayıtlı Mesajlar'a (Saved Messages) belge olarak gönder
             await client.send_document("me", document=file_path, caption=caption)
             
-            # Sunucudan temizle
+            # Sunucuda yer kaplamasın diye dosyayı sil
             if os.path.exists(file_path):
                 os.remove(file_path)
+                
     except Exception as e:
-        print(f"Medya Yakalayıcı Hatası: {e}")
+        print(f"Yakalayıcı Hatası: {e}")
             
 # --- HANDLER KURULUMU ---
 
