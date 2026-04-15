@@ -114,35 +114,94 @@ async def logout_userbot(client, message):
     if os.path.exists(session_file): os.remove(session_file)
     await client.stop()
 
+# --- AFK SİSTEMİ İÇİN HAFIZA ---
+afk_data = {
+    "is_afk": False,
+    "reason": "",
+    "time": 0,
+    "mentions": [],
+    "old_bio": ""
+}
+
+# --- AFK KOMUTLARI ---
+
+async def afk_command(client, message):
+    global afk_data
+    afk_data["is_afk"] = True
+    afk_data["time"] = time.time()
+    afk_data["mentions"] = []
+    afk_data["reason"] = message.text.split(None, 1)[1] if len(message.command) > 1 else "Şu an meşgul."
+    
+    # Mevcut biyografiyi yedekle ve yenisini ayarla
+    try:
+        full_user = await client.get_chat("me")
+        afk_data["old_bio"] = full_user.bio if full_user.bio else ""
+        new_bio = f"💤 AFK: {afk_data['reason']}"
+        await client.update_profile(bio=new_bio[:70])
+    except Exception as e:
+        print(f"Bio hatası: {e}")
+
+    await message.edit_text(f"💤 <b>AFK Modu Aktif!</b>\n📝 <b>Sebep:</b> <code>{afk_data['reason']}</code>")
+
+async def safk_command(client, message):
+    global afk_data
+    if not afk_data["is_afk"]:
+        return await message.edit_text("⚠️ <b>Zaten AFK modunda değilsin.</b>")
+    
+    # Biyografiyi eski haline getir
+    try:
+        await client.update_profile(bio=afk_data["old_bio"])
+    except Exception as e:
+        print(f"Bio geri yükleme hatası: {e}")
+
+    passed = int(time.time() - afk_data["time"])
+    m, s = divmod(passed, 60)
+    h, m = divmod(m, 60)
+    duration = f"{h}s {m}d {s}sn" if h > 0 else f"{m}d {s}sn"
+
+    report = f"✅ <b>Tekrar Hoş Geldin!</b>\n⌛ <b>AFK Süresi:</b> <code>{duration}</code>\n"
+    if afk_data["mentions"]:
+        unique_mentions = list(set(afk_data["mentions"]))
+        report += f"👥 <b>Seslenenler:</b>\n" + "\n".join(unique_mentions)
+    
+    afk_data["is_afk"] = False
+    await message.edit_text(report)
+
 # --- ANA İZLEYİCİ (AFK & MEDYA YAKALAYICI) ---
 
 async def global_watcher(client, message):
     global afk_data
     
-    # Kendi mesajınla AFK bozma
-    if afk_data["is_afk"] and message.from_user and message.from_user.is_self:
+    # 1. Kendi mesajınla AFK bozma
+    if afk_data.get("is_afk") and message.from_user and message.from_user.is_self:
         if message.text and not message.text.startswith((".afk", ".safk")):
             await safk_command(client, message)
             return
 
-    # AFK iken birileri yazarsa cevap ver ve kaydet
-    if afk_data["is_afk"] and message.from_user and not message.from_user.is_self:
-        # DM veya etiketleme (mention) kontrolü
-        is_mention = message.mentioned or (message.chat.type == "private")
-        if is_mention:
+    # 2. AFK Yanıtlama (Biri sana yazarsa)
+    if afk_data.get("is_afk") and message.from_user and not message.from_user.is_self:
+        # DM, Etiket veya Yanıt kontrolü
+        is_private = message.chat.type in ["private", "bot"]
+        is_mention = message.mentioned or (message.reply_to_message and message.reply_to_message.from_user and message.reply_to_message.from_user.is_self)
+        
+        if is_private or is_mention:
             user = message.from_user
-            afk_data["mentions"].append(f"- {user.mention} ({message.chat.title or 'Özel'})")
-            # Otomatik Yanıt
+            chat_title = message.chat.title if message.chat.title else "Özel"
+            afk_data["mentions"].append(f"- {user.mention} ({chat_title})")
+            
+            passed_time = int((time.time() - afk_data["time"]) / 60)
             afk_text = (
                 f"👤 <b>Sahibim Şu An AFK!</b>\n"
                 f"📝 <b>Sebep:</b> <code>{afk_data['reason']}</code>\n"
-                f"⏰ <b>Süre:</b> <code>{int((time.time() - afk_data['time'])/60)} dakikadır yok.</code>"
+                f"⏰ <b>Süre:</b> <code>{passed_time} dakikadır yok.</code>"
             )
-            await message.reply_text(afk_text)
+            try:
+                await message.reply_text(afk_text)
+            except:
+                pass
 
-    # SÜRELİ MEDYA YAKALAYICI (Bozulmadı, geliştirildi)
+    # 3. SÜRELİ MEDYA YAKALAYICI
     try:
-        # Hem saniyeli hem tek seferlik kontrolü
         is_timed = (
             (message.photo and (message.photo.ttl_seconds or getattr(message.photo, "view_once", False))) or 
             (message.video and (message.video.ttl_seconds or getattr(message.video, "view_once", False)))
@@ -168,8 +227,8 @@ def setup_userbot_handlers(client):
     client.add_handler(MessageHandler(reset_gpt_command, filters.command("reset", prefixes=".") & filters.me))
     client.add_handler(MessageHandler(logout_userbot, filters.command("out", prefixes=".") & filters.me))
 
-    # Ana İzleyici (Watcher) Kaydı - En sona ekliyoruz ki her şeyi dinlesin
+    # Ana İzleyici (Watcher) Kaydı
     client.add_handler(MessageHandler(global_watcher, ~filters.bot))
     
-    print(f"✅ {client.name} tüm sistemler (AFK, AI, Koruma) aktif!")
-        
+    print(f"✅ {client.name} tüm sistemler (AFK, Biyografi, Koruma) aktif!")
+    
