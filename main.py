@@ -1,4 +1,5 @@
 # main.py
+import logging
 from pyrogram import Client, filters
 from pyrogram.errors import (
     SessionPasswordNeeded, PhoneCodeInvalid, PasswordHashInvalid, 
@@ -9,7 +10,10 @@ from config import API_ID, API_HASH, BOT_TOKEN, BOT_NAME
 from shared import user_data, user_clients
 from userbot import setup_userbot_handlers
 
-# Ana giriş botunu başlatıyoruz
+# Hataları terminalde görmek için loglama
+logging.basicConfig(level=logging.ERROR)
+
+# Ana giriş botunu (Bot API) başlatıyoruz
 bot = Client("login_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 
 @bot.on_message(filters.command("start") & filters.private)
@@ -41,11 +45,11 @@ async def callback_handler(client, callback_query):
         cmd_text = (
             f"<b>📜 {BOT_NAME} Komutları</b>\n"
             "──────────────────────\n"
-            "• <code>.gpt (soru)</code> - Yapay zeka yanıtlar.\n"
-            "• <code>.reset</code> - GPT geçmişini siler.\n"
-            "• <code>.log</code> - Sistem loglarını gösterir.\n"
             "• <code>.alive</code> - Bot aktiflik testi.\n"
-            "• <code>.out</code> - Oturumu sonlandırır.\n"
+            "• <code>.gpt (soru)</code> - AI asistan.\n"
+            "• <code>.reset</code> - AI hafızasını siler.\n"
+            "• <code>.log</code> - Çalışma süresi.\n"
+            "• <code>.out</code> - Oturumu kapatır.\n"
             "──────────────────────"
         )
         await callback_query.edit_message_text(cmd_text, reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Geri Dön", callback_data="back_to_main")]]))
@@ -66,28 +70,29 @@ async def callback_handler(client, callback_query):
     elif data == "start_login":
         user_data[chat_id]["step"] = "phone"
         await callback_query.edit_message_text(
-            "<b>📱 Numara Girişi</b>\n──────────────────────\n<code>Lütfen Telegram numaranızı yazın (Örn: +90...):</code>", 
+            "<b>📱 Numara Girişi</b>\n──────────────────────\n<code>Lütfen numaranızı yazın (+90...):</code>", 
             reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 İptal", callback_data="back_to_main")]])
         )
 
     elif data == "confirm_phone":
         phone = user_data[chat_id].get("phone")
         session_name = f"session_{chat_id}"
-        await client.edit_message_text(chat_id, main_msg_id, "<code>⏳ Sistem sunucuya bağlanıyor...</code>")
+        await client.edit_message_text(chat_id, main_msg_id, "<code>⏳ Sunucuya bağlanılıyor...</code>")
         
-        if session_name not in user_clients:
-            user_clients[session_name] = Client(session_name, api_id=API_ID, api_hash=API_HASH)
+        # Temiz başlangıç için eski objeyi siliyoruz
+        if session_name in user_clients:
+            del user_clients[session_name]
+            
+        user_clients[session_name] = Client(session_name, api_id=API_ID, api_hash=API_HASH)
 
         try:
-            if not user_clients[session_name].is_connected: 
-                await user_clients[session_name].connect()
-            
+            await user_clients[session_name].connect()
             code_info = await user_clients[session_name].send_code(phone)
             user_data[chat_id].update({"hash": code_info.phone_code_hash, "step": "code"})
             
             await client.edit_message_text(
                 chat_id, main_msg_id, 
-                f"<b>📩 Doğrulama Kodu</b>\n──────────────────────\n<code>{phone} adresine gönderilen kodu girin:</code>", 
+                f"<b>📩 Kod Gönderildi</b>\n──────────────────────\n<code>{phone} adresine gelen kodu yazın:</code>", 
                 reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 İptal", callback_data="back_to_main")]])
             )
         except Exception as e:
@@ -103,29 +108,29 @@ async def login_logic(client, message):
     main_msg_id = user_data[chat_id].get("main_msg_id")
     session_name = f"session_{chat_id}"
     
-    try: await message.delete()
+    try: await message.delete() # Terminal kirlenmesin diye numarayı/kodu siliyoruz
     except: pass
 
     if step == "phone":
         user_data[chat_id]["phone"] = message.text
         await client.edit_message_text(
             chat_id, main_msg_id, 
-            f"<b>🤔 Numara Onayı</b>\n──────────────────────\n<code>Girdiğiniz numara: {message.text}</code>\nDoğru mu?", 
+            f"<b>🤔 Numara Onayı</b>\n──────────────────────\n<code>{message.text}</code>\nDoğru mu?", 
             reply_markup=InlineKeyboardMarkup([
-                [InlineKeyboardButton("✅ Evet, Doğru", callback_data="confirm_phone")],
-                [InlineKeyboardButton("❌ Hayır, Değiştir", callback_data="start_login")]
+                [InlineKeyboardButton("✅ Evet", callback_data="confirm_phone")],
+                [InlineKeyboardButton("❌ Hayır", callback_data="start_login")]
             ])
         )
 
     elif step == "code":
         clean_code = message.text.replace(" ", "")
-        await client.edit_message_text(chat_id, main_msg_id, "<code>⏳ Kod doğrulanıyor...</code>")
+        await client.edit_message_text(chat_id, main_msg_id, "<code>⏳ Doğrulanıyor...</code>")
         try:
             await user_clients[session_name].sign_in(user_data[chat_id]["phone"], user_data[chat_id]["hash"], clean_code)
             await finalize_login(client, chat_id, main_msg_id, session_name)
         except SessionPasswordNeeded:
             user_data[chat_id]["step"] = "password"
-            await client.edit_message_text(chat_id, main_msg_id, "<b>🔐 2FA Şifresi</b>\n──────────────────────\n<code>Lütfen bulut şifrenizi girin:</code>")
+            await client.edit_message_text(chat_id, main_msg_id, "<b>🔐 2FA Gerekli</b>\n──────────────────────\n<code>Bulut şifrenizi girin:</code>")
         except Exception as e:
             await client.edit_message_text(chat_id, main_msg_id, f"<code>❌ Hata: {str(e)}</code>")
 
@@ -134,31 +139,31 @@ async def login_logic(client, message):
             await user_clients[session_name].check_password(message.text)
             await finalize_login(client, chat_id, main_msg_id, session_name)
         except Exception as e:
-            await client.edit_message_text(chat_id, main_msg_id, f"<code>❌ Şifre Hatalı: {str(e)}</code>")
+            await client.edit_message_text(chat_id, main_msg_id, f"<code>❌ Şifre Yanlış: {str(e)}</code>")
 
 async def finalize_login(client, chat_id, main_msg_id, session_name):
+    """Oturumu başarıyla tamamlar ve komutları aktif eder."""
     user_data[chat_id]["step"] = None
     
-    # 1. Adım: Sadece numarayı onaylamak için açtığımız bağlantıyı nazikçe kapat (stop DEĞİL)
+    # Kritik: Bağlantıyı kesip tertemiz bir Client objesiyle komutları yüklüyoruz
     if user_clients[session_name].is_connected:
         await user_clients[session_name].disconnect()
-
-    # 2. Adım: Motorun kilitlenmemesi (Terminated hatası) için bot objesini tertemiz yeniden kuruyoruz
+    
     user_clients[session_name] = Client(session_name, api_id=API_ID, api_hash=API_HASH)
-
-    # 3. Adım: Komutları bu temiz bota yüklüyoruz
+    
+    # Komutları userbot.py'den çekip yüklüyoruz
     setup_userbot_handlers(user_clients[session_name])
-
-    # 4. Adım: Botu tam teşekküllü (mesaj dinleyecek şekilde) başlatıyoruz
+    
+    # Artık Userbot tamamen hazır
     await user_clients[session_name].start()
     
-    print(f"🚀 UserBot {session_name} aktif edildi!")
     await client.edit_message_text(
         chat_id, main_msg_id, 
-        "<b>🎉 Başarılı!</b>\n\n<code>UserBot aktif edildi. Şimdi herhangi bir sohbete .alive yazarak test edebilirsiniz.</code>"
+        f"<b>🎉 Tebrikler!</b>\n\n<code>UserBot başarıyla kuruldu. Artık komutları (.alive, .gpt) kullanabilirsiniz.</code>"
     )
+    # Kendine bildirim gönder
+    await user_clients[session_name].send_message("me", f"✅ <b>{BOT_NAME} Kurulumu Tamamlandı!</b>\nKomutları test etmek için <code>.alive</code> yazabilirsin.")
 
 if __name__ == "__main__":
     print(f"--- {BOT_NAME} ÇALIŞIYOR ---")
     bot.run()
-    
