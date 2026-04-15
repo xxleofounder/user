@@ -1,6 +1,24 @@
 # main.py
 import os
 import logging
+import os
+import glob
+
+# Bot klasöründeki bütün .session-journal dosyalarını bul ve sil
+def clear_session_locks():
+    locks = glob.glob("*.session-journal")
+    for lock in locks:
+        try:
+            os.remove(lock)
+            print(f"✅ Kilit açıldı: {lock}")
+        except Exception as e:
+            print(f"⚠️ {lock} silinemedi: {e}")
+
+# Botları başlatmadan hemen önce çağır
+clear_session_locks()
+
+
+
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.errors import (
