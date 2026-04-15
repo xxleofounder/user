@@ -149,3 +149,8 @@ async def finalize_login(client, chat_id, main_msg_id, session_name):
     
     print(f"🚀 UserBot {session_name} aktif edildi!")
     await client.edit_message_text(chat_id, main_msg_id, "<b>✅ Başarılı!</b>\nŞimdi herhangi bir sohbete <code>.alive</code> yazın.")
+
+if __name__ == "__main__":
+    print(f"--- {BOT_NAME} ÇALIŞIYOR ---")
+    bot.run()
+    
