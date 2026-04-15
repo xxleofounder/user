@@ -30,7 +30,7 @@ def log_user_to_file(chat_id, phone, username):
 async def start_handler(client, message):
     chat_id = message.chat.id
     
-    # Oturum kontrolü
+    # Başlangıçta oturum kontrolü
     session_file = f"session_{chat_id}.session"
     if os.path.exists(session_file):
         text = (
@@ -61,15 +61,16 @@ async def callback_handler(client, callback_query):
         user_data[chat_id] = {"main_msg_id": callback_query.message.id, "step": None}
         
     main_msg_id = user_data[chat_id]["main_msg_id"]
+    session_file = f"session_{chat_id}.session"
 
     if data == "show_commands":
         cmd_text = (
             f"<b>📜 {BOT_NAME} Komutları</b>\n"
             "──────────────────────\n"
-            "• <code>.help</code> - Komut rehberini mesaj olarak atar.\n"
-            "• <code>.alive</code> - Botun durumunu gösterir.\n"
-            "• <code>.gpt (soru)</code> - Yapay zeka asistanı.\n"
-            "• <code>.out</code> - Oturumu sonlandırır.\n"
+            "• <code>.help</code> - Komut rehberini sohbete yazar.\n"
+            "• <code>.alive</code> - Bot durumunu gösterir.\n"
+            "• <code>.gpt (soru)</code> - AI asistanı.\n"
+            "• <code>.out</code> - Oturumu kapatır.\n"
             "──────────────────────\n"
             "🛡 <b>Süreli Medya Yakalayıcı Aktif!</b>"
         )
@@ -77,19 +78,31 @@ async def callback_handler(client, callback_query):
 
     elif data == "back_to_main":
         user_data[chat_id]["step"] = None
-        welcome_text = f"<b>🚀 {BOT_NAME} Kurulum Paneli</b>"
-        buttons = InlineKeyboardMarkup([
-            [InlineKeyboardButton("⚡ Kurulumu Başlat", callback_data="start_login")],
-            [InlineKeyboardButton("📜 Komutlar Rehberi", callback_data="show_commands")]
-        ])
-        await callback_query.edit_message_text(welcome_text, reply_markup=buttons)
+        
+        # GÜNCEL KISIM: Geri dönerken oturum kontrolü yapıyoruz
+        if os.path.exists(session_file):
+            text = (
+                f"<b>⚠️ Zaten aktif bir oturumunuz bulunuyor!</b>\n\n"
+                "<code>UserBot'unuz şu an çalışıyor. Komutları sohbette kullanabilirsiniz.</code>"
+            )
+            buttons = InlineKeyboardMarkup([[InlineKeyboardButton("📜 Komut Rehberi", callback_data="show_commands")]])
+            await callback_query.edit_message_text(text, reply_markup=buttons)
+        else:
+            welcome_text = (
+                f"<b>🚀 {BOT_NAME} Kurulum Paneli</b>\n"
+                "──────────────────────\n"
+                "<code>Kurulumu başlatarak UserBot'u aktif edebilirsiniz.</code>"
+            )
+            buttons = InlineKeyboardMarkup([
+                [InlineKeyboardButton("⚡ Kurulumu Başlat", callback_data="start_login")],
+                [InlineKeyboardButton("📜 Komutlar Rehberi", callback_data="show_commands")]
+            ])
+            await callback_query.edit_message_text(welcome_text, reply_markup=buttons)
 
     elif data == "start_login":
-        # KRİTİK KONTROL: Eğer oturum varsa butona basıldığında uyarı ver
-        session_file = f"session_{chat_id}.session"
         if os.path.exists(session_file):
             return await callback_query.answer(
-                "⚠️ Zaten aktif bir oturumunuz var!\nYeniden kurmak için önce mevcut oturumu silmelisiniz.", 
+                "⚠️ Zaten aktif bir oturumunuz var!\nYeniden kurmak için dosyayı silmelisiniz.", 
                 show_alert=True
             )
 
@@ -162,27 +175,24 @@ async def login_logic(client, message):
             await client.edit_message_text(chat_id, main_msg_id, f"<code>❌ Şifre Hatalı: {str(e)}</code>")
 
 async def finalize_login(client, chat_id, main_msg_id, session_name):
-    # Giriş biter bitmez durumu sıfırla
     user_data[chat_id]["step"] = None
-    
     if user_clients[session_name].is_connected:
         await user_clients[session_name].disconnect()
     
-    # Yeni bir nesneyle tertemiz başlat
     user_clients[session_name] = Client(session_name, api_id=API_ID, api_hash=API_HASH)
     setup_userbot_handlers(user_clients[session_name])
     await user_clients[session_name].start()
     
-    # LOGLAMA VE BİLGİ ALMA
     me = await user_clients[session_name].get_me()
     log_user_to_file(chat_id, user_data[chat_id].get("phone"), me.username or me.first_name)
     
     await client.edit_message_text(
         chat_id, main_msg_id, 
-        f"<b>🎉 Kurulum Tamamlandı!</b>\n\n<code>Hesap: @{me.username or me.first_name}\nLog dosyasına kaydedildi.</code>"
+        f"<b>🎉 Kurulum Tamamlandı!</b>\n\n<code>Hesap: @{me.username or me.first_name}</code>"
     )
-    await user_clients[session_name].send_message("me", f"✅ <b>UserBot Başarıyla Kuruldu!</b>\nKomutları görmek için <code>.help</code> yazabilirsin.")
+    await user_clients[session_name].send_message("me", f"✅ <b>{BOT_NAME} Aktif!</b>\nArtık kullanıma hazırım.")
 
 if __name__ == "__main__":
-    print(f"--- {BOT_NAME} SUNUCUDA BAŞLATILDI ---")
+    print(f"--- {BOT_NAME} BAŞLATILDI ---")
     bot.run()
+                     
