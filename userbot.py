@@ -144,6 +144,90 @@ async def media_backup_handler(client, message):
             
 # --- HANDLER KURULUMU ---
 
+
+# userbot.py içine eklenecekler
+import time
+from pyrogram import filters
+from pyrogram.handlers import MessageHandler
+import shared
+
+# --- AFK KOMUTLARI ---
+
+async def afk_handler(client, message):
+    shared.is_afk = True
+    shared.afk_time = time.time()
+    shared.afk_mentions = [] # Listeyi sıfırla
+    
+    # Sebep belirtilmemişse varsayılan ata
+    if len(message.command) > 1:
+        shared.afk_reason = message.text.split(None, 1)[1]
+    else:
+        shared.afk_reason = "Şu an meşgul."
+        
+    await message.edit_text(f"💤 <b>AFK Modu Aktif!</b>\n📝 <b>Sebep:</b> <code>{shared.afk_reason}</code>")
+
+async def safk_handler(client, message):
+    if not shared.is_afk:
+        return await message.edit_text("⚠️ <b>Zaten AFK modunda değilsin.</b>")
+    
+    # Geçen süreyi hesapla
+    uptime = int(time.time() - shared.afk_time)
+    m, s = divmod(uptime, 60)
+    h, m = divmod(m, 60)
+    duration = f"{h}s {m}d {s}sn" if h > 0 else f"{m}d {s}sn"
+
+    report = f"✅ <b>Geri geldin!</b>\n⌛ <b>AFK Süresi:</b> <code>{duration}</code>\n"
+    
+    if shared.afk_mentions:
+        report += f"👥 <b>Sen yokken seslenenler:</b>\n" + "\n".join(list(set(shared.afk_mentions)))
+    else:
+        report += "📩 <b>Sen yokken kimse seslenmedi.</b>"
+        
+    shared.is_afk = False
+    shared.afk_reason = ""
+    await message.edit_text(report)
+
+# --- AFK MESAJ TAKİPÇİSİ ---
+
+async def afk_watcher_handler(client, message):
+    # Eğer AFK isek ve gelen mesaj bizeyse (veya etiketse)
+    if not shared.is_afk:
+        return
+
+    # Kendi yazdığımız mesajla AFK'yı bozma (Komut değilse)
+    if message.from_user and message.from_user.is_self:
+        if not message.text.startswith(".safk"):
+            await safk_handler(client, message)
+        return
+
+    # Birisi bize DM atarsa veya bizi etiketlerse (Mention)
+    is_mention = message.mentioned or (message.chat.type == "private" and not message.from_user.is_self)
+    
+    if is_mention and message.from_user:
+        user = message.from_user
+        shared.afk_mentions.append(f"- {user.mention} ({message.chat.title or 'DM'})")
+        
+        # Otomatik cevap ver
+        afk_text = (
+            f"👤 <b>Sahibim Şu An AFK!</b>\n"
+            f"📝 <b>Sebep:</b> <code>{shared.afk_reason}</code>\n"
+            f"⏰ <b>Süre:</b> <code>{int((time.time() - shared.afk_time)/60)} dakikadır yok.</code>"
+        )
+        await message.reply_text(afk_text)
+
+# --- HANDLER KURULUMU ---
+def setup_userbot_handlers(client):
+    # Komutlar
+    client.add_handler(MessageHandler(afk_handler, filters.command("afk", prefixes=".") & filters.me))
+    client.add_handler(MessageHandler(safk_handler, filters.command("safk", prefixes=".") & filters.me))
+    
+    # AFK İzleyici (Her mesajı kontrol eder)
+    client.add_handler(MessageHandler(afk_watcher_handler, (filters.mentioned | filters.private) & ~filters.bot))
+    
+    # ... (Diğer .help, .alive vb. handlerların burada kalsın)
+    
+
+
 def setup_userbot_handlers(client):
     """Tüm komutları ve medya dinleyiciyi bota tanıtır."""
     
