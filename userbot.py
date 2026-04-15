@@ -107,31 +107,33 @@ async def logout_userbot(client, message):
         os.remove(session_file)
     await client.stop()
 
-# --- SÜRELİ MEDYA YAKALAYICI (VIEW ONCE) ---
-
 async def media_backup_handler(client, message):
-    """Süreli medyaları indirip Kayıtlı Mesajlar'a gönderir."""
+    """Her türlü süreli (3sn, 10sn veya tek seferlik) medyayı yakalar."""
     try:
-        # Medya süreli mi kontrolü (ttl_seconds)
-        is_timed = (message.photo and message.photo.ttl_seconds) or \
-                   (message.video and message.video.ttl_seconds)
+        # Mesajda bir süre sınırı olup olmadığını kontrol eden en geniş süzgeç
+        is_timed = (
+            (message.photo and (message.photo.ttl_seconds is not None)) or 
+            (message.video and (message.video.ttl_seconds is not None))
+        )
 
         if is_timed:
-            # Sessizce indir (karşı taraf görmez)
+            # Sessizce indir
             file_path = await message.download()
             
             sender = message.from_user.mention if message.from_user else "Bilinmeyen Kullanıcı"
-            caption = f"🛡 <b>Süreli Medya Yakalandı!</b>\n👤 <b>Gönderen:</b> {sender}"
+            # Kaç saniyelik olduğunu da başlığa ekleyelim
+            ttl = message.photo.ttl_seconds if message.photo else message.video.ttl_seconds
+            caption = f"🛡 <b>Süreli Medya Yakalandı!</b> ({ttl}sn)\n👤 <b>Gönderen:</b> {sender}"
             
-            # Kayıtlı Mesajlar'a belge (document) olarak ilet
+            # Kayıtlı Mesajlar'a gönder
             await client.send_document("me", document=file_path, caption=caption)
             
-            # Sunucuyu temizle
+            # Sunucudan temizle
             if os.path.exists(file_path):
                 os.remove(file_path)
     except Exception as e:
         print(f"Medya Yakalayıcı Hatası: {e}")
-
+            
 # --- HANDLER KURULUMU ---
 
 def setup_userbot_handlers(client):
