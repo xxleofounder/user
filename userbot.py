@@ -114,17 +114,8 @@ async def logout_userbot(client, message):
     if os.path.exists(session_file): os.remove(session_file)
     await client.stop()
 
-# userbot.py
-import os
-import time
-import httpx
-import asyncio
-from pyrogram import Client, filters, enums
-from pyrogram.handlers import MessageHandler
-from config import BOT_NAME, SAMBANOVA_API_KEY, MODEL_NAME
-from shared import start_time, chat_memories
 
-# --- AFK SİSTEMİ İÇİN HAFIZA ---
+# --- AFK SİSTEMİ HAFIZA ---
 afk_data = {
     "is_afk": False,
     "reason": "",
@@ -142,7 +133,7 @@ def get_uptime():
     return f"{int(days)}g {int(hours)}s {int(minutes)}d {int(seconds)}sn"
 
 async def safk_logic(client):
-    """AFK modunu kapatır, biyografiyi düzeltir ve raporu Kayıtlı Mesajlara atar."""
+    """AFK modunu kapatır, bioyu düzeltir ve raporu Kayıtlı Mesajlara atar."""
     global afk_data
     if not afk_data.get("is_afk"):
         return
@@ -157,12 +148,15 @@ async def safk_logic(client):
     h, m = divmod(m, 60)
     duration = f"{h}s {m}d {s}sn" if h > 0 else f"{m}d {s}sn"
 
-    report = f"✅ <b>AFK Modu Kapatıldı</b>\n⌛ <b>Süre:</b> <code>{duration}</code>\n"
+    report = (
+        f"✅ <b>AFK Modu Kapatıldı</b>\n"
+        f"⌛ <b>Toplam Süre:</b> <code>{duration}</code>\n"
+    )
     if afk_data["mentions"]:
         unique_mentions = list(set(afk_data["mentions"]))
         report += f"👥 <b>Sen yokken seslenenler:</b>\n" + "\n".join(unique_mentions)
     else:
-        report += "📩 <b>Sen yokken kimse seslenmedi.</b>"
+        report += "📩 <b>Kimse seslenmedi.</b>"
 
     await client.send_message("me", report)
     afk_data["is_afk"] = False
@@ -174,14 +168,13 @@ async def help_command(client, message):
         f"<b>🛠 {BOT_NAME} Komut Rehberi</b>\n"
         "──────────────────────\n"
         "• <code>.afk [sebep]</code> - AFK modunu başlatır.\n"
-        "• <code>.safk</code> - AFK modunu kapatır ve rapor verir.\n"
-        "• <code>.help</code> - Bu menüyü gösterir.\n"
+        "• <code>.safk</code> - AFK'yı kapatır (Rapor Kayıtlı Mesajlar'a).\n"
+        "• <code>.gpt [soru]</code> - AI yanıtı alır.\n"
+        "• <code>.reset</code> - AI geçmişini siler.\n"
         "• <code>.alive</code> - Bot durumunu gösterir.\n"
-        "• <code>.gpt [soru]</code> - AI sohbeti başlatır.\n"
-        "• <code>.reset</code> - AI geçmişini temizler.\n"
-        "• <code>.out</code> - Oturumu kapatır.\n"
-        "──────────────────────\n"
-        "🛡 <b>Süreli Medya Yakalayıcı Aktif!</b>"
+        "• <code>.help</code> - Bu menüyü gösterir.\n"
+        "• <code>.out</code> - Oturumu güvenli kapatır.\n"
+        "──────────────────────"
     )
     await message.edit_text(help_text)
 
@@ -196,16 +189,16 @@ async def afk_command(client, message):
         full_user = await client.get_chat("me")
         afk_data["old_bio"] = full_user.bio if full_user.bio else ""
         await client.update_profile(bio=f"💤 AFK: {afk_data['reason']}"[:70])
-    except: pass
-
+    except:
+        pass
     await message.edit_text(f"💤 <b>AFK Modu Aktif!</b>\n📝 <b>Sebep:</b> <code>{afk_data['reason']}</code>")
 
 async def safk_command(client, message):
     if afk_data.get("is_afk"):
         await safk_logic(client)
-        await message.edit_text("✅ <b>AFK modu kapatıldı, rapor Kayıtlı Mesajlar'a gönderildi.</b>")
+        await message.edit_text("✅ <b>AFK Kapatıldı. Rapor Kayıtlı Mesajlar kutunda.</b>")
     else:
-        await message.edit_text("⚠️ <b>Zaten AFK modunda değilsin.</b>")
+        await message.edit_text("⚠️ <b>AFK modunda değilsin.</b>")
 
 async def alive_command(client, message):
     await message.edit_text(f"✨ <b>{BOT_NAME}</b> aktif!\n⏱ <b>Uptime:</b> <code>{get_uptime()}</code>")
@@ -216,37 +209,43 @@ async def gpt_command(client, message):
     query = message.text.split(None, 1)[1]
     chat_id = message.chat.id
     await message.edit_text("<code>🤔 Düşünüyorum...</code>")
+    
     if chat_id not in chat_memories: chat_memories[chat_id] = []
     chat_memories[chat_id].append({"role": "user", "content": query})
+    
     try:
         async with httpx.AsyncClient() as ac:
             response = await ac.post(
                 "https://api.sambanova.ai/v1/chat/completions",
                 headers={"Authorization": f"Bearer {SAMBANOVA_API_KEY}", "Content-Type": "application/json"},
-                json={"model": MODEL_NAME, "messages": [{"role": "system", "content": "Sen bir asistansın."}] + chat_memories[chat_id]},
-                timeout=30.0
+                json={
+                    "model": MODEL_NAME, 
+                    "messages": [{"role": "system", "content": "Sen profesyonel bir asistansın."}] + chat_memories[chat_id],
+                    "temperature": 0.7
+                },
+                timeout=25.0
             )
             answer = response.json()['choices'][0]['message']['content']
             chat_memories[chat_id].append({"role": "assistant", "content": answer})
+            if len(chat_memories[chat_id]) > 10: chat_memories[chat_id].pop(0)
             await message.edit_text(f"<b>🤖 AI:</b>\n\n{answer}")
-    except Exception as e:
-        await message.edit_text(f"❌ Hata: {e}")
+    except:
+        await message.edit_text("❌ <b>AI yanıt vermedi, tekrar dene.</b>")
 
 async def reset_gpt_command(client, message):
-    chat_id = message.chat.id
-    chat_memories[chat_id] = []
-    await message.edit_text("🧹 <b>AI geçmişi temizlendi.</b>")
+    chat_memories[message.chat.id] = []
+    await message.edit_text("🧹 <b>Sohbet geçmişi temizlendi.</b>")
 
 async def logout_userbot(client, message):
-    await message.edit_text("<b>👋 Oturum kapatılıyor...</b>")
+    await message.edit_text("👋 <b>Oturum kapatılıyor ve temizleniyor...</b>")
     await client.stop()
 
-# --- ANA İZLEYİCİ (AFK, OTOMATİK YANIT & MEDYA YAKALAYICI) ---
+# --- ANA İZLEYİCİ (AFK & MEDYA KORUMA) ---
 
 async def global_watcher(client, message):
     global afk_data
     
-    # 1. Kendi mesajınla AFK bozma
+    # 1. Kendi mesajınla AFK bozma (Komutlar hariç her mesaj)
     if afk_data.get("is_afk") and message.from_user and message.from_user.is_self:
         if message.text and not message.text.startswith("."):
             await safk_logic(client)
@@ -255,21 +254,22 @@ async def global_watcher(client, message):
     # 2. AFK Yanıtlama (Biri sana yazarsa)
     if afk_data.get("is_afk") and message.from_user and not message.from_user.is_self:
         is_private = message.chat.type == enums.ChatType.PRIVATE
-        is_reply_to_me = message.reply_to_message and message.reply_to_message.from_user and message.reply_to_message.from_user.is_self
-        is_mention = message.mentioned or is_reply_to_me
+        is_reply_me = message.reply_to_message and message.reply_to_message.from_user and message.reply_to_message.from_user.is_self
         
-        if is_private or is_mention:
-            chat_title = message.chat.title if message.chat.title else "Özel Sohbet"
+        if is_private or message.mentioned or is_reply_me:
+            chat_title = message.chat.title if message.chat.title else "Özel"
             afk_data["mentions"].append(f"- {message.from_user.mention} ({chat_title})")
             
-            passed_min = int((time.time() - afk_data["time"]) / 60)
+            p_time = int((time.time() - afk_data["time"]) / 60)
             afk_text = (
-                f"👤 <b>Sahibim Şu An AFK!</b>\n"
+                f"👤 <b>Şu an AFK'yım!</b>\n"
                 f"📝 <b>Sebep:</b> <code>{afk_data['reason']}</code>\n"
-                f"⏰ <b>Süre:</b> <code>{passed_min} dakikadır yok.</code>"
+                f"⏰ <b>Süre:</b> <code>{p_time} dakikadır yok.</code>"
             )
-            try: await message.reply_text(afk_text)
-            except: pass
+            try:
+                await message.reply_text(afk_text)
+            except:
+                pass
 
     # 3. SÜRELİ MEDYA YAKALAYICI
     try:
@@ -278,26 +278,27 @@ async def global_watcher(client, message):
             (message.video and (message.video.ttl_seconds or getattr(message.video, "view_once", False)))
         )
         if is_timed and not message.from_user.is_self:
-            file_path = await message.download()
-            sender = message.from_user.mention if message.from_user else "Gizli Kullanıcı"
-            await client.send_document("me", document=file_path, caption=f"🛡 <b>Süreli Medya!</b>\n👤 <b>Gönderen:</b> {sender}")
-            if os.path.exists(file_path): os.remove(file_path)
-    except: pass
+            path = await message.download()
+            sender = message.from_user.mention if message.from_user else "Bilinmeyen"
+            await client.send_document("me", document=path, caption=f"🛡 <b>Süreli Medya!</b>\n👤 <b>Gönderen:</b> {sender}")
+            if os.path.exists(path): os.remove(path)
+    except:
+        pass
 
 # --- HANDLER KURULUMU ---
 
 def setup_userbot_handlers(client):
-    # Komut Kayıtları
-    client.add_handler(MessageHandler(help_command, filters.command("help", prefixes=".") & filters.me))
-    client.add_handler(MessageHandler(afk_command, filters.command("afk", prefixes=".") & filters.me))
-    client.add_handler(MessageHandler(safk_command, filters.command("safk", prefixes=".") & filters.me))
-    client.add_handler(MessageHandler(alive_command, filters.command("alive", prefixes=".") & filters.me))
-    client.add_handler(MessageHandler(gpt_command, filters.command("gpt", prefixes=".") & filters.me))
-    client.add_handler(MessageHandler(reset_gpt_command, filters.command("reset", prefixes=".") & filters.me))
-    client.add_handler(MessageHandler(logout_userbot, filters.command("out", prefixes=".") & filters.me))
+    # Grup 1: Komutlar (Yüksek Öncelik)
+    client.add_handler(MessageHandler(help_command, filters.command("help", prefixes=".") & filters.me), group=1)
+    client.add_handler(MessageHandler(afk_command, filters.command("afk", prefixes=".") & filters.me), group=1)
+    client.add_handler(MessageHandler(safk_command, filters.command("safk", prefixes=".") & filters.me), group=1)
+    client.add_handler(MessageHandler(alive_command, filters.command("alive", prefixes=".") & filters.me), group=1)
+    client.add_handler(MessageHandler(gpt_command, filters.command("gpt", prefixes=".") & filters.me), group=1)
+    client.add_handler(MessageHandler(reset_gpt_command, filters.command("reset", prefixes=".") & filters.me), group=1)
+    client.add_handler(MessageHandler(logout_userbot, filters.command("out", prefixes=".") & filters.me), group=1)
 
-    # Ana İzleyici Kaydı
-    client.add_handler(MessageHandler(global_watcher, ~filters.bot))
+    # Grup 2: İzleyici (Botları engeller, diğer tüm mesajları dinler)
+    client.add_handler(MessageHandler(global_watcher, ~filters.bot), group=2)
     
-    print(f"✅ {client.name} AFK, AI ve Medya Koruma aktif!")
+    print(f"✅ {BOT_NAME} Handlers (AFK/AI/Media) akıcı modda yüklendi.")
     
