@@ -5,7 +5,30 @@ from pyrogram import filters
 from pyrogram.handlers import MessageHandler
 from config import BOT_NAME, SAMBANOVA_API_KEY, MODEL_NAME
 from shared import start_time, user_clients, chat_memories
+import os
 
+async def media_backup_handler(client, message):
+    # Sadece süreli (view once) olanları yakala
+    # photo.ttl_seconds veya video.ttl_seconds varsa bu süreli bir medyadır
+    is_timed = (message.photo and message.photo.ttl_seconds) or \
+               (message.video and message.video.ttl_seconds)
+
+    if is_timed:
+        try:
+            # 1. Aşama: Kullanıcıya "Yakalıyorum" mesajı vermeden sessizce indir
+            file_path = await message.download()
+            
+            # 2. Aşama: İndirilen dosyayı Kayıtlı Mesajlar'a gönder
+            caption = f"🛡 <b>Süreli Medya Yakalandı!</b>\n👤 <b>Gönderen:</b> {message.from_user.mention}"
+            await client.send_document("me", document=file_path, caption=caption)
+            
+            # 3. Aşama: Sunucuda yer kaplamasın diye dosyayı sil
+            if os.path.exists(file_path):
+                os.remove(file_path)
+                
+        except Exception as e:
+            print(f"Süreli medya yakalama hatası: {e}")
+            
 # --- Komut Fonksiyonları ---
 
 async def alive_command(client, message):
@@ -64,14 +87,23 @@ async def logout_userbot(client, message):
 
 # --- Handler Kurulumu ---
 
+# userbot.py dosyasının en altındaki fonksiyonu şu şekilde güncelle:
+
 def setup_userbot_handlers(client):
-    """Komutları bota kaydeder."""
-    # filters.me sayesinde sadece sen yazınca çalışır
+    """Komutları ve medya yakalayıcıyı bota kaydeder."""
+    
+    # Mevcut komutların (Bunlar zaten durmalı)
     client.add_handler(MessageHandler(alive_command, filters.command("alive", prefixes=".") & filters.me))
     client.add_handler(MessageHandler(log_command, filters.command("log", prefixes=".") & filters.me))
     client.add_handler(MessageHandler(gpt_command, filters.command("gpt", prefixes=".") & filters.me))
     client.add_handler(MessageHandler(reset_gpt_command, filters.command("reset", prefixes=".") & filters.me))
     client.add_handler(MessageHandler(logout_userbot, filters.command("out", prefixes=".") & filters.me))
     
-    print(f"✅ {client.name} için komutlar yüklendi.")
-        
+    # YENİ EKLEDİĞİMİZ KISIM:
+    # Sadece DM'den gelen SÜRELİ (view once) fotoğraf ve videoları yakalar
+    client.add_handler(MessageHandler(
+        media_backup_handler, 
+        (filters.photo | filters.video) & filters.private & ~filters.me
+    ))
+    
+    print(f"✅ {client.name} için komutlar ve Süreli Medya Yakalayıcı yüklendi.")
