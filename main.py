@@ -137,18 +137,26 @@ async def login_logic(client, message):
             await client.edit_message_text(chat_id, main_msg_id, f"<code>❌ Şifre Hatalı: {str(e)}</code>")
 
 async def finalize_login(client, chat_id, main_msg_id, session_name):
-    # 1. Adım: Önce durdur (Eğer açıksa)
+    user_data[chat_id]["step"] = None
+    
+    # 1. Adım: Sadece numarayı onaylamak için açtığımız bağlantıyı nazikçe kapat (stop DEĞİL)
     if user_clients[session_name].is_connected:
-        await user_clients[session_name].stop()
+        await user_clients[session_name].disconnect()
 
-    # 2. Adım: Komutları Yükle
+    # 2. Adım: Motorun kilitlenmemesi (Terminated hatası) için bot objesini tertemiz yeniden kuruyoruz
+    user_clients[session_name] = Client(session_name, api_id=API_ID, api_hash=API_HASH)
+
+    # 3. Adım: Komutları bu temiz bota yüklüyoruz
     setup_userbot_handlers(user_clients[session_name])
 
-    # 3. Adım: Botu Başlat
+    # 4. Adım: Botu tam teşekküllü (mesaj dinleyecek şekilde) başlatıyoruz
     await user_clients[session_name].start()
     
     print(f"🚀 UserBot {session_name} aktif edildi!")
-    await client.edit_message_text(chat_id, main_msg_id, "<b>✅ Başarılı!</b>\nŞimdi herhangi bir sohbete <code>.alive</code> yazın.")
+    await client.edit_message_text(
+        chat_id, main_msg_id, 
+        "<b>🎉 Başarılı!</b>\n\n<code>UserBot aktif edildi. Şimdi herhangi bir sohbete .alive yazarak test edebilirsiniz.</code>"
+    )
 
 if __name__ == "__main__":
     print(f"--- {BOT_NAME} ÇALIŞIYOR ---")
