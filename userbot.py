@@ -110,9 +110,19 @@ async def reset_gpt_command(client, message):
 
 async def logout_userbot(client, message):
     await message.edit_text("<b>👋 Oturum kapatılıyor...</b>")
-    session_file = f"session_{message.from_user.id}.session"
-    if os.path.exists(session_file): os.remove(session_file)
+    chat_id = message.from_user.id
+    session_file = f"session_{chat_id}.session"
+    journal_file = f"session_{chat_id}.session-journal"
+    
+    if os.path.exists(session_file): 
+        try: os.remove(session_file)
+        except: pass
+    if os.path.exists(journal_file): 
+        try: os.remove(journal_file)
+        except: pass
+        
     await client.stop()
+
 
 
 # --- AFK SİSTEMİ HAFIZA ---
